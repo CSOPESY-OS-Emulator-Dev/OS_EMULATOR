@@ -1,9 +1,17 @@
-Locate Main.cpp and open Terminal Directory.
+## Locate Main.cpp and open Terminal Directory
+```bash
+C:\user\OS_EMULATOR
+```
 
-#Compile the program--
-Linux, run the command: g++ o- Main -I headers *.cpp
-Windows, run the command: g++ Main.cpp -o Main
-
-#Run the program--
-Linux, run the command: ./Main
-Windows, run the command: Main
+## Compile and Run in Linux
+Enter the following commands: 
+```bash
+g++ o- Main -I headers *.cpp
+./Main
+```
+## Compile and Run Windows--
+Enter the following commands: 
+```bash
+g++ Main.cpp -o Main
+Main
+```
