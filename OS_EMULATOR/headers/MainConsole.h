@@ -1,0 +1,16 @@
+#pragma once
+#include "AConsole.h"
+
+class MainConsole : public AConsole{
+public:
+    void draw() override;
+    void process(std::string input) override;
+    void initialize() override;
+    
+    MainConsole();
+    ~MainConsole();
+
+private:
+    std::vector<std::string> outputList;
+    std::vector<std::string> commandList;
+};

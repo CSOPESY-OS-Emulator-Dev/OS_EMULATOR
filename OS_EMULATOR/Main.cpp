@@ -14,7 +14,7 @@ int main()
 
     bool running = true;
     while(running) {
-        ConsoleManager::getInstance()->drawConsole();
+        ConsoleManager::getInstance()->draw();
         ConsoleManager::getInstance()->process();
 
         running = ConsoleManager::getInstance()->isRunning();
