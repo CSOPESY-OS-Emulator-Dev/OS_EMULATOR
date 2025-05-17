@@ -12,6 +12,6 @@ g++ o- Main -I headers *.cpp
 ## Compile and Run (Windows)
 Enter the following commands: 
 ```bash
-g++ Main.cpp -o Main
+g++ -o Main -I headers *.cpp 
 Main
 ```
