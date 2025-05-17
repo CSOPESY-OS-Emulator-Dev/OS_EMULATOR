@@ -9,7 +9,7 @@ Enter the following commands:
 g++ o- Main -I headers *.cpp
 ./Main
 ```
-## Compile and Run Windows--
+## Compile and Run Windows
 Enter the following commands: 
 ```bash
 g++ Main.cpp -o Main
