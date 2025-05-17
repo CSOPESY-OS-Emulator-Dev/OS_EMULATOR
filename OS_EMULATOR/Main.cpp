@@ -1,7 +1,7 @@
 // Main.cpp : This file contains the 'main' function. Program execution begins and ends there.
 /* CSOPESY DEVELOPERS:
  * DEMANALATA, ASHANTIE LOUIZE BACO
- * GONZALES, BRYANT KIMM CUSTODIO
+ * HILOMEN, GEO BRIAN
  * KINTANAR, KRISTIAN ANTHONY REMEDIOS
  * OLORES, SEAN ANDREI PAJARTIN
  */
@@ -20,3 +20,4 @@ int main()
         running = ConsoleManager::getInstance()->isRunning();
     }
 }
+ 
