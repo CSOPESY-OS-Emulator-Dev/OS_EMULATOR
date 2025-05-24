@@ -1,5 +1,6 @@
 #pragma once
 #include "AConsole.h"
+#include "ConsoleManager.h"
 
 class MainConsole : public AConsole{
 public:
@@ -13,4 +14,8 @@ public:
 private:
     std::vector<std::string> outputList;
     std::vector<std::string> commandList;
+
+    // Function prototype of available commands
+    void setScreen(std::string);
+    void redrawScreen(std::string);
 };

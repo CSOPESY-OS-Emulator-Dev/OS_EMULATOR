@@ -1,7 +1,10 @@
 #pragma once
 #include <unordered_map>
 #include <memory>
+#include <iomanip>
+#include <ctime>
 #include "MainConsole.h"
+#include "ProcessConsole.h"
 
 class ConsoleManager {
 public:
@@ -13,10 +16,14 @@ public:
 
     void draw() const;
     void process() const;
-    void switchConsole(std::string consoleName);
+    bool switchConsole(std::string consoleName);
+    void registerConsole(std::string consoleName);
     void returnToPreviousConsole();
 
     void setCursorPosition(int X, int Y) const;
+
+    // Temporary Function
+    std::string getFormattedCurrentTime();
     
     void exitApplication();
     bool isRunning() const;

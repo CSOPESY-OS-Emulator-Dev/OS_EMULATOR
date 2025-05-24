@@ -44,15 +44,27 @@ void ConsoleManager::process() const
 	this->currentConsole->process(input);
 }
 
-void ConsoleManager::switchConsole(std::string consoleName)
+void ConsoleManager::registerConsole(std::string consoleName)
+{
+	if (this->consoleTable.find(consoleName) == this->consoleTable.end()) {
+		this->consoleTable[consoleName] = std::make_shared<ProcessConsole>(consoleName, getFormattedCurrentTime());
+		switchConsole(consoleName);
+	} else {
+		switchConsole(consoleName);
+	}
+}
+
+bool ConsoleManager::switchConsole(std::string consoleName)
 {
 	if (this->consoleTable.find(consoleName) != this->consoleTable.end()) {
-		system("cls");
+		std::system("clear");
+    	std::system("cls");
 		this->previousConsole = this->currentConsole;
 		this->currentConsole = this->consoleTable[consoleName];
 		this->currentConsole->initialize();
+		return true;
 	} else {
-		std::cout << "Console " << consoleName << " does not exist." << std::endl;
+		return false;
 	}
 }
 
@@ -71,4 +83,15 @@ bool ConsoleManager::isRunning() const
 void ConsoleManager::exitApplication()
 {
     this->running = false;
+}
+
+// Temporary function
+
+std::string ConsoleManager::getFormattedCurrentTime() {
+    std::time_t now = std::time(nullptr);
+    std::tm* localTime = std::localtime(&now);  // For Windows use localtime_s
+
+    std::ostringstream oss;
+    oss << std::put_time(localTime, "%m/%d/%Y, %I:%M:%S %p");
+    return oss.str();
 }

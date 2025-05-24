@@ -22,7 +22,7 @@ void MainConsole::initialize()
     this->outputList.push_back(" DEMANALATA, ASHANTIE LOUIZE BACO \n HILOMEN, GEO BRIAN \n KINTANAR, KRISTIAN ANTHONY REMEDIOS \n OLORES, SEAN ANDREI PAJARTIN\n");
     this->outputList.push_back("===============================================================================================\n");
     this->outputList.push_back("These are the available commands :");
-    this->outputList.push_back("initialize, screen, scheduler-test, scheduler-stop, report-util, clear, and exit\n");
+    this->outputList.push_back("initialize\nscreen\nscreen -s <process name>\nscreen -r <process name>\nscheduler-test\nscheduler-stop\nreport-util\nclear\nexit\n");
 
 }
 
@@ -58,13 +58,23 @@ void MainConsole::draw()
 void MainConsole::process(std::string input) 
 {
     auto parsed = parseInput(input);
+
     this->outputList.push_back("C:\\> " + input);
     
     for(int i = 0; i < this->commandList.size(); i++) {
-        if(parsed.command == commandList[i]) {
+        if(parsed.command == commandList[i] && parsed.args.size() == 0) {
             this->outputList.push_back(input + " command recognized. Doing something.");
         }
     }
+
+    if(parsed.command == "screen" && parsed.args.size() == 2 && parsed.args[0] == "-s") {
+        setScreen(parsed.args[1]);
+    }
+
+    if(parsed.command == "screen" && parsed.args.size() == 2 && parsed.args[0] == "-r") {
+        redrawScreen(parsed.args[1]);
+    }
+
     if(parsed.command == "exit") {
         ConsoleManager::getInstance()->exitApplication();
     }
@@ -73,3 +83,17 @@ void MainConsole::process(std::string input)
     }
 }
 
+/*  The following are function definitions that executes each available commands
+    Note: Only function definitions of commands are implemented below
+*/
+
+void MainConsole::setScreen(std::string processName)
+{
+    ConsoleManager::getInstance()->registerConsole(processName);
+}
+
+void MainConsole::redrawScreen(std::string processName)
+{
+    if(ConsoleManager::getInstance()->switchConsole(processName));
+        this->outputList.push_back("Could not find " + processName + " console");
+}
