@@ -1,3 +1,4 @@
+here the instructions to follow:
 ## Locate Main.cpp and open Terminal Directory
 ```bash
 C:\user\OS_EMULATOR
