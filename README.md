@@ -1,10 +1,10 @@
-## NOTE!
+# NOTE!
 This branch has not completely integrated the scheduler implementation to the OS Emulator
-# In order to test the scheduler algorithm, run:
+## In order to test the scheduler algorithm, run:
 ```bash
   .\scheduler
 ```
-# Sample Run
+## Sample Run
 ```bash
 OS Scheduler started.
 Scheduler set to: FCFS
