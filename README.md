@@ -2,7 +2,7 @@
 This branch has not completely integrated the scheduler implementation to the OS Emulator
 ## In order to test the scheduler algorithm, run:
 ```bash
-  .\scheduler
+  ./scheduler
 ```
 ## Sample Run
 ```bash
