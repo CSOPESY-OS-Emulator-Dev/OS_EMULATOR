@@ -22,6 +22,8 @@ public:
     void assignProcess(std::shared_ptr<Process> process, int ticks);
     bool isOccupied() const;
 
+    std::string getProcess();
+    
 private:
     std::shared_ptr<Process> currentProcess; // The process currently assigned to this core
     bool occupied = false; // Indicates if the core is currently occupied by a process

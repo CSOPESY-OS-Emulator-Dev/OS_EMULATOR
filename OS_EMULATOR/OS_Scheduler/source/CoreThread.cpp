@@ -1,6 +1,6 @@
 #include "CoreThread.h"
 
-CoreThread::CoreThread(int id, int cpuCycle) : coreID(id), cpuCycle(cpuCycle + 1), cpuTicks(0), activeTicks(0), currentTicks(0) {
+CoreThread::CoreThread(int id, int cpuCycle) : coreID(id), cpuCycle(cpuCycle), cpuTicks(0), activeTicks(0), currentTicks(0) {
     this->currentProcess = nullptr; // Initialize current process to nullptr
     this->occupied = false; // Initially, the core is not occupied
 }
@@ -10,7 +10,7 @@ void CoreThread::run() {
     // A delay is introduced using a cpu cycle to control the execution speed.
     while (this->isRunning) {
         // If the core is occupied and the current process is set, check if it can execute
-        if (this->occupied && this->currentProcess && this->cpuTicks % this->cpuCycle == 0) {
+        if (this->occupied && this->currentProcess && this->cpuTicks % (this->cpuCycle + 1) == 0) {
             // Check if the process has finished executing
             if (this->currentProcess->getState() == FINISHED) {
                 // Push current process to finished processes in GlobalScheduler
@@ -19,8 +19,8 @@ void CoreThread::run() {
                 this->currentProcess = nullptr; // Clear the current process
                 this->currentTicks = 0; // Reset current ticks
             } else if (this->currentTicks <= 0) {
-                // Push current process back to scheduler in GlobalScheduler
-                GlobalScheduler::getInstance()->addProcess(this->currentProcess);
+                // Queue current process back to scheduler in GlobalScheduler
+                GlobalScheduler::getInstance()->queueProcess(this->currentProcess);
                 this->occupied = false; // Free the core
                 this->currentProcess = nullptr; // Clear the current process
                 this->currentTicks = 0; // Reset current ticks
@@ -28,6 +28,14 @@ void CoreThread::run() {
                 // If the process is still running and has ticks left, execute its instruction
                 this->currentProcess->executeInstruction(); // Execute the current process's instruction
                 this->currentTicks--; // Decrease the ticks for the current process
+                // log process execution for debugging
+                std::cout << "Core " << this->coreID 
+                          << " executed instruction for Process " 
+                          << this->currentProcess->getProcessID() 
+                          << " at CPU Tick: "
+                          << this->cpuTicks
+                          << ". Remaining ticks: " << this->currentTicks 
+                          << std::endl;
             } 
         }
         this->cpuTicks++;
@@ -54,4 +62,13 @@ void CoreThread::assignProcess(std::shared_ptr<Process> process, int ticks) {
 
 bool CoreThread::isOccupied() const {
     return this->occupied; // Return whether the core is currently occupied
+}
+
+std::string CoreThread::getProcess() {
+    // Return a string representation of the current process running on this core
+    return currentProcess->getProcessName() + "    " + 
+           currentProcess->getTimeRunning() + "    Core: " + 
+           std::to_string(this->coreID) + "    " + 
+           std::to_string(currentProcess->getCurrentLine()) + " / " + 
+           std::to_string(currentProcess->getTotalIntstruction());
 }
