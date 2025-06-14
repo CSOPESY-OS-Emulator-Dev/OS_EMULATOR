@@ -98,11 +98,21 @@ Process::Process(std::string name, int id)
 
 std::string Process::getFormattedCurrentTime()
 {
-    std::time_t now = std::time(nullptr);
-    std::tm *localTime = std::localtime(&now); // For Windows use localtime_s
+    using namespace std::chrono;
 
+    // Get current time
+    auto now = system_clock::now();
+    auto in_time_t = system_clock::to_time_t(now);
+    auto ms = duration_cast<milliseconds>(now.time_since_epoch()) % 1000;
+
+    // Convert to local time
+    std::tm* localTime = std::localtime(&in_time_t); // Use localtime_s on Windows
+
+    // Format the output
     std::ostringstream oss;
-    oss << "(" << std::put_time(localTime, "%m/%d/%Y, %I:%M:%S %p") << ")";
+    oss << "(" << std::put_time(localTime, "%m/%d/%Y, %I:%M:%S")
+        << '.' << std::setw(3) << std::setfill('0') << ms.count()
+        << ' ' << std::put_time(localTime, "%p") << ")";
     return oss.str();
 }
 
