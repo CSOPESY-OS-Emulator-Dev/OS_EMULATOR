@@ -7,6 +7,7 @@ void Process::executeInstruction()
     {
         // Simulate executing an instruction
         this->instructionList[this->currentInstruction]->execute(*this, getFormattedCurrentTime(), coreID);
+        this->writeToTxtFile(); // Write the process log to a text file
 
         // Increment the current instruction line
         this->currentInstruction++;
@@ -16,7 +17,6 @@ void Process::executeInstruction()
             // If the current instruction exceeds total instructions, set state to FINISHED
             this->setState(FINISHED);
             this->timeFinished = getFormattedCurrentTime();
-            this->writeToTxtFile(); // Write the process log to a text file
         }
     }
 }
