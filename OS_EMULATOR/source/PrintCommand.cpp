@@ -27,5 +27,5 @@ void PrintCommand::execute(Process& process, std::string timeExecuted, int coreI
         msg << "0";
     }
     // Append the message to the process's output log
-    process.outputLog->push_back(timeExecuted + " Core: " + std::to_string(coreID) + " \"" + msg.str() + "\"");
+    process.outputLog->push_back(timeExecuted + " Core:" + std::to_string(coreID) + " \"" + msg.str() + "\"");
 }
