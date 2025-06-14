@@ -77,7 +77,8 @@ Process::Process(std::string name, int id) {
     this->currentInstruction = 0;
 
     this->currentState = READY;
-    this->coreID = -1; // Default core ID, indicating no core assigned yet
+    this->coreID = -1; // Default core ID, indicating no core assigned yet 
+    writeToTxtFile();
 }
 
 std::string Process::getFormattedCurrentTime() {
@@ -91,15 +92,31 @@ std::string Process::getFormattedCurrentTime() {
 
 Process::~Process() {}
 
-void Process::writeToTxtFile() // call it, maybe? process1Logs 
+void Process::writeToTxtFile() 
 {
-    std::ofstream MyFile(name);
+    // Create a text file with the process name
+    std::string filename = name + ".txt";
+    std::ofstream MyFile(filename);
 
-    MyFile << "Process: " << name ; // change variable to what 
-    MyFile << "\nLogs: \n\n";
+    // Check if the file was opened successfully
+    if (!MyFile.is_open()) {
+        std::cerr << "Error opening file: " << filename << std::endl;
+        return;
+    }
 
-    for(){ 
-        MyFile << outputLog; 
+    // Write the process name and logs to the file
+    MyFile << "Process name: " << name << "\n" ; // change variable to what 
+
+    // Write each log entry to the file
+    if (outputLog->empty()) {
+        MyFile << "No logs available.\n";
+    } else {
+        MyFile << "Logs:\n\n";
+    }
+
+    // Iterate through the output log and write each entry
+    for(const auto& outputLog : *outputLog) { 
+        MyFile << outputLog << "\n"; 
     }
 
     MyFile.close();
