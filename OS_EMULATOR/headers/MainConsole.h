@@ -20,5 +20,5 @@ private:
     void redrawScreen(std::string);
 
     // New functions
-    void showProcessess();
+    void showProcesses();
 };

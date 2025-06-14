@@ -2,7 +2,7 @@
 
 ProcessConsole::ProcessConsole(std::string processName, std::string timeCreated) : AConsole(processName)
 {
-    this-> currentProcess = std::make_shared<Process>(processName, 0, 20); // Change to existing process
+    this-> currentProcess = GlobalScheduler::getInstance()->getProcessByName(processName); // Change to existing process
 
     this->processName = processName;
     this->processID = this->currentProcess->processID;
@@ -65,7 +65,7 @@ void ProcessConsole::initialize()
         this->outputList.push_back("\nFinished!\n");
     } else {
         this->outputList.push_back("\nCurrent Instruction Line: " + std::to_string(this->currentProcess->currentInstruction));
-        this->outputList.push_back("Lines of code: " + std::to_string(this->currentProcess->totalInstructions) + '\n');
+        this->outputList.push_back("Lines of code: " + std::to_string(this->currentProcess->instructionCount) + '\n');
     }
 }
 

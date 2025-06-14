@@ -74,9 +74,9 @@ void GlobalScheduler::setScheduler(std::string schedulerAlgorithm) {
     auto it = schedulerAlgorithms.find(schedulerAlgorithm);
     if (it != schedulerAlgorithms.end()) {
         currentScheduler = it->second;
-        std::cout << "Scheduler set to: " << schedulerAlgorithm << std::endl;
+        // std::cout << "Scheduler set to: " << schedulerAlgorithm << std::endl;
     } else {
-        std::cerr << "Scheduler algorithm not found: " << schedulerAlgorithm << std::endl;
+        // std::cerr << "Scheduler algorithm not found: " << schedulerAlgorithm << std::endl;
     }
 }
 

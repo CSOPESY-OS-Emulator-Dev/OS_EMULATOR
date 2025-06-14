@@ -21,7 +21,7 @@ void AScheduler::run() {
 void AScheduler::stop() {
     // Stop the scheduler thread
     isRunning = false; // Set the running flag to false
-    std::cout << "Scheduler stopped." << std::endl;
+    // std::cout << "Scheduler stopped." << std::endl;
 }
 
 void AScheduler::addProcess(std::shared_ptr<Process> process) {

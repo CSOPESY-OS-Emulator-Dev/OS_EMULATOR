@@ -29,13 +29,13 @@ void CoreThread::run() {
                 this->currentProcess->executeInstruction(); // Execute the current process's instruction
                 this->currentTicks--; // Decrease the ticks for the current process
                 // log process execution for debugging
-                std::cout << "Core " << this->coreID 
-                          << " executed instruction for Process " 
-                          << this->currentProcess->getProcessID() 
-                          << " at CPU Tick: "
-                          << this->cpuTicks
-                          << ". Remaining ticks: " << this->currentTicks 
-                          << std::endl;
+                // std::cout << "Core " << this->coreID 
+                //           << " executed instruction for Process " 
+                //           << this->currentProcess->getProcessID() 
+                //           << " at CPU Tick: "
+                //           << this->cpuTicks
+                //           << ". Remaining ticks: " << this->currentTicks 
+                //           << std::endl;
             } 
         }
         this->cpuTicks++;
@@ -45,7 +45,7 @@ void CoreThread::run() {
 
 void CoreThread::stop() {
     this->isRunning = false; // Stop the core thread
-    std::cout << "Core " << this->coreID << " stopped." << std::endl; // Log the stop action
+    // std::cout << "Core " << this->coreID << " stopped." << std::endl; // Log the stop action
 }
 
 void CoreThread::assignProcess(std::shared_ptr<Process> process, int ticks) {
@@ -57,7 +57,7 @@ void CoreThread::assignProcess(std::shared_ptr<Process> process, int ticks) {
     this->currentTicks = ticks;
     this->occupied = true;
     
-    std::cout << "Process " << this->currentProcess->getProcessID() << " assigned to Core " << this->coreID << " with " << ticks << " ticks." << std::endl;
+    // std::cout << "Process " << this->currentProcess->getProcessID() << " assigned to Core " << this->coreID << " with " << ticks << " ticks." << std::endl;
 }
 
 bool CoreThread::isOccupied() const {
