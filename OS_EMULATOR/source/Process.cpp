@@ -1,5 +1,6 @@
 #include "Process.h"
 
+
 void Process::executeInstruction(){
     // Check if the current instruction is within the total instructions
     if (this->currentInstruction < this->instructionCount) {
@@ -89,3 +90,17 @@ std::string Process::getFormattedCurrentTime() {
 }
 
 Process::~Process() {}
+
+void Process::writeToTxtFile() // call it, maybe? process1Logs 
+{
+    std::ofstream MyFile(name);
+
+    MyFile << "Process: " << name ; // change variable to what 
+    MyFile << "\nLogs: \n\n";
+
+    for(){ 
+        MyFile << outputLog; 
+    }
+
+    MyFile.close();
+}

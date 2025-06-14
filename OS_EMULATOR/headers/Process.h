@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <memory>
 #include <vector>
 #include <unordered_map>
@@ -8,14 +9,16 @@
 #include <ctime>
 #include "ICommand.h"
 
-enum state {
+enum state
+{
     READY,
     RUNNING,
     WAITING,
     FINISHED
 };
 
-class Process {
+class Process
+{
 public:
     void executeInstruction();
 
@@ -41,6 +44,7 @@ public:
 
     friend class ProcessConsole;
     friend class PrintCommand;
+
 private:
     std::string getFormattedCurrentTime();
 
@@ -54,7 +58,7 @@ private:
     std::string timeRunning;
     std::string timeFinished;
     std::string name;
-    
+
     int processID;
     int coreID;
 
@@ -62,4 +66,6 @@ private:
     int currentInstruction;
 
     state currentState;
+
+    void writeToTxtFile(); // call it, maybe? process1Logs
 };

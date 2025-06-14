@@ -20,6 +20,7 @@ public:
     ICommand(int pid, CommandType commandType);
     // Get Command Type
     CommandType getCommandType() const;
+    
     // Execute the command. This method should be implemented by derived classes to define the command's behavior.
     virtual void execute(Process& process, std::string timeExecuted, int coreID) = 0;
 protected:

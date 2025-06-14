@@ -8,8 +8,8 @@ GlobalScheduler* GlobalScheduler::sharedInstance = nullptr;
 GlobalScheduler::GlobalScheduler()
 {
     // initialize scheduler algorithms
-    schedulerAlgorithms["FCFS"] = std::make_shared<FCFSScheduler>();
-    //schedulerAlgorithms["RR"] = std::make_shared<AScheduler>();
+    schedulerAlgorithms["fcfs"] = std::make_shared<FCFSScheduler>();
+    //schedulerAlgorithms["rr"] = std::make_shared<AScheduler>();
     currentScheduler = nullptr; // No scheduler set initially
 }
 
