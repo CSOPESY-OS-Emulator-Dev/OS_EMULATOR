@@ -19,7 +19,7 @@ public:
     void runCores();
     void initializeCores(int numCores, int cpuCycle);
     void runScheduler();
-    void setScheduler(std::string schedulerAlgorithm);
+    void setScheduler(std::string schedulerAlgorithm, int quantumCycles);
 
     // Create a new process
     void createProcess(std::string processName);

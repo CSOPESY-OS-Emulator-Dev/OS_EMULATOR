@@ -15,7 +15,8 @@ enum state
     READY,
     RUNNING,
     WAITING,
-    FINISHED
+    FINISHED,
+    SLEEPING
 };
 
 class Process

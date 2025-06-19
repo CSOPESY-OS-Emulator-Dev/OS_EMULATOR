@@ -60,6 +60,11 @@ std::shared_ptr<Process> SchedulerTestThread::createProcess(std::string processN
 
 std::shared_ptr<ICommand> SchedulerTestThread::createInstruction(CommandType commandType, std::string processName, int id) {
     // Create a random instruction of the specified command type
+    // Get a random number from 1-3
+
+
+    // Get a random number from 0-65535
+
     switch (commandType) {
         case PRINT:
             return std::make_shared<PrintCommand>(id, "Hello world from " + processName); // Assuming 0 is the PID for the test

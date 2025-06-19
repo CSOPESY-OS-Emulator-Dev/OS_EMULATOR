@@ -69,11 +69,12 @@ void GlobalScheduler::runScheduler() {
     currentScheduler->start();
 }
 
-void GlobalScheduler::setScheduler(std::string schedulerAlgorithm) {
+void GlobalScheduler::setScheduler(std::string schedulerAlgorithm, int quantumCycles) {
     // Set the current scheduler based on the provided algorithm name
     auto it = schedulerAlgorithms.find(schedulerAlgorithm);
     if (it != schedulerAlgorithms.end()) {
         currentScheduler = it->second;
+        currentScheduler->setQuantumCycles(quantumCycles); // Set quantum cycles if applicable
         // std::cout << "Scheduler set to: " << schedulerAlgorithm << std::endl;
     } else {
         // std::cerr << "Scheduler algorithm not found: " << schedulerAlgorithm << std::endl;

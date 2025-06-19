@@ -12,6 +12,7 @@ public:
     ~MainConsole();
 
 private:
+    bool isinitialized = false;
     std::vector<std::string> outputList;
     std::vector<std::string> commandList;
 
@@ -21,4 +22,5 @@ private:
 
     // New functions
     void showProcesses();
+    void initializeOS();
 };

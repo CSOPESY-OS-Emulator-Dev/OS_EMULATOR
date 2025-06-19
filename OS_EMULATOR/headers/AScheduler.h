@@ -19,6 +19,8 @@ public:
     // Add a process to the scheduler's queue
     void addProcess(std::shared_ptr<Process> process);
 
+    void setQuantumCycles(int cycles);
+
 protected:
     // Queue of processes to be scheduled
     std::vector<std::shared_ptr<Process>> ReadyQueue;
@@ -28,4 +30,5 @@ protected:
     mutable std::mutex queueMutex; 
 private:
     bool isRunning = true; // Flag to control the scheduler's execution loop
+    int quantumCycles = 0; // Quantum cycles for time-slicing in round robin preemptive scheduling
 };

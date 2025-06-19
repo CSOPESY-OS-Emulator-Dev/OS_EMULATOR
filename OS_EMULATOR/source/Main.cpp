@@ -18,7 +18,7 @@ int main()
     // set up cores and scheduler
     GlobalScheduler::getInstance()->initializeCores(4, 4);
     GlobalScheduler::getInstance()->runCores();
-    GlobalScheduler::getInstance()->setScheduler("fcfs"); 
+    GlobalScheduler::getInstance()->setScheduler("fcfs", 4); 
     // GlobalScheduler::getInstance()->setScheduler("rr"); 
 
     // Initialize process generation

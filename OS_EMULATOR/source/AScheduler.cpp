@@ -31,3 +31,9 @@ void AScheduler::addProcess(std::shared_ptr<Process> process) {
     std::lock_guard<std::mutex> lock(queueMutex); // Lock the queue to ensure thread safety
     this->ReadyQueue.push_back(process); // Add the process to the ready queue
 }
+
+void AScheduler::setQuantumCycles(int cycles) {
+    // Set the quantum cycles for time-slicing in round robin preemptive scheduling
+    this->quantumCycles = cycles;
+    // std::cout << "Quantum cycles set to: " << cycles << std::endl;
+}

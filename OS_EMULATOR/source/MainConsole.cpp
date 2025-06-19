@@ -53,16 +53,22 @@ void MainConsole::process(std::string input)
 
     this->outputList.push_back("C:\\> " + input);
 
-    if(parsed.command == "screen" && parsed.args.size() == 2 && parsed.args[0] == "-s") {
+    if(parsed.command == "screen" && parsed.args.size() == 2 && parsed.args[0] == "-s" && isinitialized) {
         setScreen(parsed.args[1]);
     }
-    if(parsed.command == "screen" && parsed.args.size() == 2 && parsed.args[0] == "-r") {
+    if(parsed.command == "screen" && parsed.args.size() == 2 && parsed.args[0] == "-r" && isinitialized) {
         redrawScreen(parsed.args[1]);
     }
-    if(parsed.command == "screen" && parsed.args.size() == 1 && parsed.args[0] == "-ls") {
+    if(parsed.command == "screen" && parsed.args.size() == 1 && parsed.args[0] == "-ls" && isinitialized) {
         showProcesses();
     }
-
+    // Call remaining function commands here
+    if(parsed.command == "initialize"){
+        isinitialized = true;
+        initializeOS();
+        this->outputList.push_back("Console Initialized");
+        //.read file 
+    }
     if(parsed.command == "exit") {
         ConsoleManager::getInstance()->exitApplication();
     }
@@ -71,6 +77,50 @@ void MainConsole::process(std::string input)
     }
 }
 
+void MainConsole::initializeOS(){
+    std::ifstream file("Config.txt");
+
+    int num_cpu, quantum_cycles, batch_process_freq, min_ins, max_ins, delays_per_exec;
+    std::string scheduler, input;
+    
+    file >> input;
+    if (input == "num_cpu"){
+        file >> num_cpu;
+    }
+
+    file >> input;
+    if (input == "quantum_cycles"){
+        file >> quantum_cycles;
+    }
+
+    file >> input;
+    if (input == "batch_process_freq"){
+        file >> batch_process_freq;
+    }
+
+
+    file >> input;
+    if (input == "min_ins"){
+        file >> min_ins;
+    }
+
+    file >> input;
+    if (input == "max_ins"){
+        file >> max_ins;
+    }
+
+    file >> input;
+    if (input == "delays_per_exec"){
+        file >> delays_per_exec;
+    }
+
+    file >> input;
+    if (input == "scheduler"){
+        file >> scheduler;
+    }
+
+    // Need error checking in config file
+}
 /*  The following are function definitions that executes each available commands
     Note: Only function definitions of commands are implemented below
 */
