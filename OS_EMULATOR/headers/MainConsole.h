@@ -18,4 +18,7 @@ private:
     // Function prototype of available commands
     void setScreen(std::string);
     void redrawScreen(std::string);
+
+    // New functions
+    void showProcesses();
 };

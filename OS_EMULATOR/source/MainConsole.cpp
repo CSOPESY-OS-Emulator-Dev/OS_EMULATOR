@@ -1,5 +1,6 @@
 #include "MainConsole.h"
 #include "ConsoleManager.h"
+#include "GlobalScheduler.h"
 
 void MainConsole::initialize()
 {
@@ -29,15 +30,6 @@ void MainConsole::initialize()
 MainConsole::MainConsole() : AConsole("MAIN_CONSOLE")
 {
     initialize();
-
-    // Initialize Commands
-    this->commandList.push_back("initialize");
-    this->commandList.push_back("screen");
-    this->commandList.push_back("scheduler-test");
-    this->commandList.push_back("scheduler-stop");
-    this->commandList.push_back("report-util");
-    this->commandList.push_back("clear");
-    this->commandList.push_back("exit");
 }
 
 MainConsole::~MainConsole()
@@ -60,19 +52,15 @@ void MainConsole::process(std::string input)
     auto parsed = parseInput(input);
 
     this->outputList.push_back("C:\\> " + input);
-    
-    for(int i = 0; i < this->commandList.size(); i++) {
-        if(parsed.command == commandList[i] && parsed.args.size() == 0) {
-            this->outputList.push_back(input + " command recognized. Doing something.");
-        }
-    }
 
     if(parsed.command == "screen" && parsed.args.size() == 2 && parsed.args[0] == "-s") {
         setScreen(parsed.args[1]);
     }
-
     if(parsed.command == "screen" && parsed.args.size() == 2 && parsed.args[0] == "-r") {
         redrawScreen(parsed.args[1]);
+    }
+    if(parsed.command == "screen" && parsed.args.size() == 1 && parsed.args[0] == "-ls") {
+        showProcesses();
     }
 
     if(parsed.command == "exit") {
@@ -96,4 +84,27 @@ void MainConsole::redrawScreen(std::string processName)
 {
     if(ConsoleManager::getInstance()->switchConsole(processName));
         this->outputList.push_back("Could not find " + processName + " console");
+}
+
+void MainConsole::showProcesses()
+{
+    this->outputList.push_back("------------------------------------");
+    this->outputList.push_back("Running Processes:");
+    if (GlobalScheduler::getInstance()->getRunningProcesses().empty()) {
+        this->outputList.push_back("No running processes.\n");
+    } else {
+        for (auto& string : GlobalScheduler::getInstance()->getRunningProcesses()) {
+            this->outputList.push_back(string);
+        }
+    }
+    // Print finished processes 
+    this->outputList.push_back("\nFinished Processes:");
+    if (GlobalScheduler::getInstance()->getFinishedProcesses().empty()) {
+        this->outputList.push_back("No finished processes.\n");
+    } else {
+        for (auto& string : GlobalScheduler::getInstance()->getFinishedProcesses()) {
+            this->outputList.push_back(string);
+        }
+    }
+    this->outputList.push_back("------------------------------------\n");
 }

@@ -2,6 +2,7 @@
 #include "AConsole.h"
 #include "Process.h"
 #include "ConsoleManager.h"
+#include "GlobalScheduler.h"
 
 class ProcessConsole : public AConsole {
 public:
