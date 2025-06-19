@@ -7,7 +7,7 @@ void Process::executeInstruction()
     {
         // Simulate executing an instruction
         this->instructionList[this->currentInstruction]->execute(*this, getFormattedCurrentTime(), coreID);
-        this->writeToTxtFile(); // Write the process log to a text file
+        // this->writeToTxtFile(); // Write the process log to a text file
 
         // Increment the current instruction line
         this->currentInstruction++;
