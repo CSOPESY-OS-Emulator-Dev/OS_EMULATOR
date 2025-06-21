@@ -69,7 +69,6 @@ void MainConsole::process(std::string input)
     } else if(parsed.command == "initialize"){
         isinitialized = true;
         initializeOS();
-        this->outputList.push_back("Console Initialized");
     }
     else{
         this->outputList.push_back("Please initialize the operating system.");
@@ -85,47 +84,106 @@ void MainConsole::process(std::string input)
 
 void MainConsole::initializeOS(){
     std::ifstream file("Config.txt");
-
+    bool isValid = true;
     int num_cpu, quantum_cycles, batch_process_freq, min_ins, max_ins, delays_per_exec;
     std::string scheduler, input;
+    this->outputList.push_back("------------------------------------");
     
     file >> input;
     if (input == "num_cpu"){
         file >> num_cpu;
+        if(num_cpu >= 1 && num_cpu <= 128){
+            this->outputList.push_back("num_cpu : " + std::to_string(num_cpu));
+        }else{
+            this->outputList.push_back("num_cpu : Invalid config");
+            isinitialized = false;
+            isValid=false;
+        }
+    }
+    file >> input;
+    if (input == "scheduler"){
+        file >> scheduler;
+        if(scheduler == "rr" || scheduler == "fcfs"){
+            this->outputList.push_back("scheduler : " + scheduler);
+        }else{
+            this->outputList.push_back("scheduler : Not supported Scheduling");
+            isinitialized = false;
+            isValid=false;
+        }
     }
 
     file >> input;
     if (input == "quantum_cycles"){
         file >> quantum_cycles;
+        if(quantum_cycles >= 1 && quantum_cycles <= 4294967296u){
+            this->outputList.push_back("quantum_cycles : " + std::to_string(quantum_cycles));
+        }else{
+            this->outputList.push_back("quantum_cycles : Invalid config");
+            isinitialized = false;
+            isValid=false;
+        }
     }
 
     file >> input;
     if (input == "batch_process_freq"){
         file >> batch_process_freq;
+        if(batch_process_freq >= 1 && batch_process_freq <= 4294967296u){
+            this->outputList.push_back("batch_process_freq : " + std::to_string(batch_process_freq));
+        }else{
+            this->outputList.push_back("batch_process_freq : Invalid config");
+            isinitialized = false;
+            isValid=false;
+        }
     }
-
 
     file >> input;
     if (input == "min_ins"){
         file >> min_ins;
+        if(min_ins >= 1 && min_ins <= 4294967296u){
+            this->outputList.push_back("min_ins : " + std::to_string(min_ins));
+        }else{
+            this->outputList.push_back("min_ins : Invalid config");
+            isinitialized = false;
+            isValid=false;
+        }
     }
 
     file >> input;
     if (input == "max_ins"){
         file >> max_ins;
+        if(max_ins >= 1 && max_ins <= 4294967296u){
+            this->outputList.push_back("max_ins : " + std::to_string(max_ins));
+        }else{
+            this->outputList.push_back("max_ins : Invalid config");
+            isinitialized = false;
+            isValid=false;
+        }
     }
 
     file >> input;
     if (input == "delays_per_exec"){
         file >> delays_per_exec;
+        if(delays_per_exec >= 0 && delays_per_exec <= 4294967296u){
+            this->outputList.push_back("delays_per_exec : " + std::to_string(delays_per_exec));
+        }else{
+            this->outputList.push_back("delays_per_exec : Invalid config");
+            isinitialized = false;
+            isValid=false;
+        }
     }
 
-    file >> input;
-    if (input == "scheduler"){
-        file >> scheduler;
-    }
+    
+    this->outputList.push_back("------------------------------------");
 
-    // Need error checking in config file
+    if(isValid){
+        GlobalScheduler::getInstance()->initializeCores(num_cpu,delays_per_exec);
+        GlobalScheduler::getInstance()->setScheduler(scheduler,quantum_cycles);
+        GlobalScheduler::getInstance()->initializeProcessGeneration(batch_process_freq,min_ins,max_ins);
+        this->outputList.push_back("OS Initialized");    
+    }else{
+        this->outputList.push_back("Invalid Config");
+    }
+    // need running the system
 }
 /*  The following are function definitions that executes each available commands
     Note: Only function definitions of commands are implemented below
