@@ -24,7 +24,6 @@ void MainConsole::initialize()
     this->outputList.push_back("===============================================================================================\n");
     this->outputList.push_back("These are the available commands :");
     this->outputList.push_back("initialize\nscreen\nscreen -s <process name>\nscreen -r <process name>\nscheduler-test\nscheduler-stop\nreport-util\nclear\nexit\n");
-
 }
 
 MainConsole::MainConsole() : AConsole("MAIN_CONSOLE")
@@ -34,88 +33,105 @@ MainConsole::MainConsole() : AConsole("MAIN_CONSOLE")
 
 MainConsole::~MainConsole()
 {
-
 }
 
 void MainConsole::draw()
 {
-    //Linux
+    // Linux
     std::system("clear");
     std::system("cls");
-    for(int i = 0; i < this->outputList.size(); i++){
+    for (int i = 0; i < this->outputList.size(); i++)
+    {
         std::cout << this->outputList[i] << std::endl;
     }
 }
 
-void MainConsole::process(std::string input) 
+void MainConsole::process(std::string input)
 {
     auto parsed = parseInput(input);
 
     this->outputList.push_back("C:\\> " + input);
 
-    if(parsed.command == "screen" && parsed.args.size() == 2 && parsed.args[0] == "-s" && isinitialized) {
+    if (parsed.command == "screen" && parsed.args.size() == 2 && parsed.args[0] == "-s" && isinitialized)
+    {
         setScreen(parsed.args[1]);
     }
-    if(parsed.command == "screen" && parsed.args.size() == 2 && parsed.args[0] == "-r" && isinitialized) {
+    if (parsed.command == "screen" && parsed.args.size() == 2 && parsed.args[0] == "-r" && isinitialized)
+    {
         redrawScreen(parsed.args[1]);
     }
-    if(parsed.command == "screen" && parsed.args.size() == 1 && parsed.args[0] == "-ls" && isinitialized) {
+    if (parsed.command == "screen" && parsed.args.size() == 1 && parsed.args[0] == "-ls" && isinitialized)
+    {
         showProcesses();
     }
     // Call remaining function commands here
-    if(parsed.command == "initialize"){
+    if (parsed.command == "initialize")
+    {
         isinitialized = true;
         initializeOS();
         this->outputList.push_back("Console Initialized");
-        //.read file 
+        //.read file
     }
-    if(parsed.command == "exit") {
+    if (parsed.command == "report-util")
+    {
+        reportUtil();
+    }
+    if (parsed.command == "exit")
+    {
         ConsoleManager::getInstance()->exitApplication();
     }
-    if(parsed.command == "clear") {
+    if (parsed.command == "clear")
+    {
         initialize();
     }
 }
 
-void MainConsole::initializeOS(){
+void MainConsole::initializeOS()
+{
     std::ifstream file("Config.txt");
 
     int num_cpu, quantum_cycles, batch_process_freq, min_ins, max_ins, delays_per_exec;
     std::string scheduler, input;
-    
+
     file >> input;
-    if (input == "num_cpu"){
+    if (input == "num_cpu")
+    {
         file >> num_cpu;
     }
 
     file >> input;
-    if (input == "quantum_cycles"){
+    if (input == "quantum_cycles")
+    {
         file >> quantum_cycles;
     }
 
     file >> input;
-    if (input == "batch_process_freq"){
+    if (input == "batch_process_freq")
+    {
         file >> batch_process_freq;
     }
 
-
     file >> input;
-    if (input == "min_ins"){
+    if (input == "min_ins")
+    {
         file >> min_ins;
     }
 
     file >> input;
-    if (input == "max_ins"){
+    if (input == "max_ins")
+    {
         file >> max_ins;
     }
 
     file >> input;
-    if (input == "delays_per_exec"){
+    if (input == "delays_per_exec")
+    {
         file >> delays_per_exec;
     }
 
     file >> input;
-    if (input == "scheduler"){
+    if (input == "scheduler")
+    {
         file >> scheduler;
     }
 
@@ -132,29 +148,93 @@ void MainConsole::setScreen(std::string processName)
 
 void MainConsole::redrawScreen(std::string processName)
 {
-    if(ConsoleManager::getInstance()->switchConsole(processName));
-        this->outputList.push_back("Could not find " + processName + " console");
+    if (ConsoleManager::getInstance()->switchConsole(processName))
+        ;
+    this->outputList.push_back("Could not find " + processName + " console");
 }
 
 void MainConsole::showProcesses()
 {
     this->outputList.push_back("------------------------------------");
+
+    // Print running processes
     this->outputList.push_back("Running Processes:");
-    if (GlobalScheduler::getInstance()->getRunningProcesses().empty()) {
+    if (GlobalScheduler::getInstance()->getRunningProcesses().empty())
+    {
         this->outputList.push_back("No running processes.\n");
-    } else {
-        for (auto& string : GlobalScheduler::getInstance()->getRunningProcesses()) {
+    }
+    else
+    {
+        for (auto &string : GlobalScheduler::getInstance()->getRunningProcesses())
+        {
             this->outputList.push_back(string);
         }
     }
-    // Print finished processes 
+    // Print finished processes
     this->outputList.push_back("\nFinished Processes:");
-    if (GlobalScheduler::getInstance()->getFinishedProcesses().empty()) {
+    if (GlobalScheduler::getInstance()->getFinishedProcesses().empty())
+    {
         this->outputList.push_back("No finished processes.\n");
-    } else {
-        for (auto& string : GlobalScheduler::getInstance()->getFinishedProcesses()) {
+    }
+    else
+    {
+        for (auto &string : GlobalScheduler::getInstance()->getFinishedProcesses())
+        {
             this->outputList.push_back(string);
         }
     }
     this->outputList.push_back("------------------------------------\n");
+}
+
+void MainConsole::reportUtil()
+{
+    std::ofstream out("csopesy-log.txt");
+    if (!out.is_open())
+    {
+        std::cout << "Failed to open log file.\n";
+        return;
+    }
+
+    auto scheduler = GlobalScheduler::getInstance();
+
+    // Add CPU info at the top
+    out << scheduler->getCPUUtilization();
+    out << scheduler->getCoresUsed();
+    out << scheduler->getCoresAvailable();
+    out << "\n------------------------------------\n";
+
+    // Running Processes
+    out << "Running Processes:\n";
+    auto running = scheduler->getRunningProcesses();
+    if (running.empty())
+    {
+        out << "No running processes.\n";
+    }
+    else
+    {
+        for (const auto &line : running)
+        {
+            out << line << "\n";
+        }
+    }
+
+    // Finished Processes
+    out << "Finished Processes:\n";
+    auto finished = scheduler->getFinishedProcesses();
+    if (finished.empty())
+    {
+        out << "No finished processes.\n";
+    }
+    else
+    {
+        for (const auto &line : finished)
+        {
+            out << line << "\n";
+        }
+    }
+
+    out << "------------------------------------\n";
+    out.close();
+
+    std::cout << "Report generated at C:/csopesy-log.txt!\n";
 }
