@@ -53,22 +53,28 @@ void MainConsole::process(std::string input)
 
     this->outputList.push_back("C:\\> " + input);
 
-    if(parsed.command == "screen" && parsed.args.size() == 2 && parsed.args[0] == "-s" && isinitialized) {
+    if(isinitialized){
+        if(parsed.command == "screen" && parsed.args.size() == 2 && parsed.args[0] == "-s" ) {
         setScreen(parsed.args[1]);
-    }
-    if(parsed.command == "screen" && parsed.args.size() == 2 && parsed.args[0] == "-r" && isinitialized) {
-        redrawScreen(parsed.args[1]);
-    }
-    if(parsed.command == "screen" && parsed.args.size() == 1 && parsed.args[0] == "-ls" && isinitialized) {
-        showProcesses();
-    }
-    // Call remaining function commands here
-    if(parsed.command == "initialize"){
+        }
+        if(parsed.command == "screen" && parsed.args.size() == 2 && parsed.args[0] == "-r" ) {
+            redrawScreen(parsed.args[1]);
+        }
+        if(parsed.command == "screen" && parsed.args.size() == 1 && parsed.args[0] == "-ls" ) {
+            showProcesses();
+        }
+        if (parsed.command == "initialize" && isinitialized){
+        this->outputList.push_back("The operating system is already initialized");
+        }
+    } else if(parsed.command == "initialize"){
         isinitialized = true;
         initializeOS();
         this->outputList.push_back("Console Initialized");
-        //.read file 
     }
+    else{
+        this->outputList.push_back("Please initialize the operating system.");
+    }
+
     if(parsed.command == "exit") {
         ConsoleManager::getInstance()->exitApplication();
     }
@@ -132,8 +138,9 @@ void MainConsole::setScreen(std::string processName)
 
 void MainConsole::redrawScreen(std::string processName)
 {
-    if(ConsoleManager::getInstance()->switchConsole(processName));
+    if(ConsoleManager::getInstance()->switchConsole(processName)){
         this->outputList.push_back("Could not find " + processName + " console");
+    }
 }
 
 void MainConsole::showProcesses()
