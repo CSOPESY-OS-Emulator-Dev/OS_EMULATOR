@@ -13,10 +13,6 @@ void SchedulerTestThread::run() {
             auto process = createProcess("Process_" + std::to_string(processCount));
             // Assign new process to scheduler
             assignToScheduler(process);
-            // Log process creation
-            std::cout << "Created Process: " << process->getProcessName() 
-                      << " with ID: " << process->getProcessID() 
-                      << " at CPU Tick: " << cpuTick << std::endl;
         }
         // Sleep for the specified CPU cycle duration
         IETThread::sleep(10); // Sleep for a short duration to avoid busy waiting

@@ -68,9 +68,11 @@ void MainConsole::process(std::string input)
         }
         if (parsed.command == "scheduler-start"){
             GlobalScheduler::getInstance()->startProcessGeneration();
+            this->outputList.push_back("start");
         }
         if (parsed.command == "scheduler-stop"){
             GlobalScheduler::getInstance()->stopProcessGeneration();
+            this->outputList.push_back("stop");
         }
     } else if(parsed.command == "initialize"){
         isinitialized = true;
@@ -184,11 +186,12 @@ void MainConsole::initializeOS(){
 
     if(isValid){
         GlobalScheduler::getInstance()->initializeCores(num_cpu,delays_per_exec);
+        GlobalScheduler::getInstance()->runCores();
         GlobalScheduler::getInstance()->setScheduler(scheduler,quantum_cycles);
+        GlobalScheduler::getInstance()->runScheduler();
         GlobalScheduler::getInstance()->initializeProcessGeneration(batch_process_freq,min_ins,max_ins);
 
-        GlobalScheduler::getInstance()->runCores();
-        GlobalScheduler::getInstance()->runScheduler();
+        
 
         this->outputList.push_back("OS Initialized");    
     }else{
