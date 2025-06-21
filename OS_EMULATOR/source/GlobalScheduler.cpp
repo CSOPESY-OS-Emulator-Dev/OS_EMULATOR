@@ -152,7 +152,7 @@ void GlobalScheduler::stopProcessGeneration()
 
 std::string GlobalScheduler::getCPUUtilization()
 {
-    // std::lock_guard<std::mutex> lock(schedulerMutex);
+    std::lock_guard<std::mutex> lock(schedulerMutex);
     int totalCores = static_cast<int>(cores.size());
     int usedCores = 0;
 
@@ -168,7 +168,7 @@ std::string GlobalScheduler::getCPUUtilization()
 
 std::string GlobalScheduler::getCoresUsed()
 {
-    // std::lock_guard<std::mutex> lock(schedulerMutex);
+    std::lock_guard<std::mutex> lock(schedulerMutex);
     int used = 0;
     for (const auto &core : cores)
     {
@@ -180,7 +180,7 @@ std::string GlobalScheduler::getCoresUsed()
 
 std::string GlobalScheduler::getCoresAvailable()
 {
-    // std::lock_guard<std::mutex> lock(schedulerMutex);
+    std::lock_guard<std::mutex> lock(schedulerMutex);
     int used = 0;
     for (const auto &core : cores)
     {

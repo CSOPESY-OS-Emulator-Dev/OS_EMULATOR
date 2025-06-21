@@ -1,0 +1,18 @@
+Log generated on: 2025-06-21 18:12:51
+------------------------------------
+CPU utilization: 100%
+Cores used: 4
+Cores available: 0
+
+------------------------------------
+Running Processes:
+process4    (06/21/2025, 06:12:48.432 PM)    Core: 0    37 / 100
+process6    (06/21/2025, 06:12:48.448 PM)    Core: 1    37 / 100
+process7    (06/21/2025, 06:12:48.448 PM)    Core: 2    37 / 100
+process5    (06/21/2025, 06:12:48.432 PM)    Core: 3    37 / 100
+Finished Processes:
+process3    (06/21/2025, 06:12:48.354 PM)    Finished    100 / 100
+process0    (06/21/2025, 06:12:48.354 PM)    Finished    100 / 100
+process2    (06/21/2025, 06:12:48.354 PM)    Finished    100 / 100
+process1    (06/21/2025, 06:12:48.354 PM)    Finished    100 / 100
+------------------------------------

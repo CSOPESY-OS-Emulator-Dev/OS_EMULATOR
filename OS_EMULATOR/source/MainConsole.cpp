@@ -1,6 +1,9 @@
 #include "MainConsole.h"
 #include "ConsoleManager.h"
 #include "GlobalScheduler.h"
+#include <chrono>
+#include <ctime>
+#include <iomanip>
 
 void MainConsole::initialize()
 {
@@ -194,6 +197,12 @@ void MainConsole::reportUtil()
         std::cout << "Failed to open log file.\n";
         return;
     }
+
+    // Add date and time
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+    out << "Log generated on: " << std::put_time(std::localtime(&now_time), "%Y-%m-%d %H:%M:%S") << "\n";
+    out << "------------------------------------\n";
 
     auto scheduler = GlobalScheduler::getInstance();
 
