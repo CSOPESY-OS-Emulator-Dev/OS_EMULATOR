@@ -66,6 +66,12 @@ void MainConsole::process(std::string input)
         if (parsed.command == "initialize" && isinitialized){
         this->outputList.push_back("The operating system is already initialized");
         }
+        if (parsed.command == "scheduler-start"){
+            GlobalScheduler::getInstance()->startProcessGeneration();
+        }
+        if (parsed.command == "scheduler-stop"){
+            GlobalScheduler::getInstance()->stopProcessGeneration();
+        }
     } else if(parsed.command == "initialize"){
         isinitialized = true;
         initializeOS();
@@ -89,6 +95,7 @@ void MainConsole::initializeOS(){
     std::string scheduler, input;
     this->outputList.push_back("------------------------------------");
     
+
     file >> input;
     if (input == "num_cpu"){
         file >> num_cpu;
@@ -179,6 +186,10 @@ void MainConsole::initializeOS(){
         GlobalScheduler::getInstance()->initializeCores(num_cpu,delays_per_exec);
         GlobalScheduler::getInstance()->setScheduler(scheduler,quantum_cycles);
         GlobalScheduler::getInstance()->initializeProcessGeneration(batch_process_freq,min_ins,max_ins);
+
+        GlobalScheduler::getInstance()->runCores();
+        GlobalScheduler::getInstance()->runScheduler();
+
         this->outputList.push_back("OS Initialized");    
     }else{
         this->outputList.push_back("Invalid Config");
