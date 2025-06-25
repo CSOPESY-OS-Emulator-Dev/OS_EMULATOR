@@ -77,6 +77,12 @@ void MainConsole::process(std::string input)
     }
     if (parsed.command == "report-util")
     {
+        if (!isinitialized) {
+            this->outputList.push_back("Initialize the console first.");
+            return;
+        }
+
+        // Generate the report
         reportUtil();
     }
     if (parsed.command == "exit")
@@ -191,10 +197,14 @@ void MainConsole::showProcesses()
 
 void MainConsole::reportUtil()
 {
-    std::ofstream out("csopesy-log.txt");
+    // Create a log file to store the report
+    std::string filename = "csopesy-log.txt";
+    std::ofstream out(filename);
+
+    // Check if the file opened successfully
     if (!out.is_open())
     {
-        std::cout << "Failed to open log file.\n";
+        this->outputList.push_back("Failed to open log file.");
         return;
     }
 
@@ -245,5 +255,6 @@ void MainConsole::reportUtil()
     out << "------------------------------------\n";
     out.close();
 
-    std::cout << "Report generated at C:/csopesy-log.txt!\n";
+    // Notify the user that the report has been generated
+    this->outputList.push_back("Report generated at " + filename + "!");
 }
