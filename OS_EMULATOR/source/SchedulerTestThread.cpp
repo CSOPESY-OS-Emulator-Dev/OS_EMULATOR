@@ -27,7 +27,8 @@ void SchedulerTestThread::stop() {
 void SchedulerTestThread::resume() {
     isRunning = true; // Set the running flag to true to resume the thread
     this->start(); // Start the thread if it was stopped
-}
+}   
+
 
 std::shared_ptr<Process> SchedulerTestThread::createProcess(std::string processName) {
     // This condition allows the main thread to retrieve an existing process if it already exists
@@ -47,12 +48,14 @@ std::shared_ptr<Process> SchedulerTestThread::createProcess(std::string processN
     for (int i = 0; i < instructionCount; ++i) {
         // Here we would create a random instruction and add it to the process
         // auto commandType = getRandomCommandType() <-- uncomment this part after implementing all command types
-        auto instruction = createInstruction(PRINT, processName, processCount); // replace PRINT with commandType after implementing all command types
+        //CommandType ProcessInstruction = getRandomCommandType(); 
+        auto instruction = createInstruction(DECLARE, processName, processCount); // replace PRINT with commandType after implementing all command types
         process->addInstruction(instruction);
     }
     
     return process; // Return the created process
 }
+
 
 std::shared_ptr<ICommand> SchedulerTestThread::createInstruction(CommandType commandType, std::string processName, int id) {
     // Create a random instruction of the specified command type
@@ -66,8 +69,7 @@ std::shared_ptr<ICommand> SchedulerTestThread::createInstruction(CommandType com
             return std::make_shared<PrintCommand>(id, "Hello world from " + processName); // Assuming 0 is the PID for the test
         // Add cases for other command types as needed
         case DECLARE:
-            // Placeholder for DECLARE command
-            return nullptr; // std::make_shared<ICommand>(id, commandType); // Assuming 0 is the PID for the test
+            return std::make_shared<DeclareCommand>(id,"var"+ std::to_string(getRandNum(0,10)),getRandNum(0,std::numeric_limits<uint16_t>::max()) );
         case ADD:
             // Placeholder for ADD command
             return nullptr; // std::make_shared<ICommand>(id, commandType); // Assuming 0 is the PID for the test
@@ -94,6 +96,9 @@ CommandType SchedulerTestThread::getRandomCommandType() {
     return static_cast<CommandType>(dist(gen));
 }
 
+int SchedulerTestThread::getRandNum(int min, int max){
+   return rand() % (max - min + 1) + min;
+}
 void SchedulerTestThread::assignToScheduler(std::shared_ptr<Process> process) {
     // Add the process to the scheduler's queue
     GlobalScheduler::getInstance()->queueProcess(process);

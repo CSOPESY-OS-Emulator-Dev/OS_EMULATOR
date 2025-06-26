@@ -46,6 +46,7 @@ public:
 
     friend class ProcessConsole;
     friend class PrintCommand;
+    friend class DeclareCommand;
 
 private:
     std::string getFormattedCurrentTime();
