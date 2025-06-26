@@ -226,6 +226,10 @@ void MainConsole::redrawScreen(std::string processName)
 
 void MainConsole::showProcesses()
 {
+    this->outputList.push_back(GlobalScheduler::getInstance()->getCPUUtilization());
+    this->outputList.push_back(GlobalScheduler::getInstance()->getCoresUsed());
+    this->outputList.push_back(GlobalScheduler::getInstance()->getCoresAvailable());
+    
     this->outputList.push_back("------------------------------------");
 
     // Print running processes
