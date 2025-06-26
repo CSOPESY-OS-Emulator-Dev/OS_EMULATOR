@@ -40,7 +40,7 @@ MainConsole::~MainConsole()
 
 void MainConsole::draw()
 {
-    // Linux
+    std::cout << std::flush;
     std::system("clear");
     std::system("cls");
     for (int i = 0; i < this->outputList.size(); i++)
@@ -181,7 +181,7 @@ void MainConsole::initializeOS()
     }
 
     file >> input;
-    if (input == "delays_per_exec")
+    if (input == "delay_per_exec")
     {
         file >> delays_per_exec;
         if(delays_per_exec >= 0 && delays_per_exec <= 4294967296u){
@@ -206,6 +206,7 @@ void MainConsole::initializeOS()
     }else{
         this->outputList.push_back("Invalid Config");
     }
+    file.close();
     // need running the system
 }
 /*  The following are function definitions that executes each available commands
@@ -280,17 +281,17 @@ void MainConsole::reportUtil()
     out << "Log generated on: " << std::put_time(std::localtime(&now_time), "%Y-%m-%d %H:%M:%S") << "\n";
     out << "------------------------------------\n";
 
-    auto scheduler = GlobalScheduler::getInstance();
+    //auto scheduler = GlobalScheduler::getInstance();
 
     // Add CPU info at the top
-    out << scheduler->getCPUUtilization();
-    out << scheduler->getCoresUsed();
-    out << scheduler->getCoresAvailable();
+    out << GlobalScheduler::getInstance()->getCPUUtilization();
+    out << GlobalScheduler::getInstance()->getCoresUsed();
+    out << GlobalScheduler::getInstance()->getCoresAvailable();
     out << "\n------------------------------------\n";
 
     // Running Processes
     out << "Running Processes:\n";
-    auto running = scheduler->getRunningProcesses();
+    auto running = GlobalScheduler::getInstance()->getRunningProcesses();
     if (running.empty())
     {
         out << "No running processes.\n";
@@ -305,7 +306,7 @@ void MainConsole::reportUtil()
 
     // Finished Processes
     out << "Finished Processes:\n";
-    auto finished = scheduler->getFinishedProcesses();
+    auto finished = GlobalScheduler::getInstance()->getFinishedProcesses();
     if (finished.empty())
     {
         out << "No finished processes.\n";
