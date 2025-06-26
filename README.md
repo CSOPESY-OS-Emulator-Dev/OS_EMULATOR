@@ -20,6 +20,6 @@ g++ -std=c++20 -o Main -I headers source/*.cpp
 ## Compile and Run (Windows)
 Enter the following commands: 
 ```bash
-g++ -o Main -I headers source/*.cpp 
+g++ -std=c++20 -o Main -I headers source/*.cpp
 Main
 ```
