@@ -1,6 +1,9 @@
 #include "MainConsole.h"
 #include "ConsoleManager.h"
 #include "GlobalScheduler.h"
+#include <chrono>
+#include <ctime>
+#include <iomanip>
 
 void MainConsole::initialize()
 {
@@ -24,7 +27,6 @@ void MainConsole::initialize()
     this->outputList.push_back("===============================================================================================\n");
     this->outputList.push_back("These are the available commands :");
     this->outputList.push_back("initialize\nscreen\nscreen -s <process name>\nscreen -r <process name>\nscheduler-test\nscheduler-stop\nreport-util\nclear\nexit\n");
-
 }
 
 MainConsole::MainConsole() : AConsole("MAIN_CONSOLE")
@@ -34,20 +36,20 @@ MainConsole::MainConsole() : AConsole("MAIN_CONSOLE")
 
 MainConsole::~MainConsole()
 {
-
 }
 
 void MainConsole::draw()
 {
-    //Linux
+    // Linux
     std::system("clear");
     std::system("cls");
-    for(int i = 0; i < this->outputList.size(); i++){
+    for (int i = 0; i < this->outputList.size(); i++)
+    {
         std::cout << this->outputList[i] << std::endl;
     }
 }
 
-void MainConsole::process(std::string input) 
+void MainConsole::process(std::string input)
 {
     auto parsed = parseInput(input);
 
@@ -74,6 +76,9 @@ void MainConsole::process(std::string input)
             GlobalScheduler::getInstance()->stopProcessGeneration();
             this->outputList.push_back("Stop Generating Processes");
         }
+        if (parsed.command == "report-util"){
+            reportUtil();
+        }
     } else if(parsed.command == "initialize"){
         isinitialized = true;
         initializeOS();
@@ -85,21 +90,23 @@ void MainConsole::process(std::string input)
     if(parsed.command == "exit") {
         ConsoleManager::getInstance()->exitApplication();
     }
-    if(parsed.command == "clear") {
+    if (parsed.command == "clear")
+    {
         initialize();
     }
 }
 
-void MainConsole::initializeOS(){
+void MainConsole::initializeOS()
+{
     std::ifstream file("Config.txt");
     bool isValid = true;
     int num_cpu, quantum_cycles, batch_process_freq, min_ins, max_ins, delays_per_exec;
     std::string scheduler, input;
     this->outputList.push_back("------------------------------------");
     
-
     file >> input;
-    if (input == "num_cpu"){
+    if (input == "num_cpu")
+    {
         file >> num_cpu;
         if(num_cpu >= 1 && num_cpu <= 128){
             this->outputList.push_back("num_cpu : " + std::to_string(num_cpu));
@@ -122,7 +129,8 @@ void MainConsole::initializeOS(){
     }
 
     file >> input;
-    if (input == "quantum_cycles"){
+    if (input == "quantum_cycles")
+    {
         file >> quantum_cycles;
         if(quantum_cycles >= 1 && quantum_cycles <= 4294967296u){
             this->outputList.push_back("quantum_cycles : " + std::to_string(quantum_cycles));
@@ -134,7 +142,8 @@ void MainConsole::initializeOS(){
     }
 
     file >> input;
-    if (input == "batch_process_freq"){
+    if (input == "batch_process_freq")
+    {
         file >> batch_process_freq;
         if(batch_process_freq >= 1 && batch_process_freq <= 4294967296u){
             this->outputList.push_back("batch_process_freq : " + std::to_string(batch_process_freq));
@@ -146,7 +155,8 @@ void MainConsole::initializeOS(){
     }
 
     file >> input;
-    if (input == "min_ins"){
+    if (input == "min_ins")
+    {
         file >> min_ins;
         if(min_ins >= 1 && min_ins <= 4294967296u){
             this->outputList.push_back("min_ins : " + std::to_string(min_ins));
@@ -158,7 +168,8 @@ void MainConsole::initializeOS(){
     }
 
     file >> input;
-    if (input == "max_ins"){
+    if (input == "max_ins")
+    {
         file >> max_ins;
         if(max_ins >= 1 && max_ins <= 4294967296u){
             this->outputList.push_back("max_ins : " + std::to_string(max_ins));
@@ -170,7 +181,8 @@ void MainConsole::initializeOS(){
     }
 
     file >> input;
-    if (input == "delays_per_exec"){
+    if (input == "delays_per_exec")
+    {
         file >> delays_per_exec;
         if(delays_per_exec >= 0 && delays_per_exec <= 4294967296u){
             this->outputList.push_back("delays_per_exec : " + std::to_string(delays_per_exec));
@@ -180,7 +192,6 @@ void MainConsole::initializeOS(){
             isValid=false;
         }
     }
-
     
     this->outputList.push_back("------------------------------------");
 
@@ -216,22 +227,96 @@ void MainConsole::redrawScreen(std::string processName)
 void MainConsole::showProcesses()
 {
     this->outputList.push_back("------------------------------------");
+
+    // Print running processes
     this->outputList.push_back("Running Processes:");
-    if (GlobalScheduler::getInstance()->getRunningProcesses().empty()) {
+    if (GlobalScheduler::getInstance()->getRunningProcesses().empty())
+    {
         this->outputList.push_back("No running processes.\n");
-    } else {
-        for (auto& string : GlobalScheduler::getInstance()->getRunningProcesses()) {
+    }
+    else
+    {
+        for (auto &string : GlobalScheduler::getInstance()->getRunningProcesses())
+        {
             this->outputList.push_back(string);
         }
     }
-    // Print finished processes 
+    // Print finished processes
     this->outputList.push_back("\nFinished Processes:");
-    if (GlobalScheduler::getInstance()->getFinishedProcesses().empty()) {
+    if (GlobalScheduler::getInstance()->getFinishedProcesses().empty())
+    {
         this->outputList.push_back("No finished processes.\n");
-    } else {
-        for (auto& string : GlobalScheduler::getInstance()->getFinishedProcesses()) {
+    }
+    else
+    {
+        for (auto &string : GlobalScheduler::getInstance()->getFinishedProcesses())
+        {
             this->outputList.push_back(string);
         }
     }
     this->outputList.push_back("------------------------------------\n");
+}
+
+void MainConsole::reportUtil()
+{
+    // Create a log file to store the report
+    std::string filename = "csopesy-log.txt";
+    std::ofstream out(filename);
+
+    // Check if the file opened successfully
+    if (!out.is_open())
+    {
+        this->outputList.push_back("Failed to open log file.");
+        return;
+    }
+
+    // Add date and time
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+    out << "Log generated on: " << std::put_time(std::localtime(&now_time), "%Y-%m-%d %H:%M:%S") << "\n";
+    out << "------------------------------------\n";
+
+    auto scheduler = GlobalScheduler::getInstance();
+
+    // Add CPU info at the top
+    out << scheduler->getCPUUtilization();
+    out << scheduler->getCoresUsed();
+    out << scheduler->getCoresAvailable();
+    out << "\n------------------------------------\n";
+
+    // Running Processes
+    out << "Running Processes:\n";
+    auto running = scheduler->getRunningProcesses();
+    if (running.empty())
+    {
+        out << "No running processes.\n";
+    }
+    else
+    {
+        for (const auto &line : running)
+        {
+            out << line << "\n";
+        }
+    }
+
+    // Finished Processes
+    out << "Finished Processes:\n";
+    auto finished = scheduler->getFinishedProcesses();
+    if (finished.empty())
+    {
+        out << "No finished processes.\n";
+    }
+    else
+    {
+        for (const auto &line : finished)
+        {
+            out << line << "\n";
+        }
+    }
+
+    out << "------------------------------------\n";
+    out.close();
+
+    // Notify the user that the report has been generated
+    this->outputList.push_back("Report generated at " + filename + "!");
 }
