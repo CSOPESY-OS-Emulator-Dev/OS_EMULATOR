@@ -50,6 +50,7 @@ public:
     friend class DeclareCommand;
     friend class AddCommand;
     friend class SubtractCommand;
+    friend class ForCommand;
 private:
     std::string getFormattedCurrentTime();
 
@@ -67,6 +68,7 @@ private:
     int processID;
     int coreID;
 
+    int progressCount; 
     int instructionCount;
     int currentInstruction;
     int sleepDuration; // Duration in milliseconds for sleep state

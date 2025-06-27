@@ -10,6 +10,7 @@
 #include "DeclareCommand.h"
 #include "AddCommand.h"
 #include "SubtractCommand.h"
+#include "ForCommand.h"
 class SchedulerTestThread : public IETThread {
     // SchedulerTestThread is a test thread for the scheduler.
     // It inherits from IETThread to allow running in a separate thread.
@@ -29,9 +30,10 @@ public:
     // Create new process with a given name and ID
     std::shared_ptr<Process> createProcess(std::string processName);
     // Create a random instruction of a given command type
-    std::shared_ptr<ICommand> createInstruction(CommandType commandType, std::shared_ptr<Process> process, int instructionCount, int nestedLevel = 0);
+    std::shared_ptr<ICommand> createInstruction(CommandType commandType, int pid, std::string processName);
     // Return random command type
-    std::vector<std::shared_ptr<ICommand>> generateInstructions(std::shared_ptr<Process> process, int instructionCount, int nestedLevel = 0);
+    std::vector<std::shared_ptr<ICommand>> generateInstructions(int& remaining, int pid, std::string processName, int nestedLevel);
+    // Get a random command type, with an option to include FOR command type
     CommandType getRandomCommandType(bool includeFOR = true); // Default includeFOR is true, to include FOR command type
     // Assign new process to scheduler
     void assignToScheduler(std::shared_ptr<Process> process);
@@ -42,7 +44,7 @@ private:
     int maxIns; // Maximum instructions per process
 
     CommandType instructionChoose();
-    bool isRunning = true; // Flag to control the thread's execution loop
+    bool isRunning = false; // Flag to control the thread's execution loop
     int processCount = 0; // Counter for the number of processes created
     int getRandNum(int min, int max);
 };

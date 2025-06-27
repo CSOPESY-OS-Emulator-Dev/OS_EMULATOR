@@ -8,3 +8,8 @@ CommandType ICommand::getCommandType() const {
     // Returns the type of command
     return commandType;
 }
+
+bool ICommand::isCommandExecuted() const
+{
+    return false;
+}

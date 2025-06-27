@@ -20,10 +20,12 @@ public:
     ICommand(int pid, CommandType commandType);
     // Get Command Type
     CommandType getCommandType() const;
+    bool isCommandExecuted() const; // Check if the command has been executed
     
     // Execute the command. This method should be implemented by derived classes to define the command's behavior.
     virtual void execute(Process& process, std::string timeExecuted, int coreID) = 0;
 protected:
     int processID; // The ID of the process that owns this command
+    bool isExecuted = false; // Flag to indicate if the command has been executed
     CommandType commandType; // The type of command (e.g., PRINT, DECLARE, etc.)
 };
