@@ -64,12 +64,49 @@ std::shared_ptr<ICommand> SchedulerTestThread::createInstruction(CommandType com
             return std::make_shared<PrintCommand>(std::to_string(process->getProcessID()), "Hello world from " + process->getProcessName()); // Assuming 0 is the PID for the test
         // Add cases for other command types as needed
         case DECLARE:
-            // Placeholder for DECLARE command
-            return nullptr; // std::make_shared<ICommand>(id, commandType); // Assuming 0 is the PID for the test
+            return std::make_shared<DeclareCommand>(id,"var"+ std::to_string(getRandNum(0,10)),getRandNum(0,std::numeric_limits<uint16_t>::max()) );
         case ADD:
+            switch (getRandNum(0,3))
+            {
+            case 0:
+                return std::make_shared<AddCommand>(id,"var" + std::to_string(getRandNum(0,10)),"var" + std::to_string(getRandNum(0, 10)),"var" + std::to_string(getRandNum(0, 10)));
+                break;
+            case 1:
+                return std::make_shared<AddCommand>(id,"var" + std::to_string(getRandNum(0,10)),getRandNum(0,10),"var"+ std::to_string(getRandNum(0,10)) );
+                break;
+            case 2:
+                return std::make_shared<AddCommand>(id,"var" + std::to_string(getRandNum(0,10)),"var" + std::to_string(getRandNum(0,10)),getRandNum(0,10));
+                break;
+            case 3:
+                return std::make_shared<AddCommand>(id,"var" + std::to_string(getRandNum(0,10)),getRandNum(0,10),getRandNum(0,10));
+                break;
+
+            default:
+                return nullptr;
+                break;
+            }
             // Placeholder for ADD command
             return nullptr; // std::make_shared<ICommand>(id, commandType); // Assuming 0 is the PID for the test
         case SUBTRACT:
+            switch (getRandNum(0,3))
+            {
+            case 0:
+                return std::make_shared<SubtractCommand>(id,"var" + std::to_string(getRandNum(0,10)),"var" + std::to_string(getRandNum(0, 10)),"var" + std::to_string(getRandNum(0, 10)));
+                break;
+            case 1:
+                return std::make_shared<SubtractCommand>(id,"var" + std::to_string(getRandNum(0,10)),getRandNum(0,10),"var"+ std::to_string(getRandNum(0,10)) );
+                break;
+            case 2:
+                return std::make_shared<SubtractCommand>(id,"var" + std::to_string(getRandNum(0,10)),"var" + std::to_string(getRandNum(0,10)),getRandNum(0,10));
+                break;
+            case 3:
+                return std::make_shared<SubtractCommand>(id,"var" + std::to_string(getRandNum(0,10)),getRandNum(0,10),getRandNum(0,10));
+                break;
+
+            default:
+                return nullptr;
+                break;
+            }
             // Placeholder for SUBTRACT command
             return nullptr; // std::make_shared<ICommand>(id, commandType); // Assuming 0 is the PID for the test
         case SLEEP:
@@ -112,6 +149,9 @@ CommandType SchedulerTestThread::getRandomCommandType(bool includeFOR = true)
     return static_cast<CommandType>(dist(gen));
 }
 
+int SchedulerTestThread::getRandNum(int min, int max){
+   return rand() % (max - min + 1) + min;
+}
 void SchedulerTestThread::assignToScheduler(std::shared_ptr<Process> process) {
     // Add the process to the scheduler's queue
     GlobalScheduler::getInstance()->queueProcess(process);

@@ -7,7 +7,9 @@
 #include "GlobalScheduler.h"
 #include "PrintCommand.h"
 #include "ICommand.h"
-
+#include "DeclareCommand.h"
+#include "AddCommand.h"
+#include "SubtractCommand.h"
 class SchedulerTestThread : public IETThread {
     // SchedulerTestThread is a test thread for the scheduler.
     // It inherits from IETThread to allow running in a separate thread.
@@ -39,6 +41,8 @@ private:
     int minIns; // Minimum instructions per process
     int maxIns; // Maximum instructions per process
 
+    CommandType instructionChoose();
     bool isRunning = true; // Flag to control the thread's execution loop
     int processCount = 0; // Counter for the number of processes created
+    int getRandNum(int min, int max);
 };
