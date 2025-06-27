@@ -32,11 +32,13 @@ public:
     // Create a random instruction of a given command type
     std::shared_ptr<ICommand> createInstruction(CommandType commandType, int pid, std::string processName);
     // Return random command type
-    std::vector<std::shared_ptr<ICommand>> generateInstructions(int& remaining, int pid, std::string processName, int nestedLevel);
+    std::vector<std::shared_ptr<ICommand>> generateInstructions(int& remainingExecs, int pid, const std::string& processName, int nestingLevel);
     // Get a random command type, with an option to include FOR command type
     CommandType getRandomCommandType(bool includeFOR); // Default includeFOR is true, to include FOR command type
     // Assign new process to scheduler
     void assignToScheduler(std::shared_ptr<Process> process);
+    int getTotalExecutions(const std::vector<std::shared_ptr<ICommand>> &instructions);
+
 private:
     int cpuTick; // The CPU tick for the test thread 
     int cpuCycle; // The CPU cycle for the test thread

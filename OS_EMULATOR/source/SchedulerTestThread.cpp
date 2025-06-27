@@ -17,7 +17,7 @@ void SchedulerTestThread::run() {
                 assignToScheduler(process);
             }
             // Sleep for the specified CPU cycle duration
-            IETThread::sleep(10); // Sleep for a short duration to avoid busy waiting
+            // IETThread::sleep(10); // Sleep for a short duration to avoid busy waiting
             cpuTick++;
         }
     }
@@ -47,57 +47,54 @@ std::shared_ptr<Process> SchedulerTestThread::createProcess(std::string processN
     // Randomly generate instructions for the process
     int instructionCount = rand() % (maxIns - minIns + 1) + minIns;
     int remaining = instructionCount;
-    process->incrementInstructionCount(instructionCount);
     // Generate instructions for the process
     auto instructions = generateInstructions(remaining, process->getProcessID(), processName, 0); // Start with nested level 0
-    
     // Add the generated instructions to the process
-    for (int i = 0; i < instructionCount; i++) {
-        process->addInstruction(instructions[i]);
-    }
+    process->instructionList = instructions;
+    process->instructionCount = instructionCount; // Set the total instruction count
+    
     return process; // Return the created process
 }
 
-std::vector<std::shared_ptr<ICommand>> SchedulerTestThread::generateInstructions(int& remaining, int pid, std::string processName, int nestedLevel)
+std::vector<std::shared_ptr<ICommand>> SchedulerTestThread::generateInstructions(int& remainingExecs, int pid, const std::string& processName, int nestingLevel)
 {
-    // Declare a vector to hold the generated instructions
-    std::vector<std::shared_ptr<ICommand>> instructions;
-    // Generate instructions until the remaining count is zero
-    while (remaining > 0) {
-        // Choose a random command type
-        auto commandType = getRandomCommandType(nestedLevel <= 3); // Include FOR command only after 3 nesting levels
-        auto instruction = createInstruction(commandType, pid, processName);
-        // If the instruction is valid, add it to the list and decrease the remaining count
-        if (instruction) {
-            // std::cout << "Generated instruction: " << commandType << " for process: " << processName << std::endl;
-            instructions.push_back(instruction);
-            remaining--;
-        }
-        // If the command type is FOR, generate nested instructions
-        if (commandType == FOR) {
-            int maxIterations = std::min(remaining - 1, 5); // 1 for the FOR itself
+    std::vector<std::shared_ptr<ICommand>> instructionList;
+
+    while (remainingExecs > 0) {
+        bool canCreateFor = (nestingLevel < 3 && remainingExecs > 1);
+        CommandType cmdType = getRandomCommandType(canCreateFor);
+
+        if (cmdType == FOR && canCreateFor) {
+            int maxIterations = std::min(remainingExecs - 1, 5); // reserve 1 for the ForCommand itself
             if (maxIterations <= 0) break;
+
             int iterations = getRandNum(1, maxIterations);
 
-            // Decide how many executions to allocate to sub-instructions
-            int maxSubExec = (remaining - 1) / iterations;
-            if (maxSubExec <= 0) continue;
-            int subExec = getRandNum(1, maxSubExec);
+            int maxNestedExecs = (remainingExecs - 1) / iterations;
+            if (maxNestedExecs <= 0) continue;
 
-            int subExecCopy = subExec;
-            auto nestedInstructions = generateInstructions(subExecCopy, pid, processName, nestedLevel + 1);
+            int nestedRemainingExecs = getRandNum(1, maxNestedExecs);
+            int actualNestedExecsUsed = nestedRemainingExecs;
 
-            // Calculate total executions this FOR will consume
-            int forExec = 1 + iterations * subExecCopy;
-            if (forExec > remaining) break;
+            auto nestedInstructions = generateInstructions(actualNestedExecsUsed, pid, processName, nestingLevel + 1);
 
-            auto forCommand = std::make_shared<ForCommand>(pid, nestedInstructions, iterations);
-            instructions.push_back(forCommand);
-            remaining -= forExec;
+            int totalForCommandCost = 1 + iterations * actualNestedExecsUsed;
+            if (totalForCommandCost > remainingExecs) break;
+
+            instructionList.push_back(std::make_shared<ForCommand>(pid, nestedInstructions, iterations));
+            remainingExecs -= totalForCommandCost;
+        } else {
+            auto simpleInstr = createInstruction(cmdType, pid, processName);
+            if (simpleInstr) {
+                instructionList.push_back(simpleInstr);
+                remainingExecs--;
+            }
         }
     }
-    return instructions;
+
+    return instructionList;
 }
+
 
 std::shared_ptr<ICommand> SchedulerTestThread::createInstruction(CommandType commandType, int pid, std::string processName) {
     // Create a new instruction based on the command type

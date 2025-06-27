@@ -52,6 +52,7 @@ public:
     friend class SubtractCommand;
     friend class SleepCommand;
     friend class ForCommand;
+    friend class SchedulerTestThread;
 private:
     std::string getFormattedCurrentTime();
 
@@ -69,9 +70,9 @@ private:
     int processID;
     int coreID;
 
-    int progressCount; 
+    int progressCount;       // Total executed instructions (including nested)
+    int currentInstruction;  // Index of current top-level instruction
     int instructionCount;
-    int currentInstruction;
     int sleepDuration; // Duration in milliseconds for sleep state
 
     state currentState;

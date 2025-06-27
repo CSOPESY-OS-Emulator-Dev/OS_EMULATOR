@@ -1,4 +1,4 @@
-num_cpu 2
+num_cpu 10
 scheduler fcfs
 quantum_cycles 5
 batch_process_freq 1
