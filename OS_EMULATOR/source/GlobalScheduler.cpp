@@ -1,6 +1,7 @@
 #include "GlobalScheduler.h"
 #include "CoreThread.h"
 #include "FCFSScheduler.h"
+#include "RRScheduler.h"
 #include "SchedulerTestThread.h"
 
 GlobalScheduler* GlobalScheduler::sharedInstance = nullptr;
@@ -9,7 +10,7 @@ GlobalScheduler::GlobalScheduler()
 {
     // initialize scheduler algorithms
     schedulerAlgorithms["fcfs"] = std::make_shared<FCFSScheduler>();
-    //schedulerAlgorithms["rr"] = std::make_shared<AScheduler>();
+    schedulerAlgorithms["rr"] = std::make_shared<RRScheduler>();
     currentScheduler = nullptr; // No scheduler set initially
 }
 

@@ -16,10 +16,10 @@ int main()
     GlobalScheduler::initialize();
 
     // set up cores and scheduler
-    GlobalScheduler::getInstance()->initializeCores(4, 4);
+    GlobalScheduler::getInstance()->initializeCores(2, 1);
     GlobalScheduler::getInstance()->runCores();
-    GlobalScheduler::getInstance()->setScheduler("fcfs", 4); 
-    // GlobalScheduler::getInstance()->setScheduler("rr"); 
+    // GlobalScheduler::getInstance()->setScheduler("fcfs", 4); 
+    GlobalScheduler::getInstance()->setScheduler("rr", 3); 
 
     // Initialize process generation
     GlobalScheduler::getInstance()->runScheduler();
@@ -28,7 +28,7 @@ int main()
     GlobalScheduler::getInstance()->initializeProcessGeneration(1, 100, 100); // para always 100
 
     // Create 10 processes ("process0 - process9")
-    for(int i = 0; i < 10; i++) {
+    for(int i = 0; i < 5; i++) {
         std::string name = "process" + std::to_string(i);
         GlobalScheduler::getInstance()->createProcess(name);
     }
