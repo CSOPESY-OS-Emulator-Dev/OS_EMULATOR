@@ -2,19 +2,19 @@
 
 void Process::executeInstruction()
 {
-    // Check if the current instruction is within the total instructions
     if (this->currentInstruction < this->instructionCount)
     {
-        // Simulate executing an instruction
+        // Add null check
+        if (this->instructionList[this->currentInstruction] == nullptr) {
+            std::cerr << "Error: Null instruction at index " << this->currentInstruction << this->processID << std::endl;
+            return;
+        }
+        
         this->instructionList[this->currentInstruction]->execute(*this, getFormattedCurrentTime(), coreID);
-        // this->writeToTxtFile(); // Write the process log to a text file
-
-        // Increment the current instruction line
         this->currentInstruction++;
 
         if (this->currentInstruction == this->instructionCount)
         {
-            // If the current instruction exceeds total instructions, set state to FINISHED
             this->setState(FINISHED);
             this->timeFinished = getFormattedCurrentTime();
         }
