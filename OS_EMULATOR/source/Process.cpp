@@ -2,19 +2,21 @@
 
 void Process::executeInstruction()
 {
-    // Check if the current instruction is within the total instructions
     if (this->currentInstruction < this->instructionCount)
     {
-        // Simulate executing an instruction
+        // Add null check
+        if (this->instructionList[this->currentInstruction] == nullptr) {
+            std::cerr << "Error: Null instruction at index " << this->currentInstruction << this->processID << std::endl;
+            return;
+        }
+        
         this->instructionList[this->currentInstruction]->execute(*this, getFormattedCurrentTime(), coreID);
-        // this->writeToTxtFile(); // Write the process log to a text file
+        if (this->instructionList[this->currentInstruction]->isCommandExecuted())
+            // std::cout << "Executed instruction: " << this->instructionList[this->currentInstruction]->getCommandType() << " for process: " << this->name << std::endl;
+            this->currentInstruction++;
 
-        // Increment the current instruction line
-        this->currentInstruction++;
-
-        if (this->currentInstruction == this->instructionCount)
+        if (this->progressCount == this->instructionCount)
         {
-            // If the current instruction exceeds total instructions, set state to FINISHED
             this->setState(FINISHED);
             this->timeFinished = getFormattedCurrentTime();
         }
@@ -59,7 +61,7 @@ int Process::getTotalIntstruction()
 
 int Process::getCurrentLine()
 {
-    return this->currentInstruction;
+    return this->progressCount;
 }
 
 int Process::getProcessID()
@@ -76,7 +78,12 @@ void Process::addInstruction(std::shared_ptr<ICommand> instruction)
 {
     // Add the instruction to the instruction list
     this->instructionList.push_back(instruction);
-    this->instructionCount++;
+}
+
+void Process::incrementInstructionCount(int count)
+{
+    // Increment the instruction count by the given count
+    this->instructionCount += count;
 }
 
 Process::Process(std::string name, int id)
@@ -89,6 +96,7 @@ Process::Process(std::string name, int id)
     this->name = name;
     this->processID = id;
 
+    this->progressCount = 0;
     this->instructionCount = 0;
     this->currentInstruction = 0;
 

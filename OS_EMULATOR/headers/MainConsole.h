@@ -2,14 +2,17 @@
 #include "AConsole.h"
 #include "ConsoleManager.h"
 
-class MainConsole : public AConsole{
+class MainConsole : public AConsole
+{
 public:
     void draw() override;
     void process(std::string input) override;
     void initialize() override;
-    
+
     MainConsole();
     ~MainConsole();
+
+    void reportUtil();
 
 private:
     bool isinitialized = false;

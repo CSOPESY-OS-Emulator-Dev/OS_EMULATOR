@@ -28,4 +28,6 @@ void PrintCommand::execute(Process& process, std::string timeExecuted, int coreI
     }
     // Append the message to the process's output log
     process.outputLog->push_back(timeExecuted + " Core:" + std::to_string(coreID) + " \"" + msg.str() + "\"");
+    process.progressCount++;
+    isExecuted = true;
 }

@@ -5,15 +5,18 @@
 #include <vector>
 #include "Process.h"
 #include "AScheduler.h"
+#include <string>
+#include <sstream>
 
 class CoreThread;
 class SchedulerTestThread;
 class FCFSScheduler;
 class RRScheduler;
 
-class GlobalScheduler {
+class GlobalScheduler
+{
 public:
-    static GlobalScheduler* getInstance();
+    static GlobalScheduler *getInstance();
     static void initialize();
     static void destroy();
 
@@ -38,15 +41,20 @@ public:
     // Stop thread for generating processes
     void stopProcessGeneration();
 
+    // Get the CPU details in string format
+    std::string getCPUUtilization();
+    std::string getCoresUsed();
+    std::string getCoresAvailable();
+
     // Get the list of running processes in string
     std::vector<std::string> getRunningProcesses();
     // Get the list of finished processes in string
     std::vector<std::string> getFinishedProcesses();
 
     // Check if a process with the given name exists
-    bool processExists(const std::string& processName) const;
+    bool processExists(const std::string &processName) const;
     // Get a process by its name
-    std::shared_ptr<Process> getProcessByName(const std::string& processName) const;
+    std::shared_ptr<Process> getProcessByName(const std::string &processName) const;
     // Get a process by its ID
     std::shared_ptr<Process> getProcessByID(int processID) const;
 
@@ -56,9 +64,9 @@ public:
 private:
     // Make singleton
     GlobalScheduler();
-    GlobalScheduler(const GlobalScheduler&) = delete;
-    GlobalScheduler& operator=(const GlobalScheduler&) = delete;
-    static GlobalScheduler* sharedInstance;
+    GlobalScheduler(const GlobalScheduler &) = delete;
+    GlobalScheduler &operator=(const GlobalScheduler &) = delete;
+    static GlobalScheduler *sharedInstance;
 
     // List of cores in the system
     std::vector<std::shared_ptr<CoreThread>> cores;
@@ -74,8 +82,8 @@ private:
     std::vector<std::string> finishedProcesses;
 
     // Mutex to ensure thread safety when accessing shared resources
-    mutable std::mutex schedulerMutex; // Mutex to ensure thread safety when accessing scheduler resources
-    mutable std::mutex processMapMutex; // Mutex to ensure thread safety when accessing processMap
+    mutable std::mutex schedulerMutex;         // Mutex to ensure thread safety when accessing scheduler resources
+    mutable std::mutex processMapMutex;        // Mutex to ensure thread safety when accessing processMap
     mutable std::mutex finishedProcessesMutex; // Mutex to ensure thread safety when accessing finishedProcesses
-    mutable std::mutex queueMutex; // Mutex to ensure thread safety when accessing the ready queue
+    mutable std::mutex queueMutex;             // Mutex to ensure thread safety when accessing the ready queue
 };

@@ -46,12 +46,16 @@ void ConsoleManager::process() const
 
 void ConsoleManager::registerConsole(std::string consoleName)
 {
-	if (this->consoleTable.find(consoleName) == this->consoleTable.end()) {
-		this->consoleTable[consoleName] = std::make_shared<ProcessConsole>(consoleName, getFormattedCurrentTime());
-		switchConsole(consoleName);
-	} else {
-		switchConsole(consoleName);
-	}
+	auto scheduler = GlobalScheduler::getInstance();
+
+    if (!scheduler->processExists(consoleName)) {
+        scheduler->createProcess(consoleName); 
+    }
+    if (consoleTable.find(consoleName) == consoleTable.end()) {
+        consoleTable[consoleName] = std::make_shared<ProcessConsole>(consoleName, getFormattedCurrentTime());
+    }
+	
+    switchConsole(consoleName);
 }
 
 bool ConsoleManager::switchConsole(std::string consoleName)
