@@ -41,7 +41,7 @@ MainConsole::~MainConsole()
 void MainConsole::draw()
 {
     std::cout << std::flush;
-    std::system("cls"); // Clear the console screen
+    std::cout << "\033c";
     for (int i = 0; i < this->outputList.size(); i++)
     {
         std::cout << this->outputList[i] << std::endl;

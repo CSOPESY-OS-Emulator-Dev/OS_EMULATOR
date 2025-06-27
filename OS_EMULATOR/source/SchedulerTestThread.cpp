@@ -48,6 +48,7 @@ std::shared_ptr<Process> SchedulerTestThread::createProcess(std::string processN
     int instructionCount = rand() % (maxIns - minIns + 1) + minIns;
     int remaining = instructionCount;
     process->incrementInstructionCount(instructionCount);
+    // Generate instructions for the process
     auto instructions = generateInstructions(remaining, process->getProcessID(), processName, 0); // Start with nested level 0
     
     // Add the generated instructions to the process
@@ -55,6 +56,44 @@ std::shared_ptr<Process> SchedulerTestThread::createProcess(std::string processN
         process->addInstruction(instr);
     }
     return process; // Return the created process
+}
+
+std::vector<std::shared_ptr<ICommand>> SchedulerTestThread::generateInstructions(int& remaining, int pid, std::string processName, int nestedLevel)
+{
+    // Declare a vector to hold the generated instructions
+    std::vector<std::shared_ptr<ICommand>> instructions;
+    // Generate instructions until the remaining count is zero
+    while (remaining > 0) {
+        // Choose a random command type
+        auto commandType = getRandomCommandType(false); // Include FOR command only after 3 nesting levels
+        auto instruction = createInstruction(commandType, pid, processName);
+        std::cout << "Generating instruction: " << commandType << " for process: " << processName << std::endl;
+        // If the instruction is valid, add it to the list and decrease the remaining count
+        if (commandType != FOR && instruction != nullptr) {
+            instructions.push_back(instruction);
+            remaining--;
+        }
+        // If the command type is FOR, generate nested instructions
+        // if (commandType == FOR && nestedLevel <= 3) {
+        //     int range = getRandNum(1, remaining);
+        //     int iterations = getRandNum(0, range - 1); // Random number of iterations between 0 to range -1
+        //     int maxInstructions = getRandNum(0, iterations == 0 ? 0 : (range - 1) / iterations); // Randomly determine the number of instructions for the FOR loop
+        //     // Display rang, iterations, randNum and maxInstructions for debugging
+        //     std::cout << std::flush;
+        //     std::cout << "Generating FOR command with range: " << range 
+        //               << ", iterations: " << iterations
+        //               << ", maxInstructions: " << maxInstructions 
+        //               << ", nested level: " << nestedLevel << std::endl;
+        //     auto nestedInstructions = generateInstructions(maxInstructions, pid, processName, nestedLevel + 1); // Generate nested instructions
+        //     // std::cout << "Instruction Count: " << nestedInstructions.size() << std::endl;
+            
+        //     // Add the FOR command with nested instructions
+        //     auto forCommand = std::make_shared<ForCommand>(pid, nestedInstructions, iterations);
+        //     instructions.push_back(forCommand);
+        //     remaining -= (maxInstructions * iterations) + 1; // Decrease the remaining count by the number of nested instructions
+        // }
+    }
+    return instructions;
 }
 
 std::shared_ptr<ICommand> SchedulerTestThread::createInstruction(CommandType commandType, int pid, std::string processName) {
@@ -108,51 +147,10 @@ std::shared_ptr<ICommand> SchedulerTestThread::createInstruction(CommandType com
     }
 }
 
-std::vector<std::shared_ptr<ICommand>> SchedulerTestThread::generateInstructions(int& remaining, int pid, std::string processName, int nestedLevel)
-{
-    std::vector<std::shared_ptr<ICommand>> instructions;
-    // Generate instructions until the remaining count is zero
-    while (remaining > 0) {
-        // Choose a random command type
-        auto commandType = getRandomCommandType(false); // Include FOR command only after 3 nesting levels
-        auto instruction = createInstruction(commandType, pid, processName);
-        // std::cout << "Generating instruction: " << commandType << " for process: " << processName << std::endl;
-        // If the instruction is valid, add it to the list and decrease the remaining count
-        if (instruction) {
-            instructions.push_back(instruction);
-            remaining--;
-        }
-        // If the command type is FOR, generate nested instructions
-        // if (commandType == FOR && nestedLevel <= 3) {
-        //     int range = getRandNum(1, remaining);
-        //     int iterations = getRandNum(0, range - 1); // Random number of iterations between 0 to range -1
-        //     int maxInstructions = getRandNum(0, iterations == 0 ? 0 : (range - 1) / iterations); // Randomly determine the number of instructions for the FOR loop
-        //     // Display rang, iterations, randNum and maxInstructions for debugging
-        //     std::cout << std::flush;
-        //     std::cout << "Generating FOR command with range: " << range 
-        //               << ", iterations: " << iterations
-        //               << ", maxInstructions: " << maxInstructions 
-        //               << ", nested level: " << nestedLevel << std::endl;
-        //     auto nestedInstructions = generateInstructions(maxInstructions, pid, processName, nestedLevel + 1); // Generate nested instructions
-        //     // std::cout << "Instruction Count: " << nestedInstructions.size() << std::endl;
-            
-        //     // Add the FOR command with nested instructions
-        //     auto forCommand = std::make_shared<ForCommand>(pid, nestedInstructions, iterations);
-        //     instructions.push_back(forCommand);
-        //     remaining -= (maxInstructions * iterations) + 1; // Decrease the remaining count by the number of nested instructions
-        // }
-    }
-    return instructions;
-}
-
 CommandType SchedulerTestThread::getRandomCommandType(bool includeFOR)
 {
-    static std::random_device rd;   // Random seed
-    static std::mt19937 gen(rd());  // Mersenne Twister RNG
-    static const int count = includeFOR ? TYPE_COUNT : TYPE_COUNT - 1; // Adjust count if FOR is excluded
-    static std::uniform_int_distribution<> dist(0, count - 1);
-
-    return static_cast<CommandType>(dist(gen));
+    int count = includeFOR ? TYPE_COUNT : TYPE_COUNT - 1; // Adjust count if FOR is excluded
+    return static_cast<CommandType>(getRandNum(0, count - 1)); // Generate a random command type between 1 and count - 1
 }
 
 int SchedulerTestThread::getRandNum(int min, int max){
