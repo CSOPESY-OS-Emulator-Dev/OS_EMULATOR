@@ -3,20 +3,23 @@
 SchedulerTestThread::SchedulerTestThread(int cpuCycle, int minIns, int maxIns) 
         : cpuTick(0), cpuCycle(cpuCycle), minIns(minIns), maxIns(maxIns) {
     // Constructor initializes the CPU cycle and instruction limits for the test thread
+    this->start();
 }
 
 void SchedulerTestThread::run() {
-    while (isRunning) {
-        if(cpuTick % cpuCycle == 0) {
-            // Create new processes only every cpuCycle
-            // Create a new process every CPU cycle
-            auto process = createProcess("Process_" + std::to_string(processCount));
-            // Assign new process to scheduler
-            assignToScheduler(process);
+    while (true) {
+        if (isRunning == true) {
+            if(cpuTick % cpuCycle == 0) {
+                // Create new processes only every cpuCycle
+                // Create a new process every CPU cycle
+                auto process = createProcess("Process_" + std::to_string(processCount));
+                // Assign new process to scheduler
+                assignToScheduler(process);
+            }
+            // Sleep for the specified CPU cycle duration
+            IETThread::sleep(10); // Sleep for a short duration to avoid busy waiting
+            cpuTick++;
         }
-        // Sleep for the specified CPU cycle duration
-        IETThread::sleep(10); // Sleep for a short duration to avoid busy waiting
-        cpuTick++;
     }
 }
 
@@ -26,9 +29,7 @@ void SchedulerTestThread::stop() {
 
 void SchedulerTestThread::resume() {
     isRunning = true; // Set the running flag to true to resume the thread
-    this->start(); // Start the thread if it was stopped
-}   
-
+}
 
 std::shared_ptr<Process> SchedulerTestThread::createProcess(std::string processName) {
     // This condition allows the main thread to retrieve an existing process if it already exists
