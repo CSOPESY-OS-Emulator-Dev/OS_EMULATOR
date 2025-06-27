@@ -52,8 +52,9 @@ std::shared_ptr<Process> SchedulerTestThread::createProcess(std::string processN
     auto instructions = generateInstructions(remaining, process->getProcessID(), processName, 0); // Start with nested level 0
     
     // Add the generated instructions to the process
-    for (auto& instr : instructions) {
-        process->addInstruction(instr);
+    for (int i = 0; i < instructionCount; i++) {
+        process->addInstruction(instructions[i]);
+        std::cout << "Added instruction: " << instructions[i]->getCommandType() << " to process: " << processName << std::endl;
     }
     return process; // Return the created process
 }
@@ -65,33 +66,30 @@ std::vector<std::shared_ptr<ICommand>> SchedulerTestThread::generateInstructions
     // Generate instructions until the remaining count is zero
     while (remaining > 0) {
         // Choose a random command type
-        auto commandType = getRandomCommandType(false); // Include FOR command only after 3 nesting levels
+        auto commandType = getRandomCommandType(nestedLevel <= 3); // Include FOR command only after 3 nesting levels
         auto instruction = createInstruction(commandType, pid, processName);
-        std::cout << "Generating instruction: " << commandType << " for process: " << processName << std::endl;
         // If the instruction is valid, add it to the list and decrease the remaining count
-        if (commandType != FOR && instruction != nullptr) {
+        if (instruction) {
+            // std::cout << "Generated instruction: " << commandType << " for process: " << processName << std::endl;
             instructions.push_back(instruction);
             remaining--;
         }
         // If the command type is FOR, generate nested instructions
-        // if (commandType == FOR && nestedLevel <= 3) {
-        //     int range = getRandNum(1, remaining);
-        //     int iterations = getRandNum(0, range - 1); // Random number of iterations between 0 to range -1
-        //     int maxInstructions = getRandNum(0, iterations == 0 ? 0 : (range - 1) / iterations); // Randomly determine the number of instructions for the FOR loop
-        //     // Display rang, iterations, randNum and maxInstructions for debugging
-        //     std::cout << std::flush;
-        //     std::cout << "Generating FOR command with range: " << range 
-        //               << ", iterations: " << iterations
-        //               << ", maxInstructions: " << maxInstructions 
-        //               << ", nested level: " << nestedLevel << std::endl;
-        //     auto nestedInstructions = generateInstructions(maxInstructions, pid, processName, nestedLevel + 1); // Generate nested instructions
-        //     // std::cout << "Instruction Count: " << nestedInstructions.size() << std::endl;
+        if (commandType == FOR) {
+            int range = getRandNum(1, remaining);
+            int iterations = getRandNum(0, range - 1); // Random number of iterations between 0 to range -1
+            int maxInstructions = getRandNum(0, iterations == 0 ? 0 : (range - 1) / iterations); // Randomly determine the number of instructions for the FOR loop
+            // Display rang, iterations, randNum and maxInstructions for debugging
+            auto nestedInstructions = generateInstructions(maxInstructions, pid, processName, nestedLevel + 1); // Generate nested instructions
+            // std::cout << "Instruction Count: " << nestedInstructions.size() << std::endl;
             
-        //     // Add the FOR command with nested instructions
-        //     auto forCommand = std::make_shared<ForCommand>(pid, nestedInstructions, iterations);
-        //     instructions.push_back(forCommand);
-        //     remaining -= (maxInstructions * iterations) + 1; // Decrease the remaining count by the number of nested instructions
-        // }
+            // Add the FOR command with nested instructions
+            auto forCommand = std::make_shared<ForCommand>(pid, nestedInstructions, iterations);
+            instructions.push_back(forCommand);
+            if (nestedLevel == 0) {
+                remaining -= (maxInstructions * iterations) + 1; // Decrease the remaining count by the number of nested instructions
+            }
+        }
     }
     return instructions;
 }

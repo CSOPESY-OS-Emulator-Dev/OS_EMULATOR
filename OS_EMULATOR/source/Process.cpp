@@ -4,12 +4,7 @@ void Process::executeInstruction()
 {
     if (this->currentInstruction < this->instructionCount)
     {
-        // Add null check
-        if (this->instructionList[this->currentInstruction] == nullptr) {
-            std::cerr << "Error: Null instruction at index " << this->currentInstruction << this->processID << std::endl;
-            return;
-        }
-        
+        // Execute the current instruction
         this->instructionList[this->currentInstruction]->execute(*this, getFormattedCurrentTime(), coreID);
         if (this->instructionList[this->currentInstruction]->isCommandExecuted())
             // std::cout << "Executed instruction: " << this->instructionList[this->currentInstruction]->getCommandType() << " for process: " << this->name << std::endl;
