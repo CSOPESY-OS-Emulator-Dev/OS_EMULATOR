@@ -54,7 +54,6 @@ std::shared_ptr<Process> SchedulerTestThread::createProcess(std::string processN
     // Add the generated instructions to the process
     for (int i = 0; i < instructionCount; i++) {
         process->addInstruction(instructions[i]);
-        std::cout << "Added instruction: " << instructions[i]->getCommandType() << " to process: " << processName << std::endl;
     }
     return process; // Return the created process
 }
@@ -76,19 +75,25 @@ std::vector<std::shared_ptr<ICommand>> SchedulerTestThread::generateInstructions
         }
         // If the command type is FOR, generate nested instructions
         if (commandType == FOR) {
-            int range = getRandNum(1, remaining);
-            int iterations = getRandNum(0, range - 1); // Random number of iterations between 0 to range -1
-            int maxInstructions = getRandNum(0, iterations == 0 ? 0 : (range - 1) / iterations); // Randomly determine the number of instructions for the FOR loop
-            // Display rang, iterations, randNum and maxInstructions for debugging
-            auto nestedInstructions = generateInstructions(maxInstructions, pid, processName, nestedLevel + 1); // Generate nested instructions
-            // std::cout << "Instruction Count: " << nestedInstructions.size() << std::endl;
-            
-            // Add the FOR command with nested instructions
+            int maxIterations = std::min(remaining - 1, 5); // 1 for the FOR itself
+            if (maxIterations <= 0) break;
+            int iterations = getRandNum(1, maxIterations);
+
+            // Decide how many executions to allocate to sub-instructions
+            int maxSubExec = (remaining - 1) / iterations;
+            if (maxSubExec <= 0) continue;
+            int subExec = getRandNum(1, maxSubExec);
+
+            int subExecCopy = subExec;
+            auto nestedInstructions = generateInstructions(subExecCopy, pid, processName, nestedLevel + 1);
+
+            // Calculate total executions this FOR will consume
+            int forExec = 1 + iterations * subExecCopy;
+            if (forExec > remaining) break;
+
             auto forCommand = std::make_shared<ForCommand>(pid, nestedInstructions, iterations);
             instructions.push_back(forCommand);
-            if (nestedLevel == 0) {
-                remaining -= (maxInstructions * iterations) + 1; // Decrease the remaining count by the number of nested instructions
-            }
+            remaining -= forExec;
         }
     }
     return instructions;

@@ -2,18 +2,16 @@
 
 void Process::executeInstruction()
 {
-    if (this->currentInstruction < this->instructionCount)
+    if (progressCount < instructionCount)
     {
         // Execute the current instruction
-        this->instructionList[this->currentInstruction]->execute(*this, getFormattedCurrentTime(), coreID);
-        if (this->instructionList[this->currentInstruction]->isCommandExecuted())
-            // std::cout << "Executed instruction: " << this->instructionList[this->currentInstruction]->getCommandType() << " for process: " << this->name << std::endl;
-            this->currentInstruction++;
+        instructionList[currentInstruction]->execute(*this, getFormattedCurrentTime(), coreID);
+        if (instructionList[currentInstruction]->isCommandExecuted())
+            currentInstruction++;
 
-        if (this->progressCount == this->instructionCount)
-        {
-            this->setState(FINISHED);
-            this->timeFinished = getFormattedCurrentTime();
+        if (progressCount == instructionCount) {
+            setState(FINISHED);
+            timeFinished = getFormattedCurrentTime();
         }
     }
 }
