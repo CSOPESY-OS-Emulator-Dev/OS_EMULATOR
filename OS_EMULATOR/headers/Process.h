@@ -50,6 +50,7 @@ public:
     friend class DeclareCommand;
     friend class AddCommand;
     friend class SubtractCommand;
+    friend class SleepCommand;
     friend class ForCommand;
 private:
     std::string getFormattedCurrentTime();

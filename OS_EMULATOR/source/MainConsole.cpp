@@ -41,8 +41,7 @@ MainConsole::~MainConsole()
 void MainConsole::draw()
 {
     std::cout << std::flush;
-    std::system("clear");
-    std::system("cls");
+    std::system("cls"); // Clear the console screen
     for (int i = 0; i < this->outputList.size(); i++)
     {
         std::cout << this->outputList[i] << std::endl;
@@ -66,15 +65,13 @@ void MainConsole::process(std::string input)
             showProcesses();
         }
         if (parsed.command == "initialize" && isinitialized){
-        this->outputList.push_back("The operating system is already initialized");
+            this->outputList.push_back("The operating system is already initialized");
         }
         if (parsed.command == "scheduler-start"){
-            GlobalScheduler::getInstance()->startProcessGeneration();
-            this->outputList.push_back("Start Generating Processes");
+            startScheduler();
         }
         if (parsed.command == "scheduler-stop"){
-            GlobalScheduler::getInstance()->stopProcessGeneration();
-            this->outputList.push_back("Stop Generating Processes");
+            stopScheduler();
         }
         if (parsed.command == "report-util"){
             reportUtil();
@@ -324,4 +321,14 @@ void MainConsole::reportUtil()
 
     // Notify the user that the report has been generated
     this->outputList.push_back("Report generated at " + filename + "!");
+}
+
+void MainConsole::startScheduler() {
+    GlobalScheduler::getInstance()->startProcessGeneration();
+    this->outputList.push_back("Start Generating Processes");
+}
+
+void MainConsole::stopScheduler() {
+    GlobalScheduler::getInstance()->stopProcessGeneration();
+    this->outputList.push_back("Stop Generating Processes");
 }

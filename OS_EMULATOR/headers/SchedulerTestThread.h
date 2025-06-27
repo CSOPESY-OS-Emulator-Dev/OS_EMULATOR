@@ -34,7 +34,7 @@ public:
     // Return random command type
     std::vector<std::shared_ptr<ICommand>> generateInstructions(int& remaining, int pid, std::string processName, int nestedLevel);
     // Get a random command type, with an option to include FOR command type
-    CommandType getRandomCommandType(bool includeFOR = true); // Default includeFOR is true, to include FOR command type
+    CommandType getRandomCommandType(bool includeFOR); // Default includeFOR is true, to include FOR command type
     // Assign new process to scheduler
     void assignToScheduler(std::shared_ptr<Process> process);
 private:
@@ -43,7 +43,6 @@ private:
     int minIns; // Minimum instructions per process
     int maxIns; // Maximum instructions per process
 
-    CommandType instructionChoose();
     bool isRunning = false; // Flag to control the thread's execution loop
     int processCount = 0; // Counter for the number of processes created
     int getRandNum(int min, int max);
