@@ -8,7 +8,8 @@
 #include "PrintCommand.h"
 #include "ICommand.h"
 #include "DeclareCommand.h"
-
+#include "AddCommand.h"
+#include "SubtractCommand.h"
 class SchedulerTestThread : public IETThread {
     // SchedulerTestThread is a test thread for the scheduler.
     // It inherits from IETThread to allow running in a separate thread.

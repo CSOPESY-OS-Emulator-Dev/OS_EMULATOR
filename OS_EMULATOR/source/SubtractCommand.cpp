@@ -1,20 +1,18 @@
-#include "AddCommand.h"
+#include "SubtractCommand.h"
 
 // Private delegating constructor - all common logic here
-AddCommand::AddCommand(int pid, const std::string& v1, 
+SubtractCommand::SubtractCommand(int pid, const std::string& v1, 
                       std::variant<std::string, int> op2, 
                       std::variant<std::string, int> op3)
     : ICommand(pid, ADD), var1(v1), operand2(op2), operand3(op3) {
 }
 
-void AddCommand::execute(Process& process, std::string timeExecuted, int coreID){
+void SubtractCommand::execute(Process& process, std::string timeExecuted, int coreID){
 
     int value2 = 0;
     int value3 = 0;
-    std::string varName2;
-    std::string varName3;
     if (std::holds_alternative<std::string>(this->operand2)) {
-        varName2 = std::get<std::string>(operand2);
+        std::string varName2 = std::get<std::string>(operand2);
         auto it = process.symbolTable.find(varName2);
         if(it != process.symbolTable.end()){
             value2 = it->second;
@@ -27,7 +25,7 @@ void AddCommand::execute(Process& process, std::string timeExecuted, int coreID)
     
     // Check what type op3 is
     if (std::holds_alternative<std::string>(this->operand3)) {
-        varName3 = std::get<std::string>(operand3);
+        std::string varName3 = std::get<std::string>(operand3);
         auto it = process.symbolTable.find(varName3);
         if(it != process.symbolTable.end()){
             value3 = it->second;
@@ -37,9 +35,8 @@ void AddCommand::execute(Process& process, std::string timeExecuted, int coreID)
     } else if (std::holds_alternative<int>(this->operand3)) {
         value3 = std::get<int>(operand3);
     }
-    int result = value2 + value3;
+    int result = value2 - value3;
     process.symbolTable[var1] = result;
-    process.outputLog->push_back(timeExecuted + " Core:" + std::to_string(coreID) + " \"" + std::to_string(result) + "\" ="+ std::to_string(value2) +"+"+ std::to_string(value3));
 }
 // // Public constructors delegate to private one
 // AddCommand::AddCommand(int pid, const std::string& v1, const std::string& v2, const std::string& v3)
@@ -52,4 +49,4 @@ void AddCommand::execute(Process& process, std::string timeExecuted, int coreID)
 //     : AddCommand(pid, v1, std::variant<std::string, int>(v2), std::variant<std::string, int>(val3)) {}
 
 // AddCommand::AddCommand(int pid, const std::string& v1, int val2, int val3)
-//     : AddCommand(pid, v1, std::variant<std::string, int>(val2), std::variant<std::string, int>(val3x )) {}
+//     : AddCommand(pid, v1, std::variant<std::string, int>(val2), std::variant<std::string, int>(val3)) {}

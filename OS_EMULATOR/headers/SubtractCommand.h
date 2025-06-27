@@ -4,7 +4,7 @@
 #include "ICommand.h"
 #include "Process.h"
 #include "GlobalScheduler.h"
-class AddCommand : public ICommand {
+class SubtractCommand : public ICommand {
 private:
     std::string var1;
     std::variant<std::string, int> operand2;
@@ -16,7 +16,7 @@ private:
     //            std::variant<std::string, int> op3);
 
 public:
-    AddCommand(int pid, const std::string& v1, 
+    SubtractCommand(int pid, const std::string& v1, 
                std::variant<std::string, int> op2, 
                std::variant<std::string, int> op3);
     void execute(Process& process, std::string timeExecuted, int coreID) override;

@@ -170,7 +170,7 @@ void MainConsole::initializeOS(){
     }
 
     file >> input;
-    if (input == "delays_per_exec"){
+    if (input == "delay_per_exec"){
         file >> delays_per_exec;
         if(delays_per_exec >= 0 && delays_per_exec <= 4294967296u){
             this->outputList.push_back("delays_per_exec : " + std::to_string(delays_per_exec));
