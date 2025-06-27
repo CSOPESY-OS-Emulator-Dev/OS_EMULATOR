@@ -46,26 +46,22 @@ std::shared_ptr<Process> SchedulerTestThread::createProcess(std::string processN
     
     // Randomly generate instructions for the process
     int instructionCount = rand() % (maxIns - minIns + 1) + minIns;
-    for (int i = 0; i < instructionCount; ++i) {
+    while (process->getTotalIntstruction() < instructionCount) {
         // Here we would create a random instruction and add it to the process
-        // auto commandType = getRandomCommandType() <-- uncomment this part after implementing all command types
-        auto instruction = createInstruction(PRINT, processName, processCount); // replace PRINT with commandType after implementing all command types
+        auto commandType = getRandomCommandType();
+        auto instruction = createInstruction(commandType, process, instructionCount); // replace PRINT with commandType after implementing all command types
         process->addInstruction(instruction);
+        process->incrementInstructionCount(); // Increment the instruction count for the process
     }
     
     return process; // Return the created process
 }
 
-std::shared_ptr<ICommand> SchedulerTestThread::createInstruction(CommandType commandType, std::string processName, int id) {
-    // Create a random instruction of the specified command type
-    // Get a random number from 1-3
-
-
-    // Get a random number from 0-65535
-
+std::shared_ptr<ICommand> SchedulerTestThread::createInstruction(CommandType commandType, std::shared_ptr<Process> process, int instructionCount, int nestedLevel = 0) {
+    // Create a new instruction based on the command type
     switch (commandType) {
         case PRINT:
-            return std::make_shared<PrintCommand>(id, "Hello world from " + processName); // Assuming 0 is the PID for the test
+            return std::make_shared<PrintCommand>(std::to_string(process->getProcessID()), "Hello world from " + process->getProcessName()); // Assuming 0 is the PID for the test
         // Add cases for other command types as needed
         case DECLARE:
             // Placeholder for DECLARE command
@@ -81,17 +77,37 @@ std::shared_ptr<ICommand> SchedulerTestThread::createInstruction(CommandType com
             return nullptr; // std::make_shared<ICommand>(id, commandType); // Assuming 0 is the PID for the test
         case FOR:
             // Placeholder for FOR command
-            return nullptr; // std::make_shared<ICommand>(id, commandType); // Assuming 0 is the PID for the test
+            // Assuming we need to generate a ForCommand with a random number of instructions and iterations
+            // Generate a random number of iterations based on the range between the instructionCount and getTotalInstructions within the process
+            int range; //getRandomNumber(1, instructionCount - process->getTotalIntstruction());
+            int iterations = rand() % (range); // Random iterations between 0 and range between instructionCount and total instructions
+            int numInstructions = std::floor(static_cast<float>(range) / iterations); // Calculate the number of instructions per iteration
+            return nullptr; // std::make_shared<ForCommand>(id, generateInstructions(process, numInstructions + process->getTotalInstruction(), nestedLevel++), iterations); // Assuming 0 is the PID for the test
         // Add more cases for other command types as needed
         default:
             return nullptr;
     }
 }
 
-CommandType SchedulerTestThread::getRandomCommandType() {
+std::vector<std::shared_ptr<ICommand>> SchedulerTestThread::generateInstructions(std::shared_ptr<Process> process, int instructionCount, int nestedLevel)
+{
+    std::vector<std::shared_ptr<ICommand>> instructions;
+    // Generate a random instruction for each instruction count
+    while(process->getTotalIntstruction() < instructionCount) {
+        // Generate a vector of random instructions for the process
+        auto commandType = getRandomCommandType(nestedLevel <= 3 ? true : false); // Limit FOR command nesting to 3 levels
+        auto instruction = createInstruction(commandType, process, instructionCount, nestedLevel);
+        instructions.push_back(instruction);
+    }
+    return instructions;
+}
+
+CommandType SchedulerTestThread::getRandomCommandType(bool includeFOR = true)
+{
     static std::random_device rd;   // Random seed
     static std::mt19937 gen(rd());  // Mersenne Twister RNG
-    static std::uniform_int_distribution<> dist(0, TYPE_COUNT - 1);
+    static const int count = includeFOR ? TYPE_COUNT : TYPE_COUNT - 1; // Adjust count if FOR is excluded
+    static std::uniform_int_distribution<> dist(0, count - 1);
 
     return static_cast<CommandType>(dist(gen));
 }

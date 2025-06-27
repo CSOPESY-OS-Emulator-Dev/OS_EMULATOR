@@ -27,9 +27,10 @@ public:
     // Create new process with a given name and ID
     std::shared_ptr<Process> createProcess(std::string processName);
     // Create a random instruction of a given command type
-    std::shared_ptr<ICommand> createInstruction(CommandType commandType, std::string processName, int id);
+    std::shared_ptr<ICommand> createInstruction(CommandType commandType, std::shared_ptr<Process> process, int instructionCount, int nestedLevel = 0);
     // Return random command type
-    CommandType getRandomCommandType();
+    std::vector<std::shared_ptr<ICommand>> generateInstructions(std::shared_ptr<Process> process, int instructionCount, int nestedLevel = 0);
+    CommandType getRandomCommandType(bool includeFOR = true); // Default includeFOR is true, to include FOR command type
     // Assign new process to scheduler
     void assignToScheduler(std::shared_ptr<Process> process);
 private:

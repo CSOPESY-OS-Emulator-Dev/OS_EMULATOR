@@ -39,7 +39,8 @@ public:
     std::string getProcessName();
 
     // Used by the scheduler-test to pipe random instruction
-    void addInstruction(std::shared_ptr<ICommand> instruction);
+    void addInstruction(std::shared_ptr<ICommand> instruction); // Default count is 1
+    void incrementInstructionCount(int count = 1); // Increment instruction count by a given count, default is 1
 
     Process(std::string name, int id);
     ~Process();
@@ -66,6 +67,7 @@ private:
 
     int instructionCount;
     int currentInstruction;
+    int sleepDuration; // Duration in milliseconds for sleep state
 
     state currentState;
 

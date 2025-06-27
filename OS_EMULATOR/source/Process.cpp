@@ -76,7 +76,12 @@ void Process::addInstruction(std::shared_ptr<ICommand> instruction)
 {
     // Add the instruction to the instruction list
     this->instructionList.push_back(instruction);
-    this->instructionCount++;
+}
+
+void Process::incrementInstructionCount(int count)
+{
+    // Increment the instruction count by the given count
+    this->instructionCount += count;
 }
 
 Process::Process(std::string name, int id)
