@@ -49,7 +49,6 @@ public:
     CommandType getRandomCommandType(bool includeFOR); // Default includeFOR is true, to include FOR command type
     // Assign new process to scheduler
     void assignToScheduler(std::shared_ptr<Process> process);
-    int getTotalExecutions(const std::vector<std::shared_ptr<ICommand>>& instructions);
 
 private:
     int cpuTick; // The CPU tick for the test thread 

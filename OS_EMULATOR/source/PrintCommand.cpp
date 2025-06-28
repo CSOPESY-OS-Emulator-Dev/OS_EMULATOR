@@ -24,7 +24,7 @@ void PrintCommand::execute(Process& process, std::string timeExecuted, int coreI
     } else {
         // If the variable does not exist and is empty, declare variable with value 0
         process.symbolTable[variable] = 0; // Initialize the variable in the symbol table
-        msg << "0";
+        msg << this->message << "0";
     }
     // Append the message to the process's output log
     process.outputLog->push_back(timeExecuted + " Core:" + std::to_string(coreID) + " \"" + msg.str() + "\"");

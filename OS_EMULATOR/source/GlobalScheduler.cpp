@@ -162,7 +162,7 @@ std::string GlobalScheduler::getCPUUtilization()
     }
 
     int utilization = (totalCores > 0) ? (usedCores * 100 / totalCores) : 0;
-    return "CPU utilization: " + std::to_string(utilization) + "%\n";
+    return "CPU utilization: " + std::to_string(utilization) + "%";
 }
 
 std::string GlobalScheduler::getCoresUsed()
@@ -173,7 +173,7 @@ std::string GlobalScheduler::getCoresUsed()
         if (core->isOccupied())
             used++;
     }
-    return "Cores used: " + std::to_string(used) + "\n";
+    return "Cores used: " + std::to_string(used);
 }
 
 std::string GlobalScheduler::getCoresAvailable()
@@ -185,7 +185,7 @@ std::string GlobalScheduler::getCoresAvailable()
             used++;
     }
     int total = static_cast<int>(cores.size());
-    return "Cores available: " + std::to_string(total - used) + "\n";
+    return "Cores available: " + std::to_string(total - used);
 }
 
 std::vector<std::string> GlobalScheduler::getRunningProcesses()

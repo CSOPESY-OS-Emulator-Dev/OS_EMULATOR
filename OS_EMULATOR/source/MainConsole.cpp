@@ -224,10 +224,10 @@ void MainConsole::redrawScreen(std::string processName)
 
 void MainConsole::showProcesses()
 {
+    this->outputList.push_back("\n------------------------------------");
     this->outputList.push_back(GlobalScheduler::getInstance()->getCPUUtilization());
     this->outputList.push_back(GlobalScheduler::getInstance()->getCoresUsed());
     this->outputList.push_back(GlobalScheduler::getInstance()->getCoresAvailable());
-    
     this->outputList.push_back("------------------------------------");
 
     // Print running processes
@@ -247,7 +247,7 @@ void MainConsole::showProcesses()
     this->outputList.push_back("\nFinished Processes:");
     if (GlobalScheduler::getInstance()->getFinishedProcesses().empty())
     {
-        this->outputList.push_back("No finished processes.\n");
+        this->outputList.push_back("No finished processes.");
     }
     else
     {
@@ -281,8 +281,8 @@ void MainConsole::reportUtil()
     //auto scheduler = GlobalScheduler::getInstance();
 
     // Add CPU info at the top
-    out << GlobalScheduler::getInstance()->getCPUUtilization();
-    out << GlobalScheduler::getInstance()->getCoresUsed();
+    out << GlobalScheduler::getInstance()->getCPUUtilization() << "\n";
+    out << GlobalScheduler::getInstance()->getCoresUsed() << "\n";
     out << GlobalScheduler::getInstance()->getCoresAvailable();
     out << "\n------------------------------------\n";
 
@@ -302,7 +302,7 @@ void MainConsole::reportUtil()
     }
 
     // Finished Processes
-    out << "Finished Processes:\n";
+    out << "\nFinished Processes:\n";
     auto finished = GlobalScheduler::getInstance()->getFinishedProcesses();
     if (finished.empty())
     {
