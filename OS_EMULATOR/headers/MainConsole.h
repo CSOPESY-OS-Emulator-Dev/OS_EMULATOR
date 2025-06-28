@@ -15,7 +15,6 @@ public:
 private:
     bool isinitialized = false;
     std::vector<std::string> outputList;
-    std::vector<std::string> commandList;
 
     // Function prototype of available commands
     void setScreen(std::string);

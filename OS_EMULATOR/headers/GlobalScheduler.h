@@ -11,6 +11,7 @@
 class CoreThread;
 class SchedulerTestThread;
 class FCFSScheduler;
+class RRScheduler;
 
 class GlobalScheduler
 {
@@ -58,6 +59,8 @@ public:
     std::shared_ptr<Process> getProcessByID(int processID) const;
 
     friend class FCFSScheduler; // Allow FCFS Scheduler to access private members
+    friend class RRScheduler; // Allow RR Scheduler to access private members
+    
 private:
     // Make singleton
     GlobalScheduler();
@@ -79,6 +82,7 @@ private:
     std::vector<std::string> finishedProcesses;
 
     // Mutex to ensure thread safety when accessing shared resources
+    mutable std::mutex coreMutex;              // Mutex to ensure thread safety when accessing core threads
     mutable std::mutex schedulerMutex;         // Mutex to ensure thread safety when accessing scheduler resources
     mutable std::mutex processMapMutex;        // Mutex to ensure thread safety when accessing processMap
     mutable std::mutex finishedProcessesMutex; // Mutex to ensure thread safety when accessing finishedProcesses

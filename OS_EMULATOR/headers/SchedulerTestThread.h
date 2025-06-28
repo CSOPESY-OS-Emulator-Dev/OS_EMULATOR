@@ -10,6 +10,7 @@
 #include "DeclareCommand.h"
 #include "AddCommand.h"
 #include "SubtractCommand.h"
+#include "SleepCommand.h"
 #include "ForCommand.h"
 #include <stack>
 
@@ -46,7 +47,7 @@ public:
     std::vector<std::shared_ptr<ICommand>> generateInstructions(int& remainingExecs, int pid, const std::string& processName, int nestingLevel);
     std::vector<std::shared_ptr<ICommand>> generateInstructionsIterative(int &remainingExecs, int pid, const std::string &processName);
     // Get a random command type, with an option to include FOR command type
-    CommandType getRandomCommandType(bool includeFOR); // Default includeFOR is true, to include FOR command type
+    CommandType getRandomCommandType(bool includeFOR, bool includeSLEEP); // Default includeFOR is true, to include FOR command type
     // Assign new process to scheduler
     void assignToScheduler(std::shared_ptr<Process> process);
 

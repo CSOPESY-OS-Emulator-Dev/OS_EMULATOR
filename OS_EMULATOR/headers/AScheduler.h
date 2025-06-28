@@ -28,7 +28,8 @@ protected:
     virtual void execute() = 0;
     // Mutex to ensure thread safety when accessing the process queue
     mutable std::mutex queueMutex; 
+    int quantumCycles = 0; // Quantum cycles for time-slicing in round robin preemptive scheduling
+    
 private:
     bool isRunning = true; // Flag to control the scheduler's execution loop
-    int quantumCycles = 0; // Quantum cycles for time-slicing in round robin preemptive scheduling
 };

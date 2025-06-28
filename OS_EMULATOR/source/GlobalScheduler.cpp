@@ -1,6 +1,7 @@
 #include "GlobalScheduler.h"
 #include "CoreThread.h"
 #include "FCFSScheduler.h"
+#include "RRScheduler.h"
 #include "SchedulerTestThread.h"
 
 GlobalScheduler *GlobalScheduler::sharedInstance = nullptr;
@@ -9,7 +10,7 @@ GlobalScheduler::GlobalScheduler()
 {
     // initialize scheduler algorithms
     schedulerAlgorithms["fcfs"] = std::make_shared<FCFSScheduler>();
-    // schedulerAlgorithms["rr"] = std::make_shared<AScheduler>();
+    schedulerAlgorithms["rr"] = std::make_shared<RRScheduler>();
     currentScheduler = nullptr; // No scheduler set initially
 }
 
@@ -152,6 +153,7 @@ void GlobalScheduler::stopProcessGeneration()
 
 std::string GlobalScheduler::getCPUUtilization()
 {
+    std::lock_guard<std::mutex> lock(coreMutex);
     int totalCores = static_cast<int>(cores.size());
     int usedCores = 0;
 
@@ -167,6 +169,7 @@ std::string GlobalScheduler::getCPUUtilization()
 
 std::string GlobalScheduler::getCoresUsed()
 {
+    std::lock_guard<std::mutex> lock(coreMutex);
     int used = 0;
     for (const auto &core : cores)
     {
@@ -178,6 +181,7 @@ std::string GlobalScheduler::getCoresUsed()
 
 std::string GlobalScheduler::getCoresAvailable()
 {
+    std::lock_guard<std::mutex> lock(coreMutex);
     int used = 0;
     for (const auto &core : cores)
     {
@@ -192,6 +196,7 @@ std::vector<std::string> GlobalScheduler::getRunningProcesses()
 {
     // Get the list of running processes in string format
     // Return running processes in occupied cores
+    std::lock_guard<std::mutex> lock(coreMutex); // Lock the mutex to ensure thread safety
     std::vector<std::string> log;
     for (auto &core : this->cores)
     {
