@@ -1,6 +1,7 @@
 #include "GlobalScheduler.h"
 #include "CoreThread.h"
 #include "FCFSScheduler.h"
+#include "RRScheduler.h"
 #include "SchedulerTestThread.h"
 
 GlobalScheduler *GlobalScheduler::sharedInstance = nullptr;
@@ -9,7 +10,7 @@ GlobalScheduler::GlobalScheduler()
 {
     // initialize scheduler algorithms
     schedulerAlgorithms["fcfs"] = std::make_shared<FCFSScheduler>();
-    // schedulerAlgorithms["rr"] = std::make_shared<AScheduler>();
+    schedulerAlgorithms["rr"] = std::make_shared<RRScheduler>();
     currentScheduler = nullptr; // No scheduler set initially
 }
 
@@ -152,35 +153,35 @@ void GlobalScheduler::stopProcessGeneration()
 
 std::string GlobalScheduler::getCPUUtilization()
 {
-    std::lock_guard<std::mutex> lock(schedulerMutex);
-    int totalCores = static_cast<int>(cores.size());
-    int usedCores = 0;
+    std::lock_guard<std::mutex> lock(coreMutex);
+    float totalCores = static_cast<float>(cores.size());
+    float usedCores = 0;
 
     for (const auto &core : cores)
     {
         if (core->isOccupied())
-            usedCores++;
+            usedCores += 1.0;
     }
 
-    int utilization = (totalCores > 0) ? (usedCores * 100 / totalCores) : 0;
-    return "CPU utilization: " + std::to_string(utilization) + "%\n";
+    int utilization = static_cast<int>((usedCores/totalCores) * 100);
+    return "CPU utilization: " + std::to_string(utilization) + "%";
 }
 
 std::string GlobalScheduler::getCoresUsed()
 {
-    std::lock_guard<std::mutex> lock(schedulerMutex);
+    std::lock_guard<std::mutex> lock(coreMutex);
     int used = 0;
     for (const auto &core : cores)
     {
         if (core->isOccupied())
             used++;
     }
-    return "Cores used: " + std::to_string(used) + "\n";
+    return "Cores used: " + std::to_string(used);
 }
 
 std::string GlobalScheduler::getCoresAvailable()
 {
-    std::lock_guard<std::mutex> lock(schedulerMutex);
+    std::lock_guard<std::mutex> lock(coreMutex);
     int used = 0;
     for (const auto &core : cores)
     {
@@ -188,13 +189,14 @@ std::string GlobalScheduler::getCoresAvailable()
             used++;
     }
     int total = static_cast<int>(cores.size());
-    return "Cores available: " + std::to_string(total - used) + "\n";
+    return "Cores available: " + std::to_string(total - used);
 }
 
 std::vector<std::string> GlobalScheduler::getRunningProcesses()
 {
     // Get the list of running processes in string format
     // Return running processes in occupied cores
+    std::lock_guard<std::mutex> lock(coreMutex); // Lock the mutex to ensure thread safety
     std::vector<std::string> log;
     for (auto &core : this->cores)
     {

@@ -8,7 +8,7 @@ SubtractCommand::SubtractCommand(int pid, const std::string& v1,
 }
 
 void SubtractCommand::execute(Process& process, std::string timeExecuted, int coreID){
-
+    process.progressCount++;
     int value2 = 0;
     int value3 = 0;
     if (std::holds_alternative<std::string>(this->operand2)) {
@@ -37,8 +37,8 @@ void SubtractCommand::execute(Process& process, std::string timeExecuted, int co
     }
     int result = value2 - value3;
     process.symbolTable[var1] = result;
-    process.outputLog->push_back(timeExecuted + " Core:" + std::to_string(coreID) + " \"" + std::to_string(result) + "\" ="+ std::to_string(value2) +"-"+ std::to_string(value3));
-    process.progressCount++;
+    // Output to log the result of the subtraction
+    process.outputLog->push_back(timeExecuted + " Core:" + std::to_string(coreID) + " Subtracted: " + std::to_string(value2) + " - " + std::to_string(value3) + " = " + std::to_string(result));
     isExecuted = true;
 }
 // // Public constructors delegate to private one

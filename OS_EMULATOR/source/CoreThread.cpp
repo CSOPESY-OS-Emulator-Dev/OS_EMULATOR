@@ -12,7 +12,13 @@ void CoreThread::run() {
         // If the core is occupied and the current process is set, check if it can execute
         if (this->occupied && this->currentProcess && this->cpuTicks % (this->cpuCycle + 1) == 0) {
             // Check if the process has finished executing
-            if (this->currentProcess->getState() == FINISHED) {
+            if (this->currentProcess->getState() == WAITING) {
+                // Queue current process back to scheduler in GlobalScheduler
+                GlobalScheduler::getInstance()->queueProcess(this->currentProcess);
+                this->occupied = false; // Free the core
+                this->currentProcess = nullptr; // Clear the current process
+                this->currentTicks = 0; // Reset current ticks
+            } else if (this->currentProcess->getState() == FINISHED) {
                 // Push current process to finished processes in GlobalScheduler
                 GlobalScheduler::getInstance()->finishProcess(this->currentProcess);
                 this->occupied = false; // Free the core
@@ -24,22 +30,17 @@ void CoreThread::run() {
                 this->occupied = false; // Free the core
                 this->currentProcess = nullptr; // Clear the current process
                 this->currentTicks = 0; // Reset current ticks
+            } else if (this->currentProcess->getState() == SLEEPING) {
+                // If process is currently executing a sleep instruction
+                this->currentProcess->executeInstruction();
             } else {
                 // If the process is still running and has ticks left, execute its instruction
                 this->currentProcess->executeInstruction(); // Execute the current process's instruction
                 this->currentTicks--; // Decrease the ticks for the current process
-                // log process execution for debugging
-                // std::cout << "Core " << this->coreID 
-                //           << " executed instruction for Process " 
-                //           << this->currentProcess->getProcessID() 
-                //           << " at CPU Tick: "
-                //           << this->cpuTicks
-                //           << ". Remaining ticks: " << this->currentTicks 
-                //           << std::endl;
             } 
         }
         this->cpuTicks++;
-        sleep(10); // Sleep for 10 millisecond to simulate time passing
+        sleep(1); // Sleep for 10 millisecond to simulate time passing
     }
 }
 

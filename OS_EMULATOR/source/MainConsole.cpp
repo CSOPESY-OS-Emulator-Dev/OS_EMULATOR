@@ -25,8 +25,7 @@ void MainConsole::initialize()
     this->outputList.push_back(" Developers : ");
     this->outputList.push_back(" DEMANALATA, ASHANTIE LOUIZE BACO \n HILOMEN, GEO BRIAN \n KINTANAR, KRISTIAN ANTHONY REMEDIOS \n OLORES, SEAN ANDREI PAJARTIN\n");
     this->outputList.push_back("===============================================================================================\n");
-    this->outputList.push_back("These are the available commands :");
-    this->outputList.push_back("initialize\nscreen\nscreen -s <process name>\nscreen -r <process name>\nscheduler-test\nscheduler-stop\nreport-util\nclear\nexit\n");
+    this->outputList.push_back("<-help> to view all available commands\n");   
 }
 
 MainConsole::MainConsole() : AConsole("MAIN_CONSOLE")
@@ -41,8 +40,7 @@ MainConsole::~MainConsole()
 void MainConsole::draw()
 {
     std::cout << std::flush;
-    std::system("clear");
-    std::system("cls");
+    std::cout << "\033c";
     for (int i = 0; i < this->outputList.size(); i++)
     {
         std::cout << this->outputList[i] << std::endl;
@@ -51,37 +49,49 @@ void MainConsole::draw()
 
 void MainConsole::process(std::string input)
 {
+    bool isvalid = false;
     auto parsed = parseInput(input);
 
     this->outputList.push_back("C:\\> " + input);
 
+    if(parsed.command == "-help"){
+        this->outputList.push_back("These are the available commands :");
+        this->outputList.push_back("initialize\nscreen -s <process name>\nscreen -r <process name>\nscheduler-start\nscheduler-stop\nreport-util\nclear\nexit\n");
+        isvalid = true;
+    }
+
     if(isinitialized){
         if(parsed.command == "screen" && parsed.args.size() == 2 && parsed.args[0] == "-s" ) {
-        setScreen(parsed.args[1]);
+            setScreen(parsed.args[1]);
+        isvalid = true;
         }
         if(parsed.command == "screen" && parsed.args.size() == 2 && parsed.args[0] == "-r" ) {
             redrawScreen(parsed.args[1]);
+            isvalid = true;
         }
         if(parsed.command == "screen" && parsed.args.size() == 1 && parsed.args[0] == "-ls" ) {
             showProcesses();
+            isvalid = true;
         }
         if (parsed.command == "initialize" && isinitialized){
-        this->outputList.push_back("The operating system is already initialized");
+            this->outputList.push_back("The operating system is already initialized");
         }
         if (parsed.command == "scheduler-start"){
-            GlobalScheduler::getInstance()->startProcessGeneration();
-            this->outputList.push_back("Start Generating Processes");
+            startScheduler();
+            isvalid = true;
         }
         if (parsed.command == "scheduler-stop"){
-            GlobalScheduler::getInstance()->stopProcessGeneration();
-            this->outputList.push_back("Stop Generating Processes");
+            stopScheduler();
+            isvalid = true;
         }
         if (parsed.command == "report-util"){
             reportUtil();
+            isvalid = true;
         }
     } else if(parsed.command == "initialize"){
         isinitialized = true;
         initializeOS();
+        isvalid = true;
     }
     else{
         this->outputList.push_back("Please initialize the operating system.");
@@ -93,6 +103,10 @@ void MainConsole::process(std::string input)
     if (parsed.command == "clear")
     {
         initialize();
+        isvalid = true;
+    }
+    if (!isvalid && isinitialized){
+        this->outputList.push_back("Enter a Valid Command");
     }
 }
 
@@ -227,10 +241,10 @@ void MainConsole::redrawScreen(std::string processName)
 
 void MainConsole::showProcesses()
 {
+    this->outputList.push_back("\n------------------------------------");
     this->outputList.push_back(GlobalScheduler::getInstance()->getCPUUtilization());
     this->outputList.push_back(GlobalScheduler::getInstance()->getCoresUsed());
     this->outputList.push_back(GlobalScheduler::getInstance()->getCoresAvailable());
-    
     this->outputList.push_back("------------------------------------");
 
     // Print running processes
@@ -250,7 +264,7 @@ void MainConsole::showProcesses()
     this->outputList.push_back("\nFinished Processes:");
     if (GlobalScheduler::getInstance()->getFinishedProcesses().empty())
     {
-        this->outputList.push_back("No finished processes.\n");
+        this->outputList.push_back("No finished processes.");
     }
     else
     {
@@ -284,8 +298,8 @@ void MainConsole::reportUtil()
     //auto scheduler = GlobalScheduler::getInstance();
 
     // Add CPU info at the top
-    out << GlobalScheduler::getInstance()->getCPUUtilization();
-    out << GlobalScheduler::getInstance()->getCoresUsed();
+    out << GlobalScheduler::getInstance()->getCPUUtilization() << "\n";
+    out << GlobalScheduler::getInstance()->getCoresUsed() << "\n";
     out << GlobalScheduler::getInstance()->getCoresAvailable();
     out << "\n------------------------------------\n";
 
@@ -305,7 +319,7 @@ void MainConsole::reportUtil()
     }
 
     // Finished Processes
-    out << "Finished Processes:\n";
+    out << "\nFinished Processes:\n";
     auto finished = GlobalScheduler::getInstance()->getFinishedProcesses();
     if (finished.empty())
     {
@@ -324,4 +338,14 @@ void MainConsole::reportUtil()
 
     // Notify the user that the report has been generated
     this->outputList.push_back("Report generated at " + filename + "!");
+}
+
+void MainConsole::startScheduler() {
+    GlobalScheduler::getInstance()->startProcessGeneration();
+    this->outputList.push_back("Start Generating Processes");
+}
+
+void MainConsole::stopScheduler() {
+    GlobalScheduler::getInstance()->stopProcessGeneration();
+    this->outputList.push_back("Stop Generating Processes");
 }

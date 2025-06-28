@@ -9,6 +9,7 @@ public:
     ForCommand(int pid, std::vector<std::shared_ptr<ICommand>> instructions, int iterations);
     // Execute the loop command by executing each instruction for the specified number of iterations
     void execute(Process& process, std::string timeExecuted, int coreID) override;
+    friend class SchedulerTestThread; // Allow SchedulerTestThread to access private members
 private:
     std::vector<std::shared_ptr<ICommand>> instructions; // Instructions to execute in the loop
     int iterations; // Number of iterations to execute the loop

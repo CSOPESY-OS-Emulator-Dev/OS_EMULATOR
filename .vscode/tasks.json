@@ -2,20 +2,25 @@
     "tasks": [
         {
             "type": "cppbuild",
-            "label": "C/C++: g++ build active file",
-            "command": "/usr/bin/g++",
+            "label": "C/C++: cl.exe build active file",
+            "command": "cl.exe",
             "args": [
-                "-fdiagnostics-color=always",
-                "-g",
-                "${file}",
-                "-o",
-                "${fileDirname}/${fileBasenameNoExtension}"
+                "/Zi",
+                "/EHsc",
+                "/nologo",
+                "/std:c++20",
+                "/MD",
+                "/I",
+                "${workspaceFolder}/OS_EMULATOR/headers",
+                "/Fe${workspaceFolder}/source/Main.exe",
+                "${workspaceFolder}/OS_EMULATOR/source/*.cpp",
+                "legacy_stdio_definitions.lib"
             ],
             "options": {
                 "cwd": "${fileDirname}"
             },
             "problemMatcher": [
-                "$gcc"
+                "$msCompile"
             ],
             "group": {
                 "kind": "build",

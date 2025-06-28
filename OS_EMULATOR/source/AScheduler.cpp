@@ -14,7 +14,7 @@ void AScheduler::run() {
         // It can be overridden by derived classes to implement specific scheduling logic.
         // The execute method should contain the scheduling logic for the specific algorithm.
         execute();
-        IETThread::sleep(10); // Sleep for a while to simulate scheduling delay
+        IETThread::sleep(1); // Sleep for a while to simulate scheduling delay
     }
 }
 

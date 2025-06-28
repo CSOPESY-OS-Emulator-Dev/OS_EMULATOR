@@ -1,6 +1,7 @@
-num_cpu 2
-scheduler fcfs
-quantum_cycles 5
+
+num_cpu 4
+scheduler rr
+quantum_cycles 10
 batch_process_freq 1
 min_ins 1000
 max_ins 2000
