@@ -37,3 +37,9 @@ Enter the following commands:
 g++ -std=c++20 -o Main -I headers source/*.cpp
 Main
 ```
+
+## Special thanks
+
+We dedicate this project to Sir Jonathan Mantua, our source of motivation to continue our studies.
+
+![alt text](<Screenshot 2025-06-28 190224.png>)
