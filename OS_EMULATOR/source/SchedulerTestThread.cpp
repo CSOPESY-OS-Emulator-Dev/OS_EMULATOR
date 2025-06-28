@@ -17,7 +17,7 @@ void SchedulerTestThread::run() {
                 assignToScheduler(process);
             }
             // Sleep for the specified CPU cycle duration
-            // IETThread::sleep(10); // Sleep for a short duration to avoid busy waiting
+            IETThread::sleep(10); // Sleep for a short duration to avoid busy waiting
             cpuTick++;
         }
     }
@@ -48,10 +48,10 @@ std::shared_ptr<Process> SchedulerTestThread::createProcess(std::string processN
     int instructionCount = rand() % (maxIns - minIns + 1) + minIns;
     int remaining = instructionCount;
     // Generate instructions for the process
-    auto instructions = generateInstructions(remaining, process->getProcessID(), processName, 0); // Start with nested level 0
+    auto instructions = generateInstructionsIterative(remaining, process->getProcessID(), processName); // Start with nested level 0
     // Add the generated instructions to the process
     process->instructionList = instructions;
-    process->instructionCount = instructionCount; // Set the total instruction count
+    process->instructionCount = instructionCount; // ✅ Correct total
     
     return process; // Return the created process
 }
@@ -95,6 +95,75 @@ std::vector<std::shared_ptr<ICommand>> SchedulerTestThread::generateInstructions
     return instructionList;
 }
 
+std::vector<std::shared_ptr<ICommand>> SchedulerTestThread::generateInstructionsIterative(int& remainingExecs, int pid, const std::string& processName) {
+    std::stack<InstructionFrame> frameStack;
+    // Save initial count of remaining executions
+    int initialRemainingExecs = remainingExecs;
+    // Push the root frame
+    frameStack.push({remainingExecs, 0, {}, 0, 0, false});
+
+    std::vector<std::shared_ptr<ICommand>> finalInstructions;
+
+    while (!frameStack.empty()) {
+        auto& frame = frameStack.top();
+
+        // If we have no more room, complete this frame
+        if (frame.remainingExecs <= 0) {
+            auto finishedInstructions = frame.instructions;
+            frameStack.pop();
+
+            if (!frameStack.empty() && frameStack.top().isForContext) {
+                auto& parent = frameStack.top();
+                int cost = 1 + frame.iterations * finishedInstructions.size();
+                parent.remainingExecs -= cost;
+
+                auto forCmd = std::make_shared<ForCommand>(pid, finishedInstructions, frame.iterations);
+                parent.instructions.push_back(forCmd);
+                parent.isForContext = false;
+            } else {
+                finalInstructions = std::move(finishedInstructions);
+            }
+
+            continue;
+        }
+
+        bool canNest = frame.nestingLevel < 3 && frame.remainingExecs > 5;
+        auto cmdType = getRandomCommandType(canNest);
+
+        if (cmdType == FOR && canNest) {
+            int maxIter = std::min(5, frame.remainingExecs - 1);
+            if (maxIter <= 0) continue;
+
+            int iterations = getRandNum(1, maxIter);
+            int maxSubExec = (frame.remainingExecs - 1) / iterations;
+            if (maxSubExec <= 0) continue;
+
+            int subExecs = getRandNum(1, maxSubExec);
+
+            // Save FOR context
+            frame.isForContext = true;
+
+            // Push new frame for nested instructions
+            frameStack.push({
+                subExecs,
+                frame.nestingLevel + 1,
+                {},
+                iterations,
+                subExecs,
+                false
+            });
+        } else {
+            auto instr = createInstruction(cmdType, pid, processName);
+            if (instr) {
+                frame.instructions.push_back(instr);
+                frame.remainingExecs--;
+            }
+        }
+    }
+
+    remainingExecs = initialRemainingExecs; // Update outer copy
+    return finalInstructions;
+}
 
 std::shared_ptr<ICommand> SchedulerTestThread::createInstruction(CommandType commandType, int pid, std::string processName) {
     // Create a new instruction based on the command type
@@ -162,6 +231,19 @@ void SchedulerTestThread::assignToScheduler(std::shared_ptr<Process> process) {
     // Add the process to the process map
     GlobalScheduler::getInstance()->addProcess(process);
     
+}
+
+int SchedulerTestThread::getTotalExecutions(const std::vector<std::shared_ptr<ICommand>>& instructions) {
+    int total = 0;
+    for (const auto& instr : instructions) {
+        if (auto forCmd = std::dynamic_pointer_cast<ForCommand>(instr)) {
+            int subExec = getTotalExecutions(forCmd->instructions); // Make sure ForCommand exposes its instructions
+            total += 1 + (forCmd->iterations * subExec);
+        } else {
+            total += 1;
+        }
+    }
+    return total;
 }
 
 

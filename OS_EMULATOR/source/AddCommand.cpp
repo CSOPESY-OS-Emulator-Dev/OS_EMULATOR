@@ -8,7 +8,7 @@ AddCommand::AddCommand(int pid, const std::string& v1,
 }
 
 void AddCommand::execute(Process& process, std::string timeExecuted, int coreID){
-
+    process.progressCount++;
     int value2 = 0;
     int value3 = 0;
     std::string varName2;
@@ -38,8 +38,11 @@ void AddCommand::execute(Process& process, std::string timeExecuted, int coreID)
         value3 = std::get<int>(operand3);
     }
     int result = value2 + value3;
+    // Output to log the result of the addition
+    process.outputLog->push_back(timeExecuted + " Core:" + std::to_string(coreID) + " Added: " + 
+                                 std::to_string(value2) + " + " + std::to_string(value3) + 
+                                 " = " + std::to_string(result));
     process.symbolTable[var1] = result;
-    process.progressCount++;
     isExecuted = true;
 }
 // // Public constructors delegate to private one

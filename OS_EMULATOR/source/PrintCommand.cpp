@@ -20,7 +20,7 @@ void PrintCommand::execute(Process& process, std::string timeExecuted, int coreI
         msg << this->message;
     } else if (it != process.symbolTable.end()) {
         // If the variable exists in the symbol table, append its value to the message
-        msg << it->second;
+        msg << this-> message << it->second;
     } else {
         // If the variable does not exist and is empty, declare variable with value 0
         process.symbolTable[variable] = 0; // Initialize the variable in the symbol table

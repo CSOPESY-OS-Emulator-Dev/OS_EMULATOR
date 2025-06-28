@@ -5,14 +5,7 @@ void Process::executeInstruction()
     if (progressCount < instructionCount)
     {
         // Execute the current instruction
-        if (currentInstruction >= instructionList.size()) {
-            setState(FINISHED);
-            timeFinished = getFormattedCurrentTime();
-            return;
-        }
-        if(!instructionList[currentInstruction]->isCommandExecuted()) {
-            instructionList[currentInstruction]->execute(*this, getFormattedCurrentTime(), coreID);
-        }
+        instructionList[currentInstruction]->execute(*this, getFormattedCurrentTime(), coreID);
         if (instructionList[currentInstruction]->isCommandExecuted()) {
             currentInstruction++;
         }
