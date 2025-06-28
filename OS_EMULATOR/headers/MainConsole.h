@@ -12,8 +12,6 @@ public:
     MainConsole();
     ~MainConsole();
 
-    void reportUtil();
-
 private:
     bool isinitialized = false;
     std::vector<std::string> outputList;
@@ -22,8 +20,9 @@ private:
     // Function prototype of available commands
     void setScreen(std::string);
     void redrawScreen(std::string);
-
-    // New functions
+    void reportUtil();
+    void startScheduler();
+    void stopScheduler();
     void showProcesses();
     void initializeOS();
 };

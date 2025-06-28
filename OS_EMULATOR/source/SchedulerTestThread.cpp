@@ -17,7 +17,7 @@ void SchedulerTestThread::run() {
                 assignToScheduler(process);
             }
             // Sleep for the specified CPU cycle duration
-            IETThread::sleep(10); // Sleep for a short duration to avoid busy waiting
+            IETThread::sleep(5); // Sleep for a short duration to avoid busy waiting
             cpuTick++;
         }
     }
@@ -47,116 +47,182 @@ std::shared_ptr<Process> SchedulerTestThread::createProcess(std::string processN
     // Randomly generate instructions for the process
     int instructionCount = rand() % (maxIns - minIns + 1) + minIns;
     int remaining = instructionCount;
-    process->incrementInstructionCount(instructionCount);
-    auto instructions = generateInstructions(remaining, process->getProcessID(), processName, 0); // Start with nested level 0
-    
+    // Generate instructions for the process
+    auto instructions = generateInstructionsIterative(remaining, process->getProcessID(), processName); // Start with nested level 0
     // Add the generated instructions to the process
-    for (auto& instr : instructions) {
-        process->addInstruction(instr);
+    process->instructionList = instructions;
+    process->instructionCount = instructionCount; // ✅ Correct total
+    
+    return process; // Return the created process
+}
+
+std::vector<std::shared_ptr<ICommand>> SchedulerTestThread::generateInstructions(int& remainingExecs, int pid, const std::string& processName, int nestingLevel)
+{
+    std::vector<std::shared_ptr<ICommand>> instructionList;
+
+    while (remainingExecs > 0) {
+        bool canCreateFor = (nestingLevel < 3 && remainingExecs > 1);
+        CommandType cmdType = getRandomCommandType(canCreateFor);
+
+        if (cmdType == FOR && canCreateFor) {
+            int maxIterations = std::min(remainingExecs - 1, 5); // reserve 1 for the ForCommand itself
+            if (maxIterations <= 0) break;
+
+            int iterations = getRandNum(1, maxIterations);
+
+            int maxNestedExecs = (remainingExecs - 1) / iterations;
+            if (maxNestedExecs <= 0) continue;
+
+            int nestedRemainingExecs = getRandNum(1, maxNestedExecs);
+            int actualNestedExecsUsed = nestedRemainingExecs;
+
+            auto nestedInstructions = generateInstructions(actualNestedExecsUsed, pid, processName, nestingLevel + 1);
+
+            int totalForCommandCost = 1 + iterations * actualNestedExecsUsed;
+            if (totalForCommandCost > remainingExecs) break;
+
+            instructionList.push_back(std::make_shared<ForCommand>(pid, nestedInstructions, iterations));
+            remainingExecs -= totalForCommandCost;
+        } else {
+            auto simpleInstr = createInstruction(cmdType, pid, processName);
+            if (simpleInstr) {
+                instructionList.push_back(simpleInstr);
+                remainingExecs--;
+            }
+        }
     }
 
-    return process; // Return the created process
+    return instructionList;
+}
+
+std::vector<std::shared_ptr<ICommand>> SchedulerTestThread::generateInstructionsIterative(int& remainingExecs, int pid, const std::string& processName) {
+    std::stack<InstructionFrame> frameStack;
+    // Save initial count of remaining executions
+    int initialRemainingExecs = remainingExecs;
+    // Push the root frame
+    frameStack.push({remainingExecs, 0, {}, 0, 0, false});
+
+    std::vector<std::shared_ptr<ICommand>> finalInstructions;
+
+    while (!frameStack.empty()) {
+        auto& frame = frameStack.top();
+
+        // If we have no more room, complete this frame
+        if (frame.remainingExecs <= 0) {
+            auto finishedInstructions = frame.instructions;
+            frameStack.pop();
+
+            if (!frameStack.empty() && frameStack.top().isForContext) {
+                auto& parent = frameStack.top();
+                int cost = 1 + frame.iterations * finishedInstructions.size();
+                parent.remainingExecs -= cost;
+
+                auto forCmd = std::make_shared<ForCommand>(pid, finishedInstructions, frame.iterations);
+                parent.instructions.push_back(forCmd);
+                parent.isForContext = false;
+            } else {
+                finalInstructions = std::move(finishedInstructions);
+            }
+
+            continue;
+        }
+
+        bool canNest = frame.nestingLevel < 3 && frame.remainingExecs > 5;
+        auto cmdType = getRandomCommandType(canNest);
+
+        if (cmdType == FOR && canNest) {
+            int maxIter = std::min(5, frame.remainingExecs - 1);
+            if (maxIter <= 0) continue;
+
+            int iterations = getRandNum(1, maxIter);
+            int maxSubExec = (frame.remainingExecs - 1) / iterations;
+            if (maxSubExec <= 0) continue;
+
+            int subExecs = getRandNum(1, maxSubExec);
+
+            // Save FOR context
+            frame.isForContext = true;
+
+            // Push new frame for nested instructions
+            frameStack.push({
+                subExecs,
+                frame.nestingLevel + 1,
+                {},
+                iterations,
+                subExecs,
+                false
+            });
+        } else {
+            auto instr = createInstruction(cmdType, pid, processName);
+            if (instr) {
+                frame.instructions.push_back(instr);
+                frame.remainingExecs--;
+            }
+        }
+    }
+
+    remainingExecs = initialRemainingExecs; // Update outer copy
+    return finalInstructions;
 }
 
 std::shared_ptr<ICommand> SchedulerTestThread::createInstruction(CommandType commandType, int pid, std::string processName) {
     // Create a new instruction based on the command type
+    std::string variable1 = "var" + std::to_string(getRandNum(0,65535));
+    std::string variable2 = "var" + std::to_string(getRandNum(0,65535));
+    std::string variable3 = "var" + std::to_string(getRandNum(0,65535));
     switch (commandType) {
         case PRINT:
-            return std::make_shared<PrintCommand>(pid, "Hello world from " + processName); // Assuming 0 is the PID for the test
-        // Add cases for other command types as needed
+            switch (getRandNum(0, 1)) {
+                case 0:
+                    return std::make_shared<PrintCommand>(pid, "Hello world from " + processName);
+                case 1:
+                    return std::make_shared<PrintCommand>(pid, "Value from " + variable1 + ": ", variable1);
+                default:
+                    return nullptr;
+            }
         case DECLARE:
-            return std::make_shared<DeclareCommand>(pid,"var"+ std::to_string(getRandNum(0,10)),getRandNum(0,std::numeric_limits<uint16_t>::max()) );
+            return std::make_shared<DeclareCommand>(pid,variable1,getRandNum(0,65535) );
         case ADD:
             switch (getRandNum(0,3))
             {
             case 0:
-                return std::make_shared<AddCommand>(pid,"var" + std::to_string(getRandNum(0,10)),"var" + std::to_string(getRandNum(0, 10)),"var" + std::to_string(getRandNum(0, 10)));
-                break;
+                return std::make_shared<AddCommand>(pid,variable1,variable2,variable3);
             case 1:
-                return std::make_shared<AddCommand>(pid,"var" + std::to_string(getRandNum(0,10)),getRandNum(0,10),"var"+ std::to_string(getRandNum(0,10)) );
-                break;
+                return std::make_shared<AddCommand>(pid,variable1,getRandNum(0,65535),variable3 );
             case 2:
-                return std::make_shared<AddCommand>(pid,"var" + std::to_string(getRandNum(0,10)),"var" + std::to_string(getRandNum(0,10)),getRandNum(0,10));
-                break;
+                return std::make_shared<AddCommand>(pid,variable1,variable2,getRandNum(0,65535));
             case 3:
-                return std::make_shared<AddCommand>(pid,"var" + std::to_string(getRandNum(0,10)),getRandNum(0,10),getRandNum(0,10));
-                break;
+                return std::make_shared<AddCommand>(pid,variable1,getRandNum(0,65535),getRandNum(0,65535));
             default:
                 return nullptr;
-                break;
             }
-            // Placeholder for ADD command
-            return nullptr; // std::make_shared<ICommand>(id, commandType); // Assuming 0 is the PID for the test
+            break;
         case SUBTRACT:
             switch (getRandNum(0,3))
             {
             case 0:
-                return std::make_shared<SubtractCommand>(pid,"var" + std::to_string(getRandNum(0,10)),"var" + std::to_string(getRandNum(0, 10)),"var" + std::to_string(getRandNum(0, 10)));
-                break;
+                return std::make_shared<SubtractCommand>(pid,variable1,variable2,variable3);
             case 1:
-                return std::make_shared<SubtractCommand>(pid,"var" + std::to_string(getRandNum(0,10)),getRandNum(0,10),"var"+ std::to_string(getRandNum(0,10)) );
-                break;
+                return std::make_shared<SubtractCommand>(pid,variable1,getRandNum(0,65535),variable3);
             case 2:
-                return std::make_shared<SubtractCommand>(pid,"var" + std::to_string(getRandNum(0,10)),"var" + std::to_string(getRandNum(0,10)),getRandNum(0,10));
-                break;
+                return std::make_shared<SubtractCommand>(pid,variable1,variable2,getRandNum(0,65535));
             case 3:
-                return std::make_shared<SubtractCommand>(pid,"var" + std::to_string(getRandNum(0,10)),getRandNum(0,10),getRandNum(0,10));
-                break;
+                return std::make_shared<SubtractCommand>(pid,variable1,getRandNum(0,65535),getRandNum(0,65535));
             default:
                 return nullptr;
-                break;
             }
         case SLEEP:
             // Placeholder for SLEEP command
-            return nullptr; // std::make_shared<ICommand>(id, commandType); // Assuming 0 is the PID for the test
+            return std::make_shared<PrintCommand>(pid, "Hello world from " + processName); // Assuming 0 is the PID for the test
         default:
             return nullptr;
     }
 }
 
-std::vector<std::shared_ptr<ICommand>> SchedulerTestThread::generateInstructions(int& remaining, int pid, std::string processName, int nestedLevel)
-{
-    std::vector<std::shared_ptr<ICommand>> instructions;
-    // Generate instructions until the remaining count is zero
-    while (remaining > 0) {
-        // Choose a random command type
-        CommandType commandType = getRandomCommandType(nestedLevel <= 3); // Include FOR command only after 3 nesting levels
-        // Create a new instruction of the chosen command type
-        auto instruction = createInstruction(commandType, pid, processName);
-        // std::cout << "Creating instruction of type: " << commandType << " for process: " << processName << std::endl;
-        if (instruction) {
-            instructions.push_back(instruction);
-            remaining--;
-        }
-        // If the command type is FOR, generate nested instructions
-        if (commandType == FOR) {
-            int range = getRandNum(1, remaining);
-            int iterations = getRandNum(0, range - 1); // Random number of iterations between 0 to range -1
-            int maxInstructions = getRandNum(0, iterations == 0 ? 0 : (range - 1) / iterations); // Randomly determine the number of instructions for the FOR loop
-            auto nestedInstructions = generateInstructions(maxInstructions, pid, processName, nestedLevel++); // Generate nested instructions
-            // std::cout << "Instruction Count: " << nestedInstructions.size() << std::endl;
-            // Display rang, iterations, randNum and maxInstructions for debugging
-            // std::cout << "Generating FOR command with range: " << range 
-            //           << ", iterations: " << iterations
-            //           << ", maxInstructions: " << maxInstructions 
-            //           << ", nested level: " << nestedLevel << std::endl;
-            // Add the FOR command with nested instructions
-            auto forCommand = std::make_shared<ForCommand>(pid, nestedInstructions, iterations);
-            instructions.push_back(forCommand);
-            remaining -= (maxInstructions * iterations) + 1; // Decrease the remaining count by the number of nested instructions
-        }
-    }
-    return instructions;
-}
-
 CommandType SchedulerTestThread::getRandomCommandType(bool includeFOR)
 {
-    static std::random_device rd;   // Random seed
-    static std::mt19937 gen(rd());  // Mersenne Twister RNG
-    static const int count = includeFOR ? TYPE_COUNT : TYPE_COUNT - 1; // Adjust count if FOR is excluded
-    static std::uniform_int_distribution<> dist(0, count - 1);
-
-    return static_cast<CommandType>(dist(gen));
+    int count = includeFOR ? TYPE_COUNT : TYPE_COUNT - 1; // Adjust count if FOR is excluded
+    return static_cast<CommandType>(getRandNum(0, count - 1)); // Generate a random command type between 1 and count - 1
 }
 
 int SchedulerTestThread::getRandNum(int min, int max){
@@ -167,7 +233,4 @@ void SchedulerTestThread::assignToScheduler(std::shared_ptr<Process> process) {
     GlobalScheduler::getInstance()->queueProcess(process);
     // Add the process to the process map
     GlobalScheduler::getInstance()->addProcess(process);
-    
 }
-
-

@@ -11,5 +11,5 @@ CommandType ICommand::getCommandType() const {
 
 bool ICommand::isCommandExecuted() const
 {
-    return false;
+    return isExecuted;
 }

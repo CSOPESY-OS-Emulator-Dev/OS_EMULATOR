@@ -41,8 +41,7 @@ MainConsole::~MainConsole()
 void MainConsole::draw()
 {
     std::cout << std::flush;
-    std::system("clear");
-    std::system("cls");
+    std::cout << "\033c";
     for (int i = 0; i < this->outputList.size(); i++)
     {
         std::cout << this->outputList[i] << std::endl;
@@ -66,15 +65,13 @@ void MainConsole::process(std::string input)
             showProcesses();
         }
         if (parsed.command == "initialize" && isinitialized){
-        this->outputList.push_back("The operating system is already initialized");
+            this->outputList.push_back("The operating system is already initialized");
         }
         if (parsed.command == "scheduler-start"){
-            GlobalScheduler::getInstance()->startProcessGeneration();
-            this->outputList.push_back("Start Generating Processes");
+            startScheduler();
         }
         if (parsed.command == "scheduler-stop"){
-            GlobalScheduler::getInstance()->stopProcessGeneration();
-            this->outputList.push_back("Stop Generating Processes");
+            stopScheduler();
         }
         if (parsed.command == "report-util"){
             reportUtil();
@@ -227,10 +224,10 @@ void MainConsole::redrawScreen(std::string processName)
 
 void MainConsole::showProcesses()
 {
+    this->outputList.push_back("\n------------------------------------");
     this->outputList.push_back(GlobalScheduler::getInstance()->getCPUUtilization());
     this->outputList.push_back(GlobalScheduler::getInstance()->getCoresUsed());
     this->outputList.push_back(GlobalScheduler::getInstance()->getCoresAvailable());
-    
     this->outputList.push_back("------------------------------------");
 
     // Print running processes
@@ -250,7 +247,7 @@ void MainConsole::showProcesses()
     this->outputList.push_back("\nFinished Processes:");
     if (GlobalScheduler::getInstance()->getFinishedProcesses().empty())
     {
-        this->outputList.push_back("No finished processes.\n");
+        this->outputList.push_back("No finished processes.");
     }
     else
     {
@@ -284,8 +281,8 @@ void MainConsole::reportUtil()
     //auto scheduler = GlobalScheduler::getInstance();
 
     // Add CPU info at the top
-    out << GlobalScheduler::getInstance()->getCPUUtilization();
-    out << GlobalScheduler::getInstance()->getCoresUsed();
+    out << GlobalScheduler::getInstance()->getCPUUtilization() << "\n";
+    out << GlobalScheduler::getInstance()->getCoresUsed() << "\n";
     out << GlobalScheduler::getInstance()->getCoresAvailable();
     out << "\n------------------------------------\n";
 
@@ -305,7 +302,7 @@ void MainConsole::reportUtil()
     }
 
     // Finished Processes
-    out << "Finished Processes:\n";
+    out << "\nFinished Processes:\n";
     auto finished = GlobalScheduler::getInstance()->getFinishedProcesses();
     if (finished.empty())
     {
@@ -324,4 +321,14 @@ void MainConsole::reportUtil()
 
     // Notify the user that the report has been generated
     this->outputList.push_back("Report generated at " + filename + "!");
+}
+
+void MainConsole::startScheduler() {
+    GlobalScheduler::getInstance()->startProcessGeneration();
+    this->outputList.push_back("Start Generating Processes");
+}
+
+void MainConsole::stopScheduler() {
+    GlobalScheduler::getInstance()->stopProcessGeneration();
+    this->outputList.push_back("Stop Generating Processes");
 }

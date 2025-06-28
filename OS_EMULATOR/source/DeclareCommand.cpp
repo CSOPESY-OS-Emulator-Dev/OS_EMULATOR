@@ -12,7 +12,8 @@ void DeclareCommand::execute(Process& process, std::string timeExecuted, int cor
     }else{
         process.symbolTable[variable]=value;
     }
-    process.outputLog->push_back(timeExecuted + " Core:" + std::to_string(coreID) + "\" Declared :" + variable + " Value :" + std::to_string(process.symbolTable[variable]) +"\"");
+    // Log the declaration
+    process.outputLog->push_back(timeExecuted + " Core:" + std::to_string(coreID) + " Declared variable \"" + variable + "\" with value " + std::to_string(value) + ".");
     process.progressCount++;
     isExecuted = true;
 }
