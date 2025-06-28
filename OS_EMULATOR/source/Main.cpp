@@ -6,6 +6,7 @@
  * OLORES, SEAN ANDREI PAJARTIN
  */
 
+// Update the path below if ConsoleManager.h is in a subfolder, e.g. "managers/ConsoleManager.h"
 #include "ConsoleManager.h"
 #include "GlobalScheduler.h"
 
