@@ -1,5 +1,8 @@
 #include "RRScheduler.h"
 
+// for debugging purposes, include necessary headers
+extern std::mutex logMutex;
+
 RRScheduler::RRScheduler() {
     // Constructor implementation
 }
@@ -24,6 +27,7 @@ void RRScheduler::execute() {
                 this->ReadyQueue.erase(this->ReadyQueue.begin()); // Remove it from the queue
 
                 // for debugging purposes, log the assignment
+                std::lock_guard<std::mutex> lock(logMutex);
                 std::cout << "[RR] Assigning Process " 
                           << process->getProcessName()
                           << " to Core " << core->getCoreID()

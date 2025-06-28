@@ -1,5 +1,8 @@
 #include "CoreThread.h"
 
+// for debugging purposes, include necessary headers
+std::mutex logMutex;
+
 CoreThread::CoreThread(int id, int cpuCycle) : coreID(id), cpuCycle(cpuCycle), cpuTicks(0), activeTicks(0), currentTicks(0) {
     this->currentProcess = nullptr; // Initialize current process to nullptr
     this->occupied = false; // Initially, the core is not occupied
@@ -15,6 +18,7 @@ void CoreThread::run() {
             if (this->currentProcess->getState() == FINISHED) {
 
                 // for debugging purposes, log the process completion
+                std::lock_guard<std::mutex> lock(logMutex);
                 std::cout << "[Core " << this->coreID << "] "
                           << this->currentProcess->getProcessName()
                           << " finished execution." << std::endl;
@@ -28,6 +32,7 @@ void CoreThread::run() {
             } else if (this->currentTicks <= 0) {
 
                 // for debugging purposes, log the quantum expiration
+                std::lock_guard<std::mutex> lock(logMutex);
                 std::cout << "[Core " << this->coreID << "] Quantum expired for "
                           << this->currentProcess->getProcessName()
                           << ". Requeuing." << std::endl;
@@ -52,6 +57,7 @@ void CoreThread::run() {
                 //           << std::endl;
 
                 // for debugging purposes, log the instruction execution
+                std::lock_guard<std::mutex> lock(logMutex);
                 std::cout << "[Core " << this->coreID << "] Executed instruction for "
                           << this->currentProcess->getProcessName()
                           << ", ticks left: " << this->currentTicks << std::endl;
