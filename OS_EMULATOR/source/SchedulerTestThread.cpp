@@ -17,7 +17,7 @@ void SchedulerTestThread::run() {
                 assignToScheduler(process);
             }
             // Sleep for the specified CPU cycle duration
-            IETThread::sleep(5); // Sleep for a short duration to avoid busy waiting
+            IETThread::sleep(1); // Sleep for a short duration to avoid busy waiting
             cpuTick++;
         }
     }
@@ -62,7 +62,8 @@ std::vector<std::shared_ptr<ICommand>> SchedulerTestThread::generateInstructions
 
     while (remainingExecs > 0) {
         bool canCreateFor = (nestingLevel < 3 && remainingExecs > 1);
-        CommandType cmdType = getRandomCommandType(canCreateFor);
+        bool canCreateSleep = false;
+        CommandType cmdType = getRandomCommandType(canCreateFor, canCreateSleep);
 
         if (cmdType == FOR && canCreateFor) {
             int maxIterations = std::min(remainingExecs - 1, 5); // reserve 1 for the ForCommand itself
@@ -128,7 +129,7 @@ std::vector<std::shared_ptr<ICommand>> SchedulerTestThread::generateInstructions
         }
 
         bool canNest = frame.nestingLevel < 3 && frame.remainingExecs > 5;
-        auto cmdType = getRandomCommandType(canNest);
+        auto cmdType = getRandomCommandType(canNest, false);
 
         if (cmdType == FOR && canNest) {
             int maxIter = std::min(5, frame.remainingExecs - 1);
@@ -213,16 +214,17 @@ std::shared_ptr<ICommand> SchedulerTestThread::createInstruction(CommandType com
             }
         case SLEEP:
             // Placeholder for SLEEP command
-            return std::make_shared<PrintCommand>(pid, "Hello world from " + processName); // Assuming 0 is the PID for the test
+            return std::make_shared<SleepCommand>(pid, getRandNum(0,255)); // Assuming 0 is the PID for the test
         default:
             return nullptr;
     }
 }
 
-CommandType SchedulerTestThread::getRandomCommandType(bool includeFOR)
+CommandType SchedulerTestThread::getRandomCommandType(bool includeFOR, bool includeSLEEP)
 {
     int count = includeFOR ? TYPE_COUNT : TYPE_COUNT - 1; // Adjust count if FOR is excluded
-    return static_cast<CommandType>(getRandNum(0, count - 1)); // Generate a random command type between 1 and count - 1
+    auto type = static_cast<CommandType>(getRandNum(0, count - 1)); // Generate a random command type between 1 and count - 1
+    return includeSLEEP?type:type==SLEEP?static_cast<CommandType>(getRandNum(0, 3)):type;
 }
 
 int SchedulerTestThread::getRandNum(int min, int max){

@@ -14,8 +14,8 @@ void FCFSScheduler::execute() {
         // Find an available core to assign the process
         for (const auto& core : GlobalScheduler::getInstance()->cores) {
             if (this->ReadyQueue.empty()) break; // If the queue is empty, break the loop
-            auto process = this->ReadyQueue.front(); // Get the first process in the queue
             if (!core->isOccupied()) {
+                auto process = this->ReadyQueue.front(); // Get the first process in the queue
                 core->assignProcess(process, process->getTotalIntstruction()); // Assign process with its total instructions as ticks
                 this->ReadyQueue.erase(this->ReadyQueue.begin()); // Remove it from the queue
             }
