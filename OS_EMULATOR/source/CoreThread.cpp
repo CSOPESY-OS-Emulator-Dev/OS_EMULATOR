@@ -1,8 +1,5 @@
 #include "CoreThread.h"
 
-// for debugging purposes, include necessary headers
-std::mutex logMutex;
-
 CoreThread::CoreThread(int id, int cpuCycle) : coreID(id), cpuCycle(cpuCycle), cpuTicks(0), activeTicks(0), currentTicks(0) {
     this->currentProcess = nullptr; // Initialize current process to nullptr
     this->occupied = false; // Initially, the core is not occupied
@@ -16,28 +13,12 @@ void CoreThread::run() {
         if (this->occupied && this->currentProcess && this->cpuTicks % (this->cpuCycle + 1) == 0) {
             // Check if the process has finished executing
             if (this->currentProcess->getState() == FINISHED) {
-
-                // for debugging purposes, log the process completion
-                std::lock_guard<std::mutex> lock(logMutex);
-                std::cout << "[Core " << this->coreID << "] "
-                          << this->currentProcess->getProcessName()
-                          << " finished execution." << std::endl;
-
-
                 // Push current process to finished processes in GlobalScheduler
                 GlobalScheduler::getInstance()->finishProcess(this->currentProcess);
                 this->occupied = false; // Free the core
                 this->currentProcess = nullptr; // Clear the current process
                 this->currentTicks = 0; // Reset current ticks
             } else if (this->currentTicks <= 0) {
-
-                // for debugging purposes, log the quantum expiration
-                std::lock_guard<std::mutex> lock(logMutex);
-                std::cout << "[Core " << this->coreID << "] Quantum expired for "
-                          << this->currentProcess->getProcessName()
-                          << ". Requeuing." << std::endl;
-
-
                 // Queue current process back to scheduler in GlobalScheduler
                 GlobalScheduler::getInstance()->queueProcess(this->currentProcess);
                 this->occupied = false; // Free the core
@@ -47,20 +28,6 @@ void CoreThread::run() {
                 // If the process is still running and has ticks left, execute its instruction
                 this->currentProcess->executeInstruction(); // Execute the current process's instruction
                 this->currentTicks--; // Decrease the ticks for the current process
-                // log process execution for debugging
-                // std::cout << "Core " << this->coreID 
-                //           << " executed instruction for Process " 
-                //           << this->currentProcess->getProcessID() 
-                //           << " at CPU Tick: "
-                //           << this->cpuTicks
-                //           << ". Remaining ticks: " << this->currentTicks 
-                //           << std::endl;
-
-                // for debugging purposes, log the instruction execution
-                std::lock_guard<std::mutex> lock(logMutex);
-                std::cout << "[Core " << this->coreID << "] Executed instruction for "
-                          << this->currentProcess->getProcessName()
-                          << ", ticks left: " << this->currentTicks << std::endl;
             } 
         }
         this->cpuTicks++;
