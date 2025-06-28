@@ -128,7 +128,8 @@ std::vector<std::shared_ptr<ICommand>> SchedulerTestThread::generateInstructions
         }
 
         bool canNest = frame.nestingLevel < 3 && frame.remainingExecs > 5;
-        auto cmdType = getRandomCommandType(false, false);
+                                        // canNest, true
+        auto cmdType = getRandomCommandType(canNest, true);
 
         if (cmdType == FOR && canNest) {
             int maxIter = std::min(5, frame.remainingExecs - 1);

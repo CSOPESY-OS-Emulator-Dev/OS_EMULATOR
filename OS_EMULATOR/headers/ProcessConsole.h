@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include "AConsole.h"
 #include "Process.h"
 #include "ConsoleManager.h"
@@ -19,8 +20,8 @@ private:
     std::vector<std::string> outputList;
     std::vector<std::string> commandList;
 
+    int processID;
     std::string processName;
-    std::string processID;
     std::shared_ptr<std::vector<std::string>> processLogs;
 
     std::string timeCreated;

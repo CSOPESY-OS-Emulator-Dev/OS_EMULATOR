@@ -44,7 +44,7 @@ void ConsoleManager::process() const
 	this->currentConsole->process(input);
 }
 
-void ConsoleManager::registerConsole(std::string consoleName)
+bool ConsoleManager::registerConsole(std::string consoleName)
 {
 	auto scheduler = GlobalScheduler::getInstance();
 
@@ -54,12 +54,19 @@ void ConsoleManager::registerConsole(std::string consoleName)
     if (consoleTable.find(consoleName) == consoleTable.end()) {
         consoleTable[consoleName] = std::make_shared<ProcessConsole>(consoleName, getFormattedCurrentTime());
     }
-	
-    switchConsole(consoleName);
+	if (scheduler->getProcessByName(consoleName)->getState() != FINISHED) {
+		switchConsole(consoleName);
+		return true;
+	}
+	return false;
 }
 
 bool ConsoleManager::switchConsole(std::string consoleName)
 {
+	auto scheduler = GlobalScheduler::getInstance();
+	if (scheduler->getProcessByName(consoleName)->getState() == FINISHED) {
+		return false;
+	}
 	if (this->consoleTable.find(consoleName) != this->consoleTable.end()) {
 		std::system("clear");
     	std::system("cls");
@@ -67,9 +74,8 @@ bool ConsoleManager::switchConsole(std::string consoleName)
 		this->currentConsole = this->consoleTable[consoleName];
 		this->currentConsole->initialize();
 		return true;
-	} else {
-		return false;
 	}
+	return false;
 }
 
 void ConsoleManager::returnToPreviousConsole()

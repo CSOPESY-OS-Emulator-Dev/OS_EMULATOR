@@ -229,12 +229,14 @@ void MainConsole::initializeOS()
 
 void MainConsole::setScreen(std::string processName)
 {
-    ConsoleManager::getInstance()->registerConsole(processName);
+    if (!ConsoleManager::getInstance()->registerConsole(processName)) {
+        this->outputList.push_back(processName + " terminated");
+    }
 }
 
 void MainConsole::redrawScreen(std::string processName)
 {
-    if(ConsoleManager::getInstance()->switchConsole(processName)){
+    if(!ConsoleManager::getInstance()->switchConsole(processName)){
         this->outputList.push_back("Could not find " + processName + " console");
     }
 }
