@@ -26,7 +26,7 @@ void MainConsole::initialize()
     this->outputList.push_back(" DEMANALATA, ASHANTIE LOUIZE BACO \n HILOMEN, GEO BRIAN \n KINTANAR, KRISTIAN ANTHONY REMEDIOS \n OLORES, SEAN ANDREI PAJARTIN\n");
     this->outputList.push_back("===============================================================================================\n");
     this->outputList.push_back("These are the available commands :");
-    this->outputList.push_back("initialize\nscreen\nscreen -s <process name>\nscreen -r <process name>\nscheduler-test\nscheduler-stop\nreport-util\nclear\nexit\n");
+    this->outputList.push_back("initialize\nscreen\nscreen -s <process name>\nscreen -r <process name>\nscheduler-start\nscheduler-stop\nreport-util\nclear\nexit\n");
 }
 
 MainConsole::MainConsole() : AConsole("MAIN_CONSOLE")
