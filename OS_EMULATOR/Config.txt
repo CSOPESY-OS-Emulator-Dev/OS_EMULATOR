@@ -2,6 +2,6 @@ num_cpu 128
 scheduler fcfs
 quantum_cycles 1
 batch_process_freq 1
-min_ins 5000
-max_ins 5000
+min_ins 1000
+max_ins 2000
 delay_per_exec 0

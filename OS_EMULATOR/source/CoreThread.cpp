@@ -39,7 +39,7 @@ void CoreThread::run() {
             } 
         }
         this->cpuTicks++;
-        sleep(5); // Sleep for 10 millisecond to simulate time passing
+        sleep(1); // Sleep for 10 millisecond to simulate time passing
     }
 }
 

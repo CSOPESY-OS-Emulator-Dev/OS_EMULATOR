@@ -10,6 +10,7 @@
 #include "DeclareCommand.h"
 #include "AddCommand.h"
 #include "SubtractCommand.h"
+#include "SleepCommand.h"
 #include "ForCommand.h"
 #include <stack>
 
