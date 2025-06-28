@@ -49,6 +49,7 @@ void MainConsole::draw()
 
 void MainConsole::process(std::string input)
 {
+    bool isvalid = false;
     auto parsed = parseInput(input);
 
     this->outputList.push_back("C:\\> " + input);
@@ -56,33 +57,41 @@ void MainConsole::process(std::string input)
     if(parsed.command == "-help"){
         this->outputList.push_back("These are the available commands :");
         this->outputList.push_back("initialize\nscreen -s <process name>\nscreen -r <process name>\nscheduler-start\nscheduler-stop\nreport-util\nclear\nexit\n");
+        isvalid = true;
     }
 
     if(isinitialized){
         if(parsed.command == "screen" && parsed.args.size() == 2 && parsed.args[0] == "-s" ) {
-        setScreen(parsed.args[1]);
+            setScreen(parsed.args[1]);
+        isvalid = true;
         }
         if(parsed.command == "screen" && parsed.args.size() == 2 && parsed.args[0] == "-r" ) {
             redrawScreen(parsed.args[1]);
+            isvalid = true;
         }
         if(parsed.command == "screen" && parsed.args.size() == 1 && parsed.args[0] == "-ls" ) {
             showProcesses();
+            isvalid = true;
         }
         if (parsed.command == "initialize" && isinitialized){
             this->outputList.push_back("The operating system is already initialized");
         }
         if (parsed.command == "scheduler-start"){
             startScheduler();
+            isvalid = true;
         }
         if (parsed.command == "scheduler-stop"){
             stopScheduler();
+            isvalid = true;
         }
         if (parsed.command == "report-util"){
             reportUtil();
+            isvalid = true;
         }
     } else if(parsed.command == "initialize"){
         isinitialized = true;
         initializeOS();
+        isvalid = true;
     }
     else{
         this->outputList.push_back("Please initialize the operating system.");
@@ -94,6 +103,10 @@ void MainConsole::process(std::string input)
     if (parsed.command == "clear")
     {
         initialize();
+        isvalid = true;
+    }
+    if (!isvalid && isinitialized){
+        this->outputList.push_back("Enter a Valid Command");
     }
 }
 
