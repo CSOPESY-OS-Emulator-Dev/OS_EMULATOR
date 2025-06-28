@@ -37,11 +37,22 @@ void ProcessConsole::process(std::string input)
     auto parsed = parseInput(input);
     this->outputList.clear();
     
+    bool isvalid = false;
     if(parsed.command == "exit") {
         exitConsole();
+        isvalid = true;
+    }
+    if(parsed.command == "-help") {
+        this->outputList.push_back("These are the available commands :");
+        this->outputList.push_back("process-smi\nhelp\nexit");
+        isvalid = true;
     }
     if(parsed.command == "process-smi") {
         initialize();
+        isvalid = true;
+    }
+    if (!isvalid){
+        this->outputList.push_back("Enter a Valid Command");
     }
 }
 
@@ -67,6 +78,7 @@ void ProcessConsole::initialize()
         this->outputList.push_back("\nCurrent Instruction Line: " + std::to_string(this->currentProcess->progressCount));
         this->outputList.push_back("Lines of code: " + std::to_string(this->currentProcess->instructionCount) + '\n');
     }
+    this->outputList.push_back("<-help> to view all available commands");
 }
 
 /*  The following are function definitions that executes each available commands
