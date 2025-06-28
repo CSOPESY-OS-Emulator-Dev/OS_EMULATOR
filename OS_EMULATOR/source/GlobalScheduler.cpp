@@ -163,7 +163,7 @@ std::string GlobalScheduler::getCPUUtilization()
             usedCores++;
     }
 
-    int utilization = (totalCores > 0) ? (usedCores * 100 / totalCores) : 0;
+    int utilization = (totalCores > 0) ? ((usedCores/totalCores) * 100) : 0;
     return "CPU utilization: " + std::to_string(utilization) + "%";
 }
 
