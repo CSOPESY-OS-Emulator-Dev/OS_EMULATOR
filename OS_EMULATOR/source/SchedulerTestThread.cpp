@@ -124,12 +124,11 @@ std::vector<std::shared_ptr<ICommand>> SchedulerTestThread::generateInstructions
             } else {
                 finalInstructions = std::move(finishedInstructions);
             }
-
             continue;
         }
 
         bool canNest = frame.nestingLevel < 3 && frame.remainingExecs > 5;
-        auto cmdType = getRandomCommandType(canNest, false);
+        auto cmdType = getRandomCommandType(false, false);
 
         if (cmdType == FOR && canNest) {
             int maxIter = std::min(5, frame.remainingExecs - 1);
@@ -220,8 +219,7 @@ std::shared_ptr<ICommand> SchedulerTestThread::createInstruction(CommandType com
     }
 }
 
-CommandType SchedulerTestThread::getRandomCommandType(bool includeFOR, bool includeSLEEP)
-{
+CommandType SchedulerTestThread::getRandomCommandType(bool includeFOR, bool includeSLEEP) {
     int count = includeFOR ? TYPE_COUNT : TYPE_COUNT - 1; // Adjust count if FOR is excluded
     auto type = static_cast<CommandType>(getRandNum(0, count - 1)); // Generate a random command type between 1 and count - 1
     return includeSLEEP?type:type==SLEEP?static_cast<CommandType>(getRandNum(0, 3)):type;

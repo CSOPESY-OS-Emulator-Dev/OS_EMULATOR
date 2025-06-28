@@ -9,6 +9,7 @@ RRScheduler::~RRScheduler() {
 }
 
 void RRScheduler::execute() {
+    std::lock_guard<std::mutex> lock(queueMutex); // Add this lock
     if (!this->ReadyQueue.empty()) {
         // Loop through all CPU cores
         for (const auto& core : GlobalScheduler::getInstance()->cores) {
