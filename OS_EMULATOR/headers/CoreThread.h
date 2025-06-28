@@ -23,6 +23,9 @@ public:
     bool isOccupied() const;
 
     std::string getProcess();
+
+    // for debugging purposes, return the core ID
+    int getCoreID() const { return coreID; }
     
 private:
     std::shared_ptr<Process> currentProcess; // The process currently assigned to this core

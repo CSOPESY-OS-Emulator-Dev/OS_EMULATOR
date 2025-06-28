@@ -13,12 +13,26 @@ void CoreThread::run() {
         if (this->occupied && this->currentProcess && this->cpuTicks % (this->cpuCycle + 1) == 0) {
             // Check if the process has finished executing
             if (this->currentProcess->getState() == FINISHED) {
+
+                // for debugging purposes, log the process completion
+                std::cout << "[Core " << this->coreID << "] "
+                          << this->currentProcess->getProcessName()
+                          << " finished execution." << std::endl;
+
+
                 // Push current process to finished processes in GlobalScheduler
                 GlobalScheduler::getInstance()->finishProcess(this->currentProcess);
                 this->occupied = false; // Free the core
                 this->currentProcess = nullptr; // Clear the current process
                 this->currentTicks = 0; // Reset current ticks
             } else if (this->currentTicks <= 0) {
+
+                // for debugging purposes, log the quantum expiration
+                std::cout << "[Core " << this->coreID << "] Quantum expired for "
+                          << this->currentProcess->getProcessName()
+                          << ". Requeuing." << std::endl;
+
+
                 // Queue current process back to scheduler in GlobalScheduler
                 GlobalScheduler::getInstance()->queueProcess(this->currentProcess);
                 this->occupied = false; // Free the core
@@ -36,6 +50,11 @@ void CoreThread::run() {
                 //           << this->cpuTicks
                 //           << ". Remaining ticks: " << this->currentTicks 
                 //           << std::endl;
+
+                // for debugging purposes, log the instruction execution
+                std::cout << "[Core " << this->coreID << "] Executed instruction for "
+                          << this->currentProcess->getProcessName()
+                          << ", ticks left: " << this->currentTicks << std::endl;
             } 
         }
         this->cpuTicks++;

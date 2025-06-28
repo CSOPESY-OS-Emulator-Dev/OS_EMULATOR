@@ -132,7 +132,7 @@ std::vector<std::shared_ptr<ICommand>> SchedulerTestThread::generateInstructions
         if (commandType == FOR) {
             int range = getRandNum(1, remaining);
             int iterations = getRandNum(0, range - 1); // Random number of iterations between 0 to range -1
-            int maxInstructions = getRandNum(0, iterations != 0 ? 0 : (range - 1) / iterations); // Randomly determine the number of instructions for the FOR loop
+            int maxInstructions = getRandNum(0, iterations == 0 ? 0 : (range - 1) / iterations); // Randomly determine the number of instructions for the FOR loop
             auto nestedInstructions = generateInstructions(maxInstructions, pid, processName, nestedLevel++); // Generate nested instructions
             // std::cout << "Instruction Count: " << nestedInstructions.size() << std::endl;
             // Display rang, iterations, randNum and maxInstructions for debugging

@@ -23,6 +23,13 @@ void RRScheduler::execute() {
                 auto process = this->ReadyQueue.front();
                 this->ReadyQueue.erase(this->ReadyQueue.begin()); // Remove it from the queue
 
+                // for debugging purposes, log the assignment
+                std::cout << "[RR] Assigning Process " 
+                          << process->getProcessName()
+                          << " to Core " << core->getCoreID()
+                          << " with quantum " << this->quantumCycles << std::endl;
+
+
                 // Assign the process to the core with quantumCycles ticks
                 core->assignProcess(process, this->quantumCycles);
 
