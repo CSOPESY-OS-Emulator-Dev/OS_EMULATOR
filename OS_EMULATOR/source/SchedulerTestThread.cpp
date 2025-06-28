@@ -17,7 +17,7 @@ void SchedulerTestThread::run() {
                 assignToScheduler(process);
             }
             // Sleep for the specified CPU cycle duration
-            IETThread::sleep(5); // Sleep for a short duration to avoid busy waiting
+            IETThread::sleep(1); // Sleep for a short duration to avoid busy waiting
             cpuTick++;
         }
     }
@@ -213,7 +213,7 @@ std::shared_ptr<ICommand> SchedulerTestThread::createInstruction(CommandType com
             }
         case SLEEP:
             // Placeholder for SLEEP command
-            return std::make_shared<PrintCommand>(pid, "Hello world from " + processName); // Assuming 0 is the PID for the test
+            return std::make_shared<SleepCommand>(pid, getRandNum(0,255)); // Assuming 0 is the PID for the test
         default:
             return nullptr;
     }

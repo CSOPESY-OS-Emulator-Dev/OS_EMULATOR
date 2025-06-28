@@ -5,6 +5,10 @@ SleepCommand::SleepCommand(int pid, int duration) : ICommand(pid, SLEEP), durati
 }
 
 void SleepCommand::execute(Process &process, std::string timeExecuted, int coreID) {
-    process.setState(SLEEPING); // Set the process state to SLEEPING
-    process.sleepDuration = duration; // Set the sleep duration for the process
+    if (duration > 0) {
+        duration--;
+    } else {
+        process.progressCount++;
+        isExecuted = true;
+    }
 }
