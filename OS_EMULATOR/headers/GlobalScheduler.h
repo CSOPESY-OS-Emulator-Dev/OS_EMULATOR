@@ -11,6 +11,7 @@
 class CoreThread;
 class SchedulerTestThread;
 class FCFSScheduler;
+class RRScheduler;
 
 class GlobalScheduler
 {
@@ -58,6 +59,8 @@ public:
     std::shared_ptr<Process> getProcessByID(int processID) const;
 
     friend class FCFSScheduler; // Allow FCFS Scheduler to access private members
+    friend class RRScheduler; // Allow RR Scheduler to access private members
+    
 private:
     // Make singleton
     GlobalScheduler();

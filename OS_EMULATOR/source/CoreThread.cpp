@@ -37,14 +37,6 @@ void CoreThread::run() {
                 // If the process is still running and has ticks left, execute its instruction
                 this->currentProcess->executeInstruction(); // Execute the current process's instruction
                 this->currentTicks--; // Decrease the ticks for the current process
-                // log process execution for debugging
-                // std::cout << "Core " << this->coreID 
-                //           << " executed instruction for Process " 
-                //           << this->currentProcess->getProcessID() 
-                //           << " at CPU Tick: "
-                //           << this->cpuTicks
-                //           << ". Remaining ticks: " << this->currentTicks 
-                //           << std::endl;
             } 
         }
         this->cpuTicks++;
