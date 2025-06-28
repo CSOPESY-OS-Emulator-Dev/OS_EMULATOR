@@ -86,6 +86,9 @@ Process::Process(std::string name, int id)
     this->symbolTable = std::unordered_map<std::string, uint16_t>();
     this->outputLog = std::make_shared<std::vector<std::string>>();
 
+    // Initialize variable x with value 0
+    this->symbolTable["x"] = 0;
+
     this->name = name;
     this->processID = id;
 

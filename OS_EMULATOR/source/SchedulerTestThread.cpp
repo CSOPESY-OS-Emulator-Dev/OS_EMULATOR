@@ -154,11 +154,21 @@ std::vector<std::shared_ptr<ICommand>> SchedulerTestThread::generateInstructions
                 false
             });
         } else {
-            auto instr = createInstruction(cmdType, pid, processName);
-            if (instr) {
+            if (remainingExecs % 2 == 0) {
+                auto instr = std::make_shared<PrintCommand>(pid, "Value from x: ", "x");
+                frame.instructions.push_back(instr);
+                frame.remainingExecs--;
+            } else {
+                auto instr = std::make_shared<AddCommand>(pid, "x", "x", getRandNum(1,10));
                 frame.instructions.push_back(instr);
                 frame.remainingExecs--;
             }
+
+            // auto instr = createInstruction(cmdType, pid, processName);
+            // if (instr) {
+            //     frame.instructions.push_back(instr);
+            //     frame.remainingExecs--;
+            // }
         }
     }
 
