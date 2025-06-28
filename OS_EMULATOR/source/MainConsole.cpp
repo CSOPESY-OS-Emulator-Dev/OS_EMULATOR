@@ -25,7 +25,7 @@ void MainConsole::initialize()
     this->outputList.push_back(" Developers : ");
     this->outputList.push_back(" DEMANALATA, ASHANTIE LOUIZE BACO \n HILOMEN, GEO BRIAN \n KINTANAR, KRISTIAN ANTHONY REMEDIOS \n OLORES, SEAN ANDREI PAJARTIN\n");
     this->outputList.push_back("===============================================================================================\n");
-    this->outputList.push_back("<-help> to view all available commands");   
+    this->outputList.push_back("<-help> to view all available commands\n");   
 }
 
 MainConsole::MainConsole() : AConsole("MAIN_CONSOLE")

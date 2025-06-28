@@ -154,16 +154,16 @@ void GlobalScheduler::stopProcessGeneration()
 std::string GlobalScheduler::getCPUUtilization()
 {
     std::lock_guard<std::mutex> lock(coreMutex);
-    int totalCores = static_cast<int>(cores.size());
-    int usedCores = 0;
+    float totalCores = static_cast<float>(cores.size());
+    float usedCores = 0;
 
     for (const auto &core : cores)
     {
         if (core->isOccupied())
-            usedCores++;
+            usedCores += 1.0;
     }
 
-    int utilization = static_cast<int>((static_cast<float>(usedCores)/totalCores) * 100);
+    int utilization = static_cast<int>((usedCores/totalCores) * 100);
     return "CPU utilization: " + std::to_string(utilization) + "%";
 }
 
