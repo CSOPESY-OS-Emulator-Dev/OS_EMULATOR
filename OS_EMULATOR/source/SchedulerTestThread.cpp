@@ -128,6 +128,7 @@ std::vector<std::shared_ptr<ICommand>> SchedulerTestThread::generateInstructions
         }
 
         bool canNest = frame.nestingLevel < 3 && frame.remainingExecs > 5;
+                                        // canNest, true
         auto cmdType = getRandomCommandType(canNest, true);
 
         if (cmdType == FOR && canNest) {

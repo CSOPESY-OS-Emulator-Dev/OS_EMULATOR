@@ -65,7 +65,7 @@ void ProcessConsole::initialize()
     this->outputList.push_back("\nCreated: " + this->timeCreated);
 
     this->outputList.push_back("\nProcess name: " + this->processName);
-    this->outputList.push_back("ID: " + this->processID);
+    this->outputList.push_back("ID: " + std::to_string(this->processID));
     this->outputList.push_back("Logs:");
 
     for (const std::string& log : *(this->processLogs)) {
