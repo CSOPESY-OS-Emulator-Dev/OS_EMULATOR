@@ -25,8 +25,7 @@ void MainConsole::initialize()
     this->outputList.push_back(" Developers : ");
     this->outputList.push_back(" DEMANALATA, ASHANTIE LOUIZE BACO \n HILOMEN, GEO BRIAN \n KINTANAR, KRISTIAN ANTHONY REMEDIOS \n OLORES, SEAN ANDREI PAJARTIN\n");
     this->outputList.push_back("===============================================================================================\n");
-    this->outputList.push_back("These are the available commands :");
-    this->outputList.push_back("initialize\nscreen\nscreen -s <process name>\nscreen -r <process name>\nscheduler-test\nscheduler-stop\nreport-util\nclear\nexit\n");
+    this->outputList.push_back("-help to view all available commands");   
 }
 
 MainConsole::MainConsole() : AConsole("MAIN_CONSOLE")
@@ -53,6 +52,11 @@ void MainConsole::process(std::string input)
     auto parsed = parseInput(input);
 
     this->outputList.push_back("C:\\> " + input);
+
+    if(parsed.command == "-help"){
+        this->outputList.push_back("These are the available commands :");
+        this->outputList.push_back("initialize\nscreen -s <process name>\nscreen -r <process name>\nscheduler-start\nscheduler-stop\nreport-util\nclear\nexit\n");
+    }
 
     if(isinitialized){
         if(parsed.command == "screen" && parsed.args.size() == 2 && parsed.args[0] == "-s" ) {
