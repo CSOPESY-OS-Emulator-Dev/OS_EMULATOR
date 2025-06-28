@@ -154,7 +154,7 @@ std::vector<std::shared_ptr<ICommand>> SchedulerTestThread::generateInstructions
                 false
             });
         } else {
-            if (remainingExecs % 2 == 0) {
+            if (frame.remainingExecs % 2 == 0) {
                 auto instr = std::make_shared<PrintCommand>(pid, "Value from x: ", "x");
                 frame.instructions.push_back(instr);
                 frame.remainingExecs--;
