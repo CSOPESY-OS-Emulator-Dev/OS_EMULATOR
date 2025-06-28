@@ -213,7 +213,9 @@ void MainConsole::initializeOS()
     }
     
     this->outputList.push_back("------------------------------------");
-
+    if(max_ins<min_ins){
+        isValid = false;
+    }
     if(isValid){
         GlobalScheduler::getInstance()->initializeCores(num_cpu,delays_per_exec);
         GlobalScheduler::getInstance()->runCores();
