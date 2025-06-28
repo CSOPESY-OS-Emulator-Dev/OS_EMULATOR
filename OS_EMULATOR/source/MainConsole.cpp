@@ -54,9 +54,13 @@ void MainConsole::process(std::string input)
 
     this->outputList.push_back("C:\\> " + input);
 
-    if(parsed.command == "-help"){
+    if(parsed.command == "-help"&& isinitialized){
         this->outputList.push_back("These are the available commands :");
         this->outputList.push_back("initialize\nscreen -s <process name>\nscreen -r <process name>\nscheduler-start\nscheduler-stop\nreport-util\nclear\nexit\n");
+        isvalid = true;
+    }else{
+        this->outputList.push_back("These are the available commands :");
+        this->outputList.push_back("clear\nexit\n");
         isvalid = true;
     }
 
