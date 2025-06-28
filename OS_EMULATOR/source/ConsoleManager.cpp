@@ -64,18 +64,18 @@ bool ConsoleManager::registerConsole(std::string consoleName)
 bool ConsoleManager::switchConsole(std::string consoleName)
 {
 	auto scheduler = GlobalScheduler::getInstance();
+	if (consoleTable.find(consoleName) == consoleTable.end()) {
+		return false;
+	}
 	if (scheduler->getProcessByName(consoleName)->getState() == FINISHED) {
 		return false;
 	}
-	if (this->consoleTable.find(consoleName) != this->consoleTable.end()) {
-		std::system("clear");
-    	std::system("cls");
-		this->previousConsole = this->currentConsole;
-		this->currentConsole = this->consoleTable[consoleName];
-		this->currentConsole->initialize();
-		return true;
-	}
-	return false;
+	std::cout << std::flush;
+    std::cout << "\033c";
+	this->previousConsole = this->currentConsole;
+	this->currentConsole = this->consoleTable[consoleName];
+	this->currentConsole->initialize();
+	return true;
 }
 
 void ConsoleManager::returnToPreviousConsole()

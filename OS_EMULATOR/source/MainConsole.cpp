@@ -235,7 +235,7 @@ void MainConsole::initializeOS()
 void MainConsole::setScreen(std::string processName)
 {
     if (!ConsoleManager::getInstance()->registerConsole(processName)) {
-        this->outputList.push_back(processName + " terminated");
+        this->outputList.push_back("Could not find " + processName + " console");
     }
 }
 
