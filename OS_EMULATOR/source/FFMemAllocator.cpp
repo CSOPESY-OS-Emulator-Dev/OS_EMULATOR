@@ -1,4 +1,4 @@
-#include "../header/FFMemAllocator.h"
+#include "FFMemAllocator.h"
 
 FFMemAllocator::FFMemAllocator(size_t maxMemorySize) : maxMemorySize(maxMemorySize) {
     char* base = new char[maxMemorySize * sizeof(char)];
