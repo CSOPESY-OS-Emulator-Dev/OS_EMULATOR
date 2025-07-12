@@ -1,6 +1,7 @@
 #include "MainConsole.h"
 #include "ConsoleManager.h"
 #include "GlobalScheduler.h"
+#include "MemoryManager.h"
 #include <chrono>
 #include <ctime>
 #include <iomanip>
@@ -267,6 +268,10 @@ void MainConsole::initializeOS()
         isValid = false;
     }
     if(isValid){
+        // Initialize MemoryManager
+        MemoryManager::getInstance()->initialize(max_overall_mem);
+        
+        // Initialize GlobalScheduler
         GlobalScheduler::getInstance()->initializeCores(num_cpu,delays_per_exec);
         GlobalScheduler::getInstance()->runCores();
         GlobalScheduler::getInstance()->setScheduler(scheduler,quantum_cycles);

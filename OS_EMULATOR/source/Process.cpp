@@ -95,7 +95,7 @@ Process::Process(std::string name, int id)
     this->progressCount = 0;
     this->instructionCount = 0;
     this->currentInstruction = 0;
-
+    
     this->currentState = READY;
     this->coreID = -1; // Default core ID, indicating no core assigned yet
 }
@@ -156,3 +156,20 @@ void Process::writeToTxtFile()
 
     MyFile.close();
 }
+
+// Add the new methods to the Process class
+size_t Process::getMemorySize() const
+{
+    return this->memorySize;
+}
+
+void *Process::getBaseAddress() const
+{
+    return this->baseAddress;
+}
+
+void Process::setBaseAddress(void *address)
+{
+    this->baseAddress = address;
+}
+
