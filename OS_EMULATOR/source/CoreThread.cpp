@@ -1,5 +1,6 @@
 #include "CoreThread.h"
 
+
 CoreThread::CoreThread(int id, int cpuCycle) : coreID(id), cpuCycle(cpuCycle), cpuTicks(0), activeTicks(0), currentTicks(0) {
     this->currentProcess = nullptr; // Initialize current process to nullptr
     this->occupied = false; // Initially, the core is not occupied
@@ -21,6 +22,7 @@ void CoreThread::run() {
             } else if (this->currentProcess->getState() == FINISHED) {
                 // Push current process to finished processes in GlobalScheduler
                 GlobalScheduler::getInstance()->finishProcess(this->currentProcess);
+                MemoryManager::getInstance()->deallocate(*this->currentProcess); // Free memory allocated for the process   
                 this->occupied = false; // Free the core
                 this->currentProcess = nullptr; // Clear the current process
                 this->currentTicks = 0; // Reset current ticks

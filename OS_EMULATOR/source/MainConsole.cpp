@@ -1,6 +1,7 @@
 #include "MainConsole.h"
 #include "ConsoleManager.h"
 #include "GlobalScheduler.h"
+#include "MemoryManager.h"
 #include <chrono>
 #include <ctime>
 #include <iomanip>
@@ -119,7 +120,7 @@ void MainConsole::initializeOS()
 {
     std::ifstream file("Config.txt");
     bool isValid = true;
-    int num_cpu, quantum_cycles, batch_process_freq, min_ins, max_ins, delays_per_exec;
+    int num_cpu, quantum_cycles, batch_process_freq, min_ins, max_ins, delays_per_exec, max_overall_mem, mem_per_frame, min_mem_per_proc, max_mem_per_proc;
     std::string scheduler, input;
     this->outputList.push_back("------------------------------------");
     
@@ -211,12 +212,66 @@ void MainConsole::initializeOS()
             isValid=false;
         }
     }
+
+    file >> input;
+    if (input == "max-overall-mem")
+    {
+        file >> max_overall_mem;
+        if(max_overall_mem >= 64 && max_overall_mem <= 65536){
+            this->outputList.push_back("max_overall_mem: " + std::to_string(max_overall_mem));
+        }else{
+            this->outputList.push_back("max_overall_mem : Invalid config");
+            isinitialized = false;
+            isValid=false;
+        }
+    }
+    file >> input;
+    if (input == "mem-per-frame")
+    {
+        file >> mem_per_frame;
+        if(mem_per_frame >= 64 && mem_per_frame <= 65536){
+            this->outputList.push_back("mem_per_frame: " + std::to_string(mem_per_frame));
+        }else{
+            this->outputList.push_back("mem_per_frame : Invalid config");
+            isinitialized = false;
+            isValid=false;
+        }
+    }
+    file >> input;
+    if (input == "min-mem-per-proc")
+    {
+        file >> min_mem_per_proc;
+        if(min_mem_per_proc >= 64 && min_mem_per_proc <= 65536){
+            this->outputList.push_back("min_mem_per_proc: " + std::to_string(min_mem_per_proc));
+        }else{
+            this->outputList.push_back("min_mem_per_proc : Invalid config");
+            isinitialized = false;
+            isValid=false;
+        }
+    }
+
+    file >> input;
+    if (input == "max-mem-per-proc")
+    {
+        file >> max_mem_per_proc;
+        if(max_mem_per_proc >= 64 && max_mem_per_proc <= 65536){
+            this->outputList.push_back("max_mem_per_proc: " + std::to_string(max_mem_per_proc));
+        }else{
+            this->outputList.push_back("max_mem_per_proc : Invalid config");
+            isinitialized = false;
+            isValid=false;
+        }
+    }
     
     this->outputList.push_back("------------------------------------");
     if(max_ins<min_ins){
         isValid = false;
     }
     if(isValid){
+        // Initialize MemoryManager
+        MemoryManager::getInstance()->initialize(max_overall_mem);
+        
+        // Initialize GlobalScheduler
         GlobalScheduler::getInstance()->initializeCores(num_cpu,delays_per_exec);
         GlobalScheduler::getInstance()->runCores();
         GlobalScheduler::getInstance()->setScheduler(scheduler,quantum_cycles);

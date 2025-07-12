@@ -16,10 +16,10 @@ void SchedulerTestThread::run() {
                 // Assign new process to scheduler
                 assignToScheduler(process);
             }
-            // Sleep for the specified CPU cycle duration
-            IETThread::sleep(1); // Sleep for a short duration to avoid busy waiting
-            cpuTick++;
         }
+        // Sleep for the specified CPU cycle duration
+        cpuTick++;
+        IETThread::sleep(1); // Sleep for a short duration to avoid busy waiting
     }
 }
 

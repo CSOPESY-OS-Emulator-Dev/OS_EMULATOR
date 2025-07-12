@@ -37,6 +37,10 @@ public:
     int getCurrentLine();
     int getProcessID();
     std::string getProcessName();
+     // Add these methods to the Process class
+    size_t getMemorySize() const; // Add 
+    void* getBaseAddress() const; // Add 
+    void setBaseAddress(void* address); // Add 
 
     // Used by the scheduler-test to pipe random instruction
     void addInstruction(std::shared_ptr<ICommand> instruction); // Default count is 1
@@ -75,6 +79,8 @@ private:
     int instructionCount;
     int sleepDuration; // Duration in milliseconds for sleep state
 
+    size_t memorySize;
+    void* baseAddress;
     state currentState;
 
     void writeToTxtFile(); // call it, maybe? process1Logs
