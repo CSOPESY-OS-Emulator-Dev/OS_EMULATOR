@@ -19,7 +19,8 @@ int main() {
     Process process9("Process9", 9, 90, 4096); // Create a ninth process with 2 bytes memory
     Process process10("Process10", 10, 100, 4096); // Create a tenth process with 1 byte memory
 
-    allocator.createSnapshot(6);
+
+
 
 
     // Allocate memory for each process
@@ -34,35 +35,39 @@ int main() {
     void* addr5 = allocator.allocate(process5);
     process5.setBaseAddress(addr5); // Set the base address in the process
 
+//    allocator.createSnapshot(5);
+
     // Visualize memory allocation
     std::cout << "Memory Visualization:\n" << allocator.visualizeMemory() << std::endl;
     // Deallocate memory for some processes
     allocator.deallocate(process1);
-    allocator.deallocate(process2);
     allocator.deallocate(process3);
+    allocator.deallocate(process4);
+
+    allocator.createSnapshot(5);
 
     // Visualize memory after deallocation
     std::cout << "Memory Visualization after deallocation:\n" << allocator.visualizeMemory() << std::endl;
 
-    // Allocate memory for remaining processes
-    void* addr6 = allocator.allocate(process6);
-    void* addr7 = allocator.allocate(process7);
-    void* addr8 = allocator.allocate(process8);
-    void* addr9 = allocator.allocate(process9);
-    void* addr10 = allocator.allocate(process10);
-
-    // Visualize memory after allocating remaining processes
-    std::cout << "Memory Visualization after allocating remaining processes:\n" << allocator.visualizeMemory() << std::endl;
-
-    // Deallocate all remaining processes
-    allocator.deallocate(process6);
-    allocator.deallocate(process7);
-    allocator.deallocate(process8);
-    allocator.deallocate(process9);
-    allocator.deallocate(process10);
-
-    // Final memory visualization
-    std::cout << "Final Memory Visualization:\n" << allocator.visualizeMemory() << std::endl;
+//    // Allocate memory for remaining processes
+//    void* addr6 = allocator.allocate(process6);
+//    void* addr7 = allocator.allocate(process7);
+//    void* addr8 = allocator.allocate(process8);
+//    void* addr9 = allocator.allocate(process9);
+//    void* addr10 = allocator.allocate(process10);
+//
+//    // Visualize memory after allocating remaining processes
+//    std::cout << "Memory Visualization after allocating remaining processes:\n" << allocator.visualizeMemory() << std::endl;
+//
+//    // Deallocate all remaining processes
+//    allocator.deallocate(process6);
+//    allocator.deallocate(process7);
+//    allocator.deallocate(process8);
+//    allocator.deallocate(process9);
+//    allocator.deallocate(process10);
+//
+//    // Final memory visualization
+//    std::cout << "Final Memory Visualization:\n" << allocator.visualizeMemory() << std::endl;
 
 
 

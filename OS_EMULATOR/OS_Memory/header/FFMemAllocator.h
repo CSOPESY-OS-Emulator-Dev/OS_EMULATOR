@@ -28,10 +28,14 @@ private:
         bool isFree;
         int processID = -1; // Optional: to track which process owns the block
 
+
         // Default constructor
         Block() : address(nullptr), size(0), isFree(false) {}
         Block(void* addr, size_t sz, bool free) : address(addr), size(sz), isFree(free) {}
     };
+
+    int allocatedMemory = 0; //For Number of processes in memory
+    size_t remainingMemory = 0; //For Total external fragmenation in KB
 
     size_t maxMemorySize;
     std::list<std::shared_ptr<Block>> memoryBlocks;
