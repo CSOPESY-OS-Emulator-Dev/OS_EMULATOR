@@ -1,5 +1,6 @@
 #include "../header/FFMemAllocator.h"
 
+
 FFMemAllocator::FFMemAllocator(size_t maxMemorySize) : maxMemorySize(maxMemorySize) {
     char* base = new char[maxMemorySize * sizeof(char)];
     baseAddress = base;
@@ -14,6 +15,7 @@ FFMemAllocator::FFMemAllocator(size_t maxMemorySize) : maxMemorySize(maxMemorySi
 void *FFMemAllocator::allocate(Process &process)
 {
     size_t size = process.getMemorySize();
+
     if (size == 0 || size > maxMemorySize) {
         return nullptr; // Invalid allocation request
     }
@@ -21,6 +23,8 @@ void *FFMemAllocator::allocate(Process &process)
     if (ptr) {
         // Set the process ID for the allocated block
         blockMap[ptr]->processID = process.getProcessID();
+        allocatedMemory++;
+        remainingMemory = remainingMemory + size;
         return ptr;
     }
     // If no free block is found, return nullptr
@@ -29,10 +33,14 @@ void *FFMemAllocator::allocate(Process &process)
 
 void FFMemAllocator::deallocate(Process &process) {
     void *ptr = process.getBaseAddress();
-    
+
+
+
     auto block = blockMap[ptr];
     // If the block is found and is currently allocated
     if (!block->isFree) {
+        allocatedMemory--;
+        remainingMemory = remainingMemory - block->size;
         block->isFree = true; // Mark the block as free
         block->processID = -1; // Reset the process ID
         mergeFreeBlocks(); // Attempt to merge adjacent free blocks
@@ -48,7 +56,7 @@ std::string FFMemAllocator::visualizeMemory() const {
             continue; // Skip free blocks
         }
         blockAddress = reinterpret_cast<uintptr_t>(block->address) - reinterpret_cast<uintptr_t>(baseAddress);
-        visualization = std::to_string(blockAddress + block->size) + "\n"
+        visualization = "\n" + std::to_string(blockAddress + block->size) + "\n"
                         + std::to_string(block->processID) + "\n"
                         + std::to_string(blockAddress) + "\n\n" + visualization;
     }
@@ -102,4 +110,50 @@ void FFMemAllocator::mergeFreeBlocks() {
             ++it;
         }
     }
+}
+
+//Remove when integrating to main header and source
+std::string getFormattedCurrentTime()
+{
+    using namespace std::chrono;
+
+    // Get current time
+    auto now = system_clock::now();
+    auto in_time_t = system_clock::to_time_t(now);
+    auto ms = duration_cast<milliseconds>(now.time_since_epoch()) % 1000;
+
+    // Convert to local time
+    std::tm* localTime = std::localtime(&in_time_t); // Use localtime_s on Windows
+
+    // Format the output
+    std::ostringstream oss;
+    oss << "(" << std::put_time(localTime, "%m/%d/%Y, %I:%M:%S")
+        << '.' << std::setw(3) << std::setfill('0') << ms.count()
+        << ' ' << std::put_time(localTime, "%p") << ")";
+    return oss.str();
+}
+
+void FFMemAllocator::createSnapshot(int quantumCycle)
+{
+    std::string filename = "memory_stamp_" + std::to_string(quantumCycle) + ".txt";
+    std::ofstream MyFile(filename);
+
+    if (!MyFile.is_open())
+    {
+        std::perror("Error opening file");
+        std::cerr << "Filename attempted: " << filename << std::endl;
+        return;
+    }
+
+    MyFile <<"Timestamp: " << getFormattedCurrentTime() << "\n"; //Timestamp
+    MyFile << "Number of processes in memory: " << allocatedMemory << "\n";
+    MyFile << "Total External Fragmentation: " << maxMemorySize - remainingMemory << "\n";
+    MyFile << "---------------------------------------------- = " << maxMemorySize << std::endl;
+    MyFile << visualizeMemory();
+    MyFile << "---------------------------------------------- = 0\n";
+
+
+    MyFile.close();
+
+    std::cout<<"Memory Block Size: " << blockMap.size() << std::endl;
 }
