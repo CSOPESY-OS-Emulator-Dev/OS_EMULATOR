@@ -27,7 +27,7 @@ void RRScheduler::execute() {
                 // core->assignProcess(process, this->quantumCycles); // Assign the process to the core with quantumCycles ticks
 
                 // Attempt to allocate memory for the process
-                void* memAddress = MemoryManager->allocate(*process);
+                void* memAddress = MemoryManager::getInstance()->allocate(*process);
 
                 if (memAddress == nullptr) {
                     // Not enough memory: requeue process

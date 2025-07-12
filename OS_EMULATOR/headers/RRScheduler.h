@@ -6,7 +6,7 @@
 #include "GlobalScheduler.h"
 #include "CoreThread.h"
 
-#include "MemoryManager.h"
+#include "../header/MemoryManager.h"
 
 class RRScheduler : public AScheduler {
     // RRScheduler implements the Round Robin scheduling algorithm.

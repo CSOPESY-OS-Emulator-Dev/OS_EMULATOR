@@ -28,7 +28,7 @@ void MemoryManager::deallocate(Process& process) {
 
 void MemoryManager::createSnapshot(int quantumCycle) {
     if (allocator) {
-        allocator->createSnapshot(quantumCycle);
+        // allocator->createSnapshot(quantumCycle);
     } else {
         std::cerr << "[MemoryManager] Cannot create snapshot: Allocator not initialized.\n";
     }
