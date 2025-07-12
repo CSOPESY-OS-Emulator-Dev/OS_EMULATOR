@@ -1,11 +1,9 @@
 #include <iostream>
-#include <vector>
 #include <string>
-#include "FFMemAllocator.h"
-#include "Process.h"
+#include "../header/MemoryManager.h"
+#include "../header/Process.h"
 
 int main() {
-    
     // Example usage of multiple Processes and FFMemAllocator classes
     FFMemAllocator allocator(16384); // Create a memory allocator with 1024 bytes
     Process process1("Process1", 1, 10, 4096); // Create a process with 256 bytes memory
@@ -46,30 +44,10 @@ int main() {
 
     allocator.createSnapshot(5);
 
-    // Visualize memory after deallocation
-    std::cout << "Memory Visualization after deallocation:\n" << allocator.visualizeMemory() << std::endl;
 
-//    // Allocate memory for remaining processes
-//    void* addr6 = allocator.allocate(process6);
-//    void* addr7 = allocator.allocate(process7);
-//    void* addr8 = allocator.allocate(process8);
-//    void* addr9 = allocator.allocate(process9);
-//    void* addr10 = allocator.allocate(process10);
-//
-//    // Visualize memory after allocating remaining processes
-//    std::cout << "Memory Visualization after allocating remaining processes:\n" << allocator.visualizeMemory() << std::endl;
-//
-//    // Deallocate all remaining processes
-//    allocator.deallocate(process6);
-//    allocator.deallocate(process7);
-//    allocator.deallocate(process8);
-//    allocator.deallocate(process9);
-//    allocator.deallocate(process10);
-//
-//    // Final memory visualization
-//    std::cout << "Final Memory Visualization:\n" << allocator.visualizeMemory() << std::endl;
-
-
+    // Step 4: Create snapshot after first allocations
+    MemoryManager::getInstance()->createSnapshot(1);
+    std::cout << "📸 Snapshot 1 saved: memory_stamp_1.txt\n";
 
     return 0;
 }
