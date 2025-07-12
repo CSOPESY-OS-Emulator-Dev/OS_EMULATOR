@@ -1,5 +1,6 @@
 #include "FFMemAllocator.h"
 
+
 FFMemAllocator::FFMemAllocator(size_t maxMemorySize) : maxMemorySize(maxMemorySize) {
     char* base = new char[maxMemorySize * sizeof(char)];
     baseAddress = base;
@@ -102,4 +103,20 @@ void FFMemAllocator::mergeFreeBlocks() {
             ++it;
         }
     }
+}
+
+void FFMemAllocator::createSnapshot(int quantumCycle)
+{
+    std::string filename = "memory_stamp_" + std::to_string(quantumCycle) + ".txt";
+    std::ofstream MyFile(filename);
+
+    if (!MyFile.is_open())
+    {
+        std::perror("Error opening file");
+        std::cerr << "Filename attempted: " << filename << std::endl;
+        return;
+    }
+
+    MyFile << "Snapshot for quantum cycle: " << quantumCycle << "\n"; // Ensure content
+    MyFile.close();
 }

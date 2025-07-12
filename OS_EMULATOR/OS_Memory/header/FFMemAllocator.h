@@ -1,5 +1,10 @@
 #pragma once
 #include <iostream>
+#include <sstream>
+#include <fstream>
+#include <vector>
+#include <chrono>
+#include <ctime>
 #include <memory>
 #include <list>
 #include <string>
@@ -14,6 +19,7 @@ public:
     void* allocate(Process &process) override;
     void deallocate(Process &process) override;
     std::string visualizeMemory() const override;
+    void createSnapshot(int quantumCycle);
 
 private:
     struct Block {

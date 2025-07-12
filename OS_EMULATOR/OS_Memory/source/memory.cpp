@@ -5,6 +5,7 @@
 #include "Process.h"
 
 int main() {
+    
     // Example usage of multiple Processes and FFMemAllocator classes
     FFMemAllocator allocator(16384); // Create a memory allocator with 1024 bytes
     Process process1("Process1", 1, 10, 4096); // Create a process with 256 bytes memory
@@ -17,6 +18,9 @@ int main() {
     Process process8("Process8", 8, 80, 4096); // Create an eighth process with 4 bytes memory
     Process process9("Process9", 9, 90, 4096); // Create a ninth process with 2 bytes memory
     Process process10("Process10", 10, 100, 4096); // Create a tenth process with 1 byte memory
+
+    allocator.createSnapshot(6);
+
 
     // Allocate memory for each process
     void* addr1 = allocator.allocate(process1);
@@ -59,6 +63,8 @@ int main() {
 
     // Final memory visualization
     std::cout << "Final Memory Visualization:\n" << allocator.visualizeMemory() << std::endl;
+
+
 
     return 0;
 }
