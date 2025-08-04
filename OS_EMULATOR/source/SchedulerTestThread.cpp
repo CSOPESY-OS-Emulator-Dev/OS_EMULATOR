@@ -56,9 +56,9 @@ std::shared_ptr<Process> SchedulerTestThread::createProcess(std::string processN
     return process; // Return the created process
 }
 
-std::vector<std::shared_ptr<ICommand>> SchedulerTestThread::generateInstructions(int& remainingExecs, int pid, const std::string& processName, int nestingLevel)
+std::vector<std::string> SchedulerTestThread::generateInstructions(int& remainingExecs, int pid, const std::string& processName, int nestingLevel)
 {
-    std::vector<std::shared_ptr<ICommand>> instructionList;
+    std::vector<std::string> instructionList;
 
     while (remainingExecs > 0) {
         bool canCreateFor = (nestingLevel < 3 && remainingExecs > 1);
@@ -82,11 +82,20 @@ std::vector<std::shared_ptr<ICommand>> SchedulerTestThread::generateInstructions
             int totalForCommandCost = 1 + iterations * actualNestedExecsUsed;
             if (totalForCommandCost > remainingExecs) break;
 
-            instructionList.push_back(std::make_shared<ForCommand>(pid, nestedInstructions, iterations));
+            std::stringstream forLoopString;
+            forLoopString << "FOR([ ";
+            for (size_t i = 0; i < nestedInstructions.size(); ++i) {
+                forLoopString << nestedInstructions[i];
+                if (i < nestedInstructions.size() - 1) {
+                    forLoopString << "; ";
+                }
+            }
+            forLoopString << " ], " << iterations << ")";
+            instructionList.push_back(forLoopString.str());
             remainingExecs -= totalForCommandCost;
         } else {
             auto simpleInstr = createInstruction(cmdType, pid, processName);
-            if (simpleInstr) {
+            if (!simpleInstr.empty()) {
                 instructionList.push_back(simpleInstr);
                 remainingExecs--;
             }
@@ -176,34 +185,35 @@ std::vector<std::shared_ptr<ICommand>> SchedulerTestThread::generateInstructions
     return finalInstructions;
 }
 
-std::shared_ptr<ICommand> SchedulerTestThread::createInstruction(CommandType commandType, int pid, std::string processName) {
+std::string SchedulerTestThread::createInstruction(CommandType commandType, int pid, std::string processName) {
     // Create a new instruction based on the command type
     std::string variable1 = "var" + std::to_string(getRandNum(0,65535));
     std::string variable2 = "var" + std::to_string(getRandNum(0,65535));
     std::string variable3 = "var" + std::to_string(getRandNum(0,65535));
+
     switch (commandType) {
         case PRINT:
             switch (getRandNum(0, 1)) {
                 case 0:
-                    return std::make_shared<PrintCommand>(pid, "Hello world from " + processName);
+                    return "PRINT(Hello from"  + processName + "),";
                 case 1:
-                    return std::make_shared<PrintCommand>(pid, "Value from " + variable1 + ": ", variable1);
+                    return "PRINT(\"Value of " + variable1 + ": \", " + variable1 + "),";
                 default:
                     return nullptr;
             }
         case DECLARE:
-            return std::make_shared<DeclareCommand>(pid,variable1,getRandNum(0,65535) );
+            return "DECLARE(" + variable1 + ", " + std::to_string(getRandNum(0, 65535)) + "),";
         case ADD:
             switch (getRandNum(0,3))
             {
             case 0:
-                return std::make_shared<AddCommand>(pid,variable1,variable2,variable3);
+                return "ADD("  + std::to_string(pid) + ", " + variable1 + ", " + variable2 + ", " + variable3 + "),";
             case 1:
-                return std::make_shared<AddCommand>(pid,variable1,getRandNum(0,65535),variable3 );
+                return "ADD("  + std::to_string(pid) + ", " + variable1 + ", " + std::to_string(getRandNum(0,65535)) + ", " + variable3 + "),";
             case 2:
-                return std::make_shared<AddCommand>(pid,variable1,variable2,getRandNum(0,65535));
+                return "ADD("  + std::to_string(pid) + ", "+ variable1 + ", " + variable2 + ", " + std::to_string(getRandNum(0,65535)) + "),";
             case 3:
-                return std::make_shared<AddCommand>(pid,variable1,getRandNum(0,65535),getRandNum(0,65535));
+                return "ADD("  + std::to_string(pid) + ", " + variable1 + ", " + variable2 + ", " + std::to_string(getRandNum(0,65535)) + "),";
             default:
                 return nullptr;
             }
@@ -212,19 +222,19 @@ std::shared_ptr<ICommand> SchedulerTestThread::createInstruction(CommandType com
             switch (getRandNum(0,3))
             {
             case 0:
-                return std::make_shared<SubtractCommand>(pid,variable1,variable2,variable3);
+                return "SUBTRACT("  + std::to_string(pid) + ", " + variable1 + ", " + variable2 + ", " + variable3 + "),";
             case 1:
-                return std::make_shared<SubtractCommand>(pid,variable1,getRandNum(0,65535),variable3);
+                return "SUBTRACT("  + std::to_string(pid) + ", " + variable1 + ", " + std::to_string(getRandNum(0,65535)) + ", " + variable3 + "),";
             case 2:
-                return std::make_shared<SubtractCommand>(pid,variable1,variable2,getRandNum(0,65535));
+                return "SUBTRACT("  + std::to_string(pid) + ", "+ variable1 + ", " + variable2 + ", " + std::to_string(getRandNum(0,65535)) + "),";
             case 3:
-                return std::make_shared<SubtractCommand>(pid,variable1,getRandNum(0,65535),getRandNum(0,65535));
+                return "SUBTRACT("  + std::to_string(pid) + ", " + variable1 + ", " + std::to_string(getRandNum(0,65535)) + ", " + std::to_string(getRandNum(0,65535)) + "),";
             default:
                 return nullptr;
             }
         case SLEEP:
             // Placeholder for SLEEP command
-            return std::make_shared<SleepCommand>(pid, getRandNum(0,255)); // Assuming 0 is the PID for the test
+            return "SLEEP("+std::to_string(pid) + ", " + std::to_string(getRandNum(0,255))+"),"; // Assuming 0 is the PID for the test
         default:
             return nullptr;
     }
