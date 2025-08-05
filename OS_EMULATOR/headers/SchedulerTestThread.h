@@ -45,9 +45,9 @@ public:
     // Create new process with a given name and ID
     std::shared_ptr<Process> createProcess(std::string processName);
     // Create a random instruction of a given command type
-    std::shared_ptr<ICommand> createInstruction(CommandType commandType, int pid, std::string processName);
+    std::string createInstruction(CommandType commandType, int pid, std::string processName);
     // Return random command type
-    std::vector<std::shared_ptr<ICommand>> generateInstructions(int& remainingExecs, int pid, const std::string& processName, int nestingLevel);
+    std::vector<std::string>generateInstructions(int& remainingExecs, int pid, const std::string& processName, int nestingLevel);
     std::vector<std::shared_ptr<ICommand>> generateInstructionsIterative(int &remainingExecs, int pid, const std::string &processName);
     // Get a random command type, with an option to include FOR command type
     CommandType getRandomCommandType(bool includeFOR, bool includeSLEEP); // Default includeFOR is true, to include FOR command type
