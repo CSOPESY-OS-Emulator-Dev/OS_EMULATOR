@@ -207,12 +207,19 @@ void CoreThread::executeByteCode(uint16_t PC) {
             break;
         }
 
-        case OpCode::JMP_ZERO: {
-            // std::cout << ((variant == 0x10) ? "JMP Process" : "JMP_ZERO Process") << std::endl;
-            uint8_t regID = (variant == 0x10) ? 0 : fetch();
+        case OpCode::JMP: { // New, simple handler for unconditional JMP
             uint16_t jumpAddress = fetch16();
-            uint16_t& regValue = currentProcess->registers.getRegister(regID);
-            if (regValue == 0 || variant == 0x10) {
+            currentProcess->programCounter = jumpAddress;
+            currentProcess->progressCounter--;
+            break;
+        }
+
+        case OpCode::JMP_ZERO: { // Cleaned-up handler for conditional JMP_ZERO
+            uint8_t regID = fetch();
+            uint16_t jumpAddress = fetch16();
+            uint16_t& regValue = currentProcess->registers.getRegister(regID); // This is now safe
+
+            if (regValue == 0) {
                 currentProcess->programCounter = jumpAddress;
             } else {
                 regValue--;

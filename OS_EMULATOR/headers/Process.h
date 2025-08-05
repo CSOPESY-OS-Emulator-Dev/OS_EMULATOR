@@ -79,7 +79,7 @@ public:
     std::string getTimeRunning();
     std::string getTimeFinished();
     std::string getTimeShutDowned();
-    std::string getInvalidAddres();
+    std::string getInvalidAddress();
 
     int getTotalIntstruction();
     int getProgressCount();

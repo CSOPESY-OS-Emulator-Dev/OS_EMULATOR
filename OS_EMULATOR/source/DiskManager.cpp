@@ -3,7 +3,9 @@
 
 DiskManager *DiskManager::sharedInstance = nullptr;
 
-DiskManager::DiskManager() {}
+DiskManager::DiskManager() {
+    clearBackingStore();
+}
 
 void DiskManager::removePage(int pid, int pageNum)
 {
