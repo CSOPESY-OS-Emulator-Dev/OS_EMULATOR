@@ -42,7 +42,7 @@ std::string Process::getTimeShutDowned()
     return this->timeShutDowned;
 }
 
-std::string Process::getInvalidAddres()
+std::string Process::getInvalidAddress()
 {
     return this->invalidAddress;
 }
