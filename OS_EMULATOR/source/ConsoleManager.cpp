@@ -61,21 +61,35 @@ bool ConsoleManager::registerConsole(std::string consoleName, std::string memory
 	return false;
 }
 
-bool ConsoleManager::switchConsole(std::string consoleName)
+std::string ConsoleManager::switchConsole(std::string consoleName)
 {
+	std::stringstream errorMessage;
 	auto scheduler = GlobalScheduler::getInstance();
-	if (consoleTable.find(consoleName) == consoleTable.end()) {
-		return false;
+	auto process = scheduler->getProcessByName(consoleName); // get Process
+	if (process) {
+		if (process->getState() == FINISHED) { // Process finished executing
+			errorMessage << "Could not find " << consoleName << " console";
+			return errorMessage.str();
+		} else if (process->getState() == ACCESSVIOLATION) { // Access Violation
+			errorMessage << "Process "
+				<< process->getProcessName()
+				<< " shut down due to memory access violation error that occured at "
+				<< process->getTimeShutDowned() << ". "
+				<< process->getInvalidAddress() << " invalid.";
+			return errorMessage.str();
+		} else if (consoleTable.find(consoleName) == consoleTable.end()) { // Console not existing
+			consoleTable[consoleName] = std::make_shared<ProcessConsole>(consoleName, getFormattedCurrentTime()); // Create new console for process
+		} 
+		std::cout << std::flush;
+		std::cout << "\033c";
+		this->previousConsole = this->currentConsole;
+		this->currentConsole = this->consoleTable[consoleName];
+		this->currentConsole->initialize();
+		return "";
+	} else {
+		errorMessage << "Could not find " << consoleName << " console";
+		return errorMessage.str();
 	}
-	if (scheduler->getProcessByName(consoleName)->getState() == FINISHED) {
-		return false;
-	}
-	std::cout << std::flush;
-    std::cout << "\033c";
-	this->previousConsole = this->currentConsole;
-	this->currentConsole = this->consoleTable[consoleName];
-	this->currentConsole->initialize();
-	return true;
 }
 
 void ConsoleManager::returnToPreviousConsole()

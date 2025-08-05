@@ -304,8 +304,9 @@ void MainConsole::setScreen(std::string processName, std::string memorySize)
 
 void MainConsole::redrawScreen(std::string processName)
 {
-    if(!ConsoleManager::getInstance()->switchConsole(processName)){
-        this->outputList.push_back("Could not find " + processName + " console");
+    auto err = ConsoleManager::getInstance()->switchConsole(processName);
+    if(err != ""){
+        this->outputList.push_back(err);
     }
 }
 

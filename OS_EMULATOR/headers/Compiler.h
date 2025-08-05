@@ -26,8 +26,8 @@ enum class OpCode : uint8_t {
     NOP = 0x07, // Skip instsruction NOP, NOP, NOP, ... , X
     SLEEP = 0x08, // 0x08 = SLEEP(X)
     JMP_ZERO = 0x09, // 0x09 = JMP_ZERO(reg.id, address)
-    JMP = 0x19, // 0x19 = JMP(address)
     MOV = 0x0A, // 0x0A = MOV(reg.id, value)
+    JMP = 0x0B, // unconditional jump
     HALT = 0x0F, // HALT process
 };
 
