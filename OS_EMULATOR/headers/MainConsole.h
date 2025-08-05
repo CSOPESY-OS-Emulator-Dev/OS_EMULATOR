@@ -24,4 +24,5 @@ private:
     void stopScheduler();
     void showProcesses();
     void initializeOS();
+    void showProcessSMI(std::string processName);
 };
