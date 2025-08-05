@@ -44,6 +44,8 @@ public:
     static void destroy();
 
     void setMemoryManager(int memorySize, int pageSize, int maxFrames);
+    // ---- Utilities ----
+    int getPageSize() const;
 
     // ---- Page Handling ----
     int getFrame(std::shared_ptr<Process> proc, int virtualPage);

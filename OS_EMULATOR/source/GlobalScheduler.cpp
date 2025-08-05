@@ -100,10 +100,18 @@ void GlobalScheduler::setScheduler(std::string schedulerAlgorithm, int quantumCy
     }
 }
 
-void GlobalScheduler::createProcess(std::string processName)
+bool GlobalScheduler::createProcess(std::string processName, int memorySize)
 {
-    auto process = processGenerator->createProcess(processName);
-    processGenerator->assignToScheduler(process);
+    auto process = processGenerator->createProcess(processName, memorySize);
+    if (process) processGenerator->assignToScheduler(process);
+    else return false;
+}
+
+bool GlobalScheduler::createProcess(std::string processName, int memorySize, const std::vector<std::string> &lines)
+{
+    auto process = processGenerator->createProcess(processName, memorySize, lines);
+    if (process) processGenerator->assignToScheduler(process);
+    else return false;
 }
 
 void GlobalScheduler::finishProcess(std::shared_ptr<Process> process)
@@ -112,7 +120,7 @@ void GlobalScheduler::finishProcess(std::shared_ptr<Process> process)
     std::lock_guard<std::mutex> lock(finishedProcessesMutex); // Lock the mutex to ensure thread safety
     finishedProcesses.push_back(process->getProcessName() + "    " +
                                 process->getTimeFinished() + "    Finished    " +
-                                std::to_string(process->getCurrentLine()) + " / " +
+                                std::to_string(process->getProgressCount()) + " / " +
                                 std::to_string(process->getTotalIntstruction()));
 }
 

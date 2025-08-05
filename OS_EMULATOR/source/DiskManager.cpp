@@ -64,8 +64,8 @@ void DiskManager::storePage(int pid, int pageNum, const std::vector<uint8_t> &by
     out.close();
 
     // Get associated process and update page
-    // auto proc = GlobalScheduler::getInstance()->getProcessByID();
-    // proc->pageTable[pageNum].inMemory = false;
+    auto proc = GlobalScheduler::getInstance()->getProcessByID(pid);
+    proc->pageTable[pageNum].inMemory = false;
 }
 
 std::vector<uint8_t> DiskManager::loadPage(int pid, int pageSize, int pageNumber)

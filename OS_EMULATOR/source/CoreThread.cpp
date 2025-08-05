@@ -15,19 +15,19 @@ void CoreThread::run() {
             // Check if the process has finished executing
             if (this->currentProcess->getState() == ACCESSVIOLATION) {
                 // Push current process to error processes in GlobalScheduler
-                // GlobalScheduler::getInstance()->processError(this->currentProcess);
+                GlobalScheduler::getInstance()->finishProcess(this->currentProcess);
                 releaseProcess();
             } else if (this->currentProcess->getState() == WAITING) {
                 // Queue current process back to scheduler in GlobalScheduler
-                // GlobalScheduler::getInstance()->queueProcess(this->currentProcess);
+                GlobalScheduler::getInstance()->queueProcess(this->currentProcess);
                 releaseProcess();
             } else if (this->currentProcess->getState() == FINISHED) {
                 // Push current process to finished processes in GlobalScheduler
-                // GlobalScheduler::getInstance()->finishProcess(this->currentProcess);
+                GlobalScheduler::getInstance()->finishProcess(this->currentProcess);
                 releaseProcess();
             } else if (this->currentTicks <= 0) {
                 // Queue current process back to scheduler in GlobalScheduler
-                // GlobalScheduler::getInstance()->queueProcess(this->currentProcess);
+                GlobalScheduler::getInstance()->queueProcess(this->currentProcess);
                 releaseProcess();
             } else if (this->currentProcess->getState() == SLEEPING && this->currentProcess->sleepDuration > 0) {
                 // If process is currently executing a sleep instruction
@@ -156,7 +156,15 @@ void CoreThread::executeByteCode(uint16_t PC) {
             uint16_t value = fetch16();
             // Validate Address
             if(address < currentProcess->getByteSize() || address > currentProcess->getMemorySize()) {
+                std::stringstream hex;
+                hex << "0x"                          // Add the "0x" prefix
+                    << std::hex                       // Set the stream to output in hexadecimal format
+                    << std::uppercase                // Use uppercase letters for hex (A-F)
+                    << std::setfill('0')              // Set the padding character to '0'
+                    << std::setw(4)                   // Set the total width of the number to 4 digits
+                    << address; 
                 currentProcess->setState(ACCESSVIOLATION); // Siginify Memory Access Violation
+                currentProcess->invalidAddress = hex.str();
                 return;
             }
             mm->write16(currentProcess, address, value);
@@ -169,7 +177,15 @@ void CoreThread::executeByteCode(uint16_t PC) {
             uint16_t address = fetch16();
             uint16_t value = mm->read16(currentProcess, address);
             if(address < currentProcess->getByteSize() || address > currentProcess->getMemorySize()) {
+                std::stringstream hex;
+                hex << "0x"                          // Add the "0x" prefix
+                    << std::hex                       // Set the stream to output in hexadecimal format
+                    << std::uppercase                // Use uppercase letters for hex (A-F)
+                    << std::setfill('0')              // Set the padding character to '0'
+                    << std::setw(4)                   // Set the total width of the number to 4 digits
+                    << address; 
                 currentProcess->setState(ACCESSVIOLATION); // Siginify Memory Access Violation
+                currentProcess->invalidAddress = hex.str();
                 return;
             }
             mm->write16(currentProcess, varID * 2, value);
@@ -188,7 +204,6 @@ void CoreThread::executeByteCode(uint16_t PC) {
             uint8_t regID = fetch();
             uint8_t value = fetch();
             currentProcess->registers.getRegister(regID) = value;
-            currentProcess->progressCounter--;
             break;
         }
 
@@ -197,17 +212,18 @@ void CoreThread::executeByteCode(uint16_t PC) {
             uint8_t regID = (variant == 0x10) ? 0 : fetch();
             uint16_t jumpAddress = fetch16();
             uint16_t& regValue = currentProcess->registers.getRegister(regID);
-
             if (regValue == 0 || variant == 0x10) {
                 currentProcess->programCounter = jumpAddress;
             } else {
                 regValue--;
             }
+            currentProcess->progressCounter--;
             break;
         }
 
         default:
-            std::cerr << "Error: Unknown OpCode " << std::hex << (int)byteInstr << std::endl;
+            currentProcess->progressCounter--;
+            // std::cerr << "Error: Unknown OpCode " << std::hex << (int)byteInstr << std::endl;
             currentProcess->setState(FINISHED); // Halt on error
             break;
     }

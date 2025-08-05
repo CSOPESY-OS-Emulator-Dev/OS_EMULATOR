@@ -26,11 +26,11 @@ public:
     void setScheduler(std::string schedulerAlgorithm, int quantumCycles);
 
     // Create a new process
-    void createProcess(std::string processName);
+    bool createProcess(std::string processName, int memorySize);
+    // Create a new process with user defined instructions
+    bool createProcess(std::string processName, int memorySize, const std::vector<std::string> &lines);
     // Add finished process to the list
     void finishProcess(std::shared_ptr<Process> process);
-    // Add shut downed process to the list
-    void shutDownProcess(std::shared_ptr<Process> process);
     // Add a process to the scheduler's readyqueue
     void queueProcess(std::shared_ptr<Process> process);
     // Add a process to the process map

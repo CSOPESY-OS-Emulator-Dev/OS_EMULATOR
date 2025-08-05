@@ -52,11 +52,12 @@ class Process {
 private:
     std::string timeRunning;
     std::string timeFinished;
+    std::string timeShutDowned;
     std::string name;
+    std::string invalidAddress;
 
     int processID;
     int coreID;
-
     int instructionCount;
 
     size_t memorySize;
@@ -77,6 +78,8 @@ public:
 
     std::string getTimeRunning();
     std::string getTimeFinished();
+    std::string getTimeShutDowned();
+    std::string getInvalidAddres();
 
     int getTotalIntstruction();
     int getProgressCount();
@@ -90,6 +93,7 @@ public:
 
     // Used by the scheduler-test to pipe random instructions
     void setInstructions(std::vector<std::string> instructions); // Default count is 1
+    std::vector<std::string> getInstructions() const;
     void setTotalInstructions(int total);
 
     std::vector<std::string> stringLiterals;
@@ -97,16 +101,17 @@ public:
     uint16_t programCounter = 64; // Virtual address above symbolTable
     int progressCounter = 0; // Instructions executed
     int sleepDuration; // Duration in milliseconds for sleep state
+    bool hasBeenCompiled = false;
     // This vector is shared with the processConsole
     std::shared_ptr<std::vector<std::string>> outputLog;
 
     Process(std::string name, int id, int memorySize);
     ~Process();
 
-    // friend class ProcessConsole;
-    // friend class SchedulerTestThread;
+    friend class ProcessConsole;
     friend class MemoryManager;
     friend class DiskManager;
     friend class SymbolTable;
     friend class CoreThread;
+    friend class SchedulerTestThread;
 };

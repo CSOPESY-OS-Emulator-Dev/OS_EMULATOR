@@ -7,6 +7,7 @@
 #include <variant>
 #include <unordered_map>
 #include <regex>
+#include <cctype> // Required for isspace
 
 enum class OpCode : uint8_t {
     PRINT = 0x01, // 0x01 = PRINT(msg.id)

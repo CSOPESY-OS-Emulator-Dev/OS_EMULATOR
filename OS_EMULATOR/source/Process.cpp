@@ -2,6 +2,13 @@
 
 void Process::setState(state newState)
 {
+    if (newState == RUNNING) {
+        this->timeRunning = getFormattedCurrentTime();
+    } else if (newState == FINISHED) {
+        this->timeFinished = getFormattedCurrentTime();
+    } else if (newState == ACCESSVIOLATION) {
+        this->timeShutDowned = getFormattedCurrentTime();
+    }
     this->currentState = newState;
 }
 
@@ -13,7 +20,6 @@ state Process::getState() const
 void Process::setCoreID(int coreID)
 {
     this->coreID = coreID;
-    this->timeRunning = getFormattedCurrentTime();
 }
 
 int Process::getCoreID() const
@@ -29,6 +35,16 @@ std::string Process::getTimeRunning()
 std::string Process::getTimeFinished()
 {
     return this->timeFinished;
+}
+
+std::string Process::getTimeShutDowned()
+{
+    return this->timeShutDowned;
+}
+
+std::string Process::getInvalidAddres()
+{
+    return this->invalidAddress;
 }
 
 int Process::getTotalIntstruction()
@@ -72,6 +88,11 @@ void Process::setInstructions(std::vector<std::string> instructions)
     this->instructionList.insert(instructionList.end(),instructions.begin(),instructions.end());
 }
 
+std::vector<std::string> Process::getInstructions() const
+{
+    return this->instructionList;
+}
+
 void Process::setTotalInstructions(int total)
 {
     this->instructionCount = total;
@@ -88,6 +109,7 @@ Process::Process(std::string name, int id, int memorySize)
     this->name = name;
     this->processID = id;
 
+    this->byteSize = 0;
     this->progressCounter = 0;
     this->instructionCount = 0;
 

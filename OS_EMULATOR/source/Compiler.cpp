@@ -6,8 +6,6 @@ void Compiler::append(std::vector<uint8_t> &code, uint8_t op, std::initializer_l
     code.insert(code.end(), operands.begin(), operands.end());
 }
 
-#include <cctype> // Required for isspace
-
 /**
  * @brief Tokenizes a line of code using a single, unified state machine.
  * This function is robust and flexible, correctly parsing all specified formats:

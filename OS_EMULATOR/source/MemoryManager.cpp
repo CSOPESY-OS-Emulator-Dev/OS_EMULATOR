@@ -36,6 +36,11 @@ void MemoryManager::setMemoryManager(int memorySize, int pageSize, int maxFrames
     frameTable.reserve(maxFrames);
 }
 
+int MemoryManager::getPageSize() const
+{
+    return this->pageSize;
+}
+
 int MemoryManager::findFreeOrReplaceFrame() {
     // Get free frame index
     // std::cout << "Finding Free Frame" << std::endl;

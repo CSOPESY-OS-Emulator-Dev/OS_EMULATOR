@@ -16,8 +16,8 @@ public:
 
     void draw() const;
     void process() const;
+    bool registerConsole(std::string consoleName, std::string memorySize);
     bool switchConsole(std::string consoleName);
-    bool registerConsole(std::string consoleName);
     void returnToPreviousConsole();
 
     void setCursorPosition(int X, int Y) const;
