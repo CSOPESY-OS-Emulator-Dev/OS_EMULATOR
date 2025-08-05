@@ -94,6 +94,10 @@ void MainConsole::process(std::string input)
             reportUtil();
             isvalid = true;
         }
+        if (parsed.command == "process-smi") {
+            showProcessSMI("Process: Mumei");
+            isvalid = true;
+        }
     } else if(parsed.command == "initialize"){
         isinitialized = true;
         initializeOS();
