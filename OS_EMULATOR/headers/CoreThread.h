@@ -26,6 +26,11 @@ public:
 
     // for debugging purposes, return the core ID
     int getCoreID() const { return coreID; }
+
+    // For vmstat
+    int getTotalTicks() const { return cpuTicks; }
+    int getActiveTicks() const { return activeTicks; }
+    int getIdleTicks() const { return cpuTicks - activeTicks; }
     
 private:
     std::shared_ptr<Process> currentProcess; // The process currently assigned to this core

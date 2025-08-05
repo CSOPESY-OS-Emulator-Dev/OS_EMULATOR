@@ -60,6 +60,26 @@ public:
 
     friend class FCFSScheduler; // Allow FCFS Scheduler to access private members
     friend class RRScheduler; // Allow RR Scheduler to access private members
+
+    // For vmstat
+    size_t getTotalCpuTicks();
+    size_t getIdleCpuTicks();
+    size_t getActiveCpuTicks();
+
+    // For vmstat
+    size_t getTotalMemory() const;
+    size_t getUsedMemory();
+    size_t getFreeMemory();
+
+    // For vmstat
+    void pageIn(size_t pages);
+    void pageOut(size_t pages);
+    size_t getPagesPagedIn() const;
+    size_t getPagesPagedOut() const;
+
+    // For vmstat
+    int getRunnableProcessCount();
+    int getBlockedProcessCount();
     
 private:
     // Make singleton
@@ -87,4 +107,9 @@ private:
     mutable std::mutex processMapMutex;        // Mutex to ensure thread safety when accessing processMap
     mutable std::mutex finishedProcessesMutex; // Mutex to ensure thread safety when accessing finishedProcesses
     mutable std::mutex queueMutex;             // Mutex to ensure thread safety when accessing the ready queue
+
+    // For vmstat
+    size_t totalSystemMemory;
+    size_t pagesPagedIn;
+    size_t pagesPagedOut;
 };

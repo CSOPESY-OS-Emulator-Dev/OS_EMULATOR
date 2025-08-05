@@ -12,7 +12,127 @@ GlobalScheduler::GlobalScheduler()
     schedulerAlgorithms["fcfs"] = std::make_shared<FCFSScheduler>();
     schedulerAlgorithms["rr"] = std::make_shared<RRScheduler>();
     currentScheduler = nullptr; // No scheduler set initially
+
+    // For vmstat
+    this->totalSystemMemory = 65536; // Example: 64KB total memory. Make this configurable!
+    this->pagesPagedIn = 0;
+    this->pagesPagedOut = 0;
 }
+
+// --- ADD ALL OF THESE ARE FOR VMSTAT ---
+
+// Process State Counters
+int GlobalScheduler::getRunnableProcessCount() {
+    std::lock_guard<std::mutex> lock(processMapMutex);
+    int count = 0;
+    for (const auto& pair : processMap) {
+        if (pair.second && (pair.second->getState() == READY || pair.second->getState() == RUNNING)) {
+            count++;
+        }
+    }
+    return count;
+}
+
+int GlobalScheduler::getBlockedProcessCount() {
+    std::lock_guard<std::mutex> lock(processMapMutex);
+    int count = 0;
+    for (const auto& pair : processMap) {
+        if (pair.second && (pair.second->getState() == SLEEPING || pair.second->getState() == WAITING)) {
+            count++;
+        }
+    }
+    return count;
+}
+
+// Memory Aggregators
+size_t GlobalScheduler::getTotalMemory() const {
+    return totalSystemMemory;
+}
+
+size_t GlobalScheduler::getUsedMemory() {
+    std::lock_guard<std::mutex> lock(processMapMutex);
+    size_t used = 0;
+    for (const auto &pair : processMap) {
+        if (pair.second && pair.second->getState() != FINISHED) {
+            used += pair.second->getMemorySize();
+        }
+    }
+    return used;
+}
+
+size_t GlobalScheduler::getFreeMemory() {
+    // This can be calculated without locking again
+    return getTotalMemory() - getUsedMemory();
+}
+
+// CPU Tick Aggregators
+size_t GlobalScheduler::getTotalCpuTicks() {
+    size_t total = 0;
+    std::lock_guard<std::mutex> lock(coreMutex); // Protect access to cores vector
+    for (const auto &core : cores) {
+        if (core) total += core->getTotalTicks();
+    }
+    return total;
+}
+
+size_t GlobalScheduler::getIdleCpuTicks() {
+    size_t idle = 0;
+    std::lock_guard<std::mutex> lock(coreMutex); // Protect access to cores vector
+    for (const auto &core : cores) {
+        if (core) idle += core->getIdleTicks();
+    }
+    return idle;
+}
+
+size_t GlobalScheduler::getActiveCpuTicks() {
+    // This can be calculated without locking again
+    return getTotalCpuTicks() - getIdleCpuTicks();
+}
+
+// Paging Methods
+void GlobalScheduler::pageIn(size_t pages) {
+    this->pagesPagedIn += pages;
+}
+
+void GlobalScheduler::pageOut(size_t pages) {
+    this->pagesPagedOut += pages;
+}
+
+size_t GlobalScheduler::getPagesPagedIn() const {
+    return this->pagesPagedIn;
+}
+
+size_t GlobalScheduler::getPagesPagedOut() const {
+    return this->pagesPagedOut;
+}
+
+void GlobalScheduler::createProcess(std::string processName)
+{
+    auto process = processGenerator->createProcess(processName);
+    
+    // --- THIS IS WHERE YOU SET MEMORY AND PAGE IN ---
+    // This assumes a page size of 4096 and a default process size.
+    // You should get this from the screen command later.
+    size_t processMemory = 4096;
+    process->setMemorySize(processMemory);
+    this->pageIn(processMemory / 4096); // Assuming 4KB page size
+    
+    processGenerator->assignToScheduler(process);
+}
+
+void GlobalScheduler::finishProcess(std::shared_ptr<Process> process)
+{
+    // --- THIS IS WHERE YOU PAGE OUT ---
+    this->pageOut(process->getMemorySize() / 4096); // Assuming 4KB page size
+
+    std::lock_guard<std::mutex> lock(finishedProcessesMutex);
+    finishedProcesses.push_back(process->getProcessName() + "    " +
+                                process->getTimeFinished() + "    Finished    " +
+                                std::to_string(process->getCurrentLine()) + " / " +
+                                std::to_string(process->getTotalIntstruction()));
+}
+
+// -------------------------------------------------
 
 GlobalScheduler *GlobalScheduler::getInstance()
 {
@@ -98,22 +218,6 @@ void GlobalScheduler::setScheduler(std::string schedulerAlgorithm, int quantumCy
     {
         // std::cerr << "Scheduler algorithm not found: " << schedulerAlgorithm << std::endl;
     }
-}
-
-void GlobalScheduler::createProcess(std::string processName)
-{
-    auto process = processGenerator->createProcess(processName);
-    processGenerator->assignToScheduler(process);
-}
-
-void GlobalScheduler::finishProcess(std::shared_ptr<Process> process)
-{
-    // Add the finished process to the list of finished processes
-    std::lock_guard<std::mutex> lock(finishedProcessesMutex); // Lock the mutex to ensure thread safety
-    finishedProcesses.push_back(process->getProcessName() + "    " +
-                                process->getTimeFinished() + "    Finished    " +
-                                std::to_string(process->getCurrentLine()) + " / " +
-                                std::to_string(process->getTotalIntstruction()));
 }
 
 void GlobalScheduler::queueProcess(std::shared_ptr<Process> process)
