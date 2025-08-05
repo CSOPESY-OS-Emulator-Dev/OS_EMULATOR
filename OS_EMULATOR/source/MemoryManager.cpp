@@ -180,3 +180,28 @@ void MemoryManager::writeByte(std::shared_ptr<Process> proc, uint16_t vAddr, uin
     int pAddr = translate(proc, vAddr);
     memory->write(pAddr, value);
 }
+
+size_t MemoryManager::getMemorySize() const
+{
+    return memory->getMemorySize();
+}
+
+/*
+
+Get the total memory usage by getting the number of all pages/processes in the frameTable
+and multiplying by the page size.
+This is a simple approximation and may not reflect the actual memory usage accurately
+
+
+*/
+size_t MemoryManager::getMemoryUsage() const
+{
+    size_t totalUsage = 0;
+    for (const auto& frame : frameTable) {
+        if (frame.has_value()) {
+            totalUsage += pageSize; // Check if page size is in MiB
+        }
+    }
+    return totalUsage / (1024 * 1024); // Convert to MiB
+
+}
