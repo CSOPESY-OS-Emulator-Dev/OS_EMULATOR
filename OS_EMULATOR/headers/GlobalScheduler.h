@@ -29,6 +29,8 @@ public:
     void createProcess(std::string processName);
     // Add finished process to the list
     void finishProcess(std::shared_ptr<Process> process);
+    // Add shut downed process to the list
+    void shutDownProcess(std::shared_ptr<Process> process);
     // Add a process to the scheduler's readyqueue
     void queueProcess(std::shared_ptr<Process> process);
     // Add a process to the process map
@@ -53,6 +55,8 @@ public:
 
     // Check if a process with the given name exists
     bool processExists(const std::string &processName) const;
+    // Check if a process accessed an invalid memory
+    bool processViolation(const std::string &processName) const;
     // Get a process by its name
     std::shared_ptr<Process> getProcessByName(const std::string &processName) const;
     // Get a process by its ID
@@ -83,7 +87,6 @@ private:
 
     // Mutex to ensure thread safety when accessing shared resources
     mutable std::mutex coreMutex;              // Mutex to ensure thread safety when accessing core threads
-    mutable std::mutex schedulerMutex;         // Mutex to ensure thread safety when accessing scheduler resources
     mutable std::mutex processMapMutex;        // Mutex to ensure thread safety when accessing processMap
     mutable std::mutex finishedProcessesMutex; // Mutex to ensure thread safety when accessing finishedProcesses
     mutable std::mutex queueMutex;             // Mutex to ensure thread safety when accessing the ready queue

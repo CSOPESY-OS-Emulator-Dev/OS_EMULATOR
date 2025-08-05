@@ -63,6 +63,11 @@
         "xmemory": "cpp",
         "xstring": "cpp",
         "xtr1common": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "algorithm": "cpp",
+        "deque": "cpp",
+        "random": "cpp",
+        "regex": "cpp",
+        "stack": "cpp"
     }
 }

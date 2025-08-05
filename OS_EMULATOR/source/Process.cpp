@@ -1,21 +1,5 @@
 #include "Process.h"
 
-void Process::executeInstruction()
-{
-    if (progressCount < instructionCount)
-    {
-        // Execute the current instruction
-        instructionList[currentInstruction]->execute(*this, getFormattedCurrentTime(), coreID);
-        if (instructionList[currentInstruction]->isCommandExecuted()) {
-            currentInstruction++;
-        }
-        if (progressCount == instructionCount) {
-            setState(FINISHED);
-            timeFinished = getFormattedCurrentTime();
-        }
-    }
-}
-
 void Process::setState(state newState)
 {
     this->currentState = newState;
@@ -52,9 +36,9 @@ int Process::getTotalIntstruction()
     return this->instructionCount;
 }
 
-int Process::getCurrentLine()
+int Process::getProgressCount()
 {
-    return this->progressCount;
+    return this->programCounter;
 }
 
 int Process::getProcessID()
@@ -67,34 +51,45 @@ std::string Process::getProcessName()
     return this->name;
 }
 
-void Process::addInstruction(std::shared_ptr<ICommand> instruction)
+size_t Process::getMemorySize() const
 {
-    // Add the instruction to the instruction list
-    this->instructionList.push_back(instruction);
+    return this->memorySize;
 }
 
-void Process::incrementInstructionCount(int count)
+size_t Process::getByteSize() const
 {
-    // Increment the instruction count by the given count
-    this->instructionCount += count;
+    return this->byteSize;
 }
 
-Process::Process(std::string name, int id)
+void Process::setByteSize(size_t byteSize)
+{
+    this->byteSize = byteSize;
+}
+
+void Process::setInstructions(std::vector<std::string> instructions)
+{
+    // Add the instructions to the instruction list
+    this->instructionList.insert(instructionList.end(),instructions.begin(),instructions.end());
+}
+
+void Process::setTotalInstructions(int total)
+{
+    this->instructionCount = total;
+}
+
+Process::Process(std::string name, int id, int memorySize)
 {
     // Initialize the instruction list and symbol table
-    this->instructionList = std::vector<std::shared_ptr<ICommand>>();
-    this->symbolTable = std::unordered_map<std::string, uint16_t>();
+    this->instructionList = std::vector<std::string>();
     this->outputLog = std::make_shared<std::vector<std::string>>();
 
-    // Initialize variable x with value 0
-    this->symbolTable["x"] = 0;
+    this->memorySize = memorySize;
 
     this->name = name;
     this->processID = id;
 
-    this->progressCount = 0;
+    this->progressCounter = 0;
     this->instructionCount = 0;
-    this->currentInstruction = 0;
 
     this->currentState = READY;
     this->coreID = -1; // Default core ID, indicating no core assigned yet
@@ -121,38 +116,3 @@ std::string Process::getFormattedCurrentTime()
 }
 
 Process::~Process() {}
-
-void Process::writeToTxtFile()
-{
-    // Create a text file with the process name
-    std::string filename = name + ".txt";
-    std::ofstream MyFile(filename);
-
-    // Check if the file was opened successfully
-    if (!MyFile.is_open())
-    {
-        std::cerr << "Error opening file: " << filename << std::endl;
-        return;
-    }
-
-    // Write the process name and logs to the file
-    MyFile << "Process name: " << name << "\n"; // change variable to what
-
-    // Write each log entry to the file
-    if (outputLog->empty())
-    {
-        MyFile << "No logs available.\n";
-    }
-    else
-    {
-        MyFile << "Logs:\n\n";
-
-        // Iterate through the output log and write each entry
-        for (const auto &outputLog : *outputLog)
-        {
-            MyFile << outputLog << "\n";
-        }
-    }
-
-    MyFile.close();
-}

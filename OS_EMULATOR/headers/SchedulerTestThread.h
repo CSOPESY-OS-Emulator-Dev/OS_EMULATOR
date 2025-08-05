@@ -5,14 +5,17 @@
 #include "IETThread.h"
 #include "Process.h"
 #include "GlobalScheduler.h"
-#include "PrintCommand.h"
-#include "ICommand.h"
-#include "DeclareCommand.h"
-#include "AddCommand.h"
-#include "SubtractCommand.h"
-#include "SleepCommand.h"
-#include "ForCommand.h"
 #include <stack>
+
+enum CommandType {
+    PRINT,
+    DECLARE,
+    ADD,
+    SUBTRACT,
+    SLEEP,
+    FOR,
+    TYPE_COUNT
+};
 
 struct InstructionFrame {
     int remainingExecs;
