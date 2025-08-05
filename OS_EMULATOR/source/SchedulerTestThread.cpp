@@ -13,15 +13,20 @@ void SchedulerTestThread::run() {
         if (isRunning) {
             if (cpuTick % cpuCycle == 0) {
                 // Create new Process Name
+                // std::cout << "Creating process name" << std::endl;
                 auto processName = "Process_" + std::to_string(processCount);
+                // std::cout << "Name: " << processName << std::endl;
                 // Generate a random number of memory in the power of 2
+                // std::cout << "Generating random sized memory" << std::endl;
                 int memorySize = getRandNum(maxMemProc, minMemProc);
                 // Create new process
+                // std::cout << "Creating new process" << std::endl;
                 auto process = createProcess(processName, memorySize); // Using a fixed 4KB memory for example
                 // Assign to scheduler
+                // std::cout << "Assigning to scheduler" << std::endl;
                 assignToScheduler(process);
             }
-            IETThread::sleep(1);
+            IETThread::sleep(500);
             cpuTick++;
         }
     }

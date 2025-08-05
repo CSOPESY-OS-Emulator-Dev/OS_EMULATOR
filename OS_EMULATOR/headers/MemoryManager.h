@@ -7,7 +7,8 @@
 #include <list>
 #include "Process.h"
 #include "Memory.h"
-#include "DiskManager.h"
+
+class DiskManager;
 
 class MemoryManager {
 private:
@@ -20,9 +21,9 @@ private:
         int virtualPage;
     };
 
-    DiskManager* disk = DiskManager::getInstance();  // Swap space/backing store
+    DiskManager* disk;  // Swap space/backing store
     std::vector<std::optional<FrameInfo>> frameTable; // indexed by frame number
-
+    
     // Replacement policy data
     std::deque<int> fifoQueue;             // for FIFO
     std::list<int> lruList;                // for LRU

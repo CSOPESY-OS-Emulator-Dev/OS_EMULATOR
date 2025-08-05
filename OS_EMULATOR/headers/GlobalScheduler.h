@@ -4,10 +4,11 @@
 #include <memory>
 #include <vector>
 #include "Process.h"
-#include "AScheduler.h"
 #include <string>
 #include <sstream>
+#include <mutex>
 
+class AScheduler; 
 class CoreThread;
 class SchedulerTestThread;
 class FCFSScheduler;
@@ -37,7 +38,7 @@ public:
     void addProcess(std::shared_ptr<Process> process);
 
     // Initialize thread for process generation
-    void initializeProcessGeneration(int cpuCycle, int minInstructions, int maxInstructions);
+    void initializeProcessGeneration(int cpuCycle, int minInstructions, int maxInstructions, int minMemProcess, int maxMemProcess, int frameSize);
     // Start thread for generating processes
     void startProcessGeneration();
     // Stop thread for generating processes

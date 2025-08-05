@@ -7,7 +7,6 @@
 #include <cstdint>
 #include <iostream>
 #include "Process.h"
-#include "GlobalScheduler.h"
 
 class DiskManager {
 private:

@@ -1,4 +1,5 @@
 #include "DiskManager.h"
+#include "GlobalScheduler.h"
 
 DiskManager *DiskManager::sharedInstance = nullptr;
 
@@ -85,10 +86,10 @@ std::vector<uint8_t> DiskManager::loadPage(int pid, int pageSize, int pageNumber
 
             // Get page bytecode
             while (iss >> byte) {
-                std::cout << "0x" << std::hex << byte << " ";
+                // std::cout << "0x" << std::hex << byte << " ";
                 bytecode.push_back(static_cast<uint8_t>(byte));
             }
-            std::cout << std::endl;
+            // std::cout << std::endl;
 
             // Pad with zeros if shorter than pageSize
             while (bytecode.size() < pageSize) bytecode.push_back(0);
