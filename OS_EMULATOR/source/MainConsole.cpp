@@ -444,14 +444,25 @@ void MainConsole::showProcessSMI(std::string processName) {
                                 std::to_string(MemoryManager::getInstance()->getMemorySize()) + 
                                 "MiB");
     this->outputList.push_back("Memory Utilization: " + 
-                                    std::to_string(MemoryManager::getInstance()->getMemoryUsage()/
-                                    MemoryManager::getInstance()->getMemorySize() * 100) + "%"
+                                    std::to_string(MemoryManager::getInstance()->getMemoryUsage()/MemoryManager::getInstance()->getMemorySize() * 100) + "%"
                                 );
     this->outputList.push_back("");
     this->outputList.push_back("==============================================");
     this->outputList.push_back("Running processes and memory usage:");
     this->outputList.push_back("----------------------------------------------");
-    this->outputList.push_back("process05 134MiB");
+    
+    //Frame table
+    auto frameTable = MemoryManager::getInstance()->getFrameTable();
+    for (int i = 0; i < frameTable.size(); ++i) {
+        if (frameTable[i].has_value()) {
+            auto frame = frameTable[i].value();
+            this->outputList.push_back("Frame " + std::to_string(i) + ": Process ID " + std::to_string(frame.processId) + ", Virtual Page " + std::to_string(frame.virtualPage));
+        } else {
+            this->outputList.push_back("Frame " + std::to_string(i) + ": Free");
+        }
+    }
+
+
     this->outputList.push_back("----------------------------------------------");
     
 
