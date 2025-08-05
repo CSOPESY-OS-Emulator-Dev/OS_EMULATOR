@@ -358,3 +358,46 @@ void MainConsole::stopScheduler() {
     GlobalScheduler::getInstance()->stopProcessGeneration();
     this->outputList.push_back("Stop Generating Processes");
 }
+
+void MainConsole::showProcessSMI(std::string processName) {
+
+    
+
+
+
+
+
+
+    this->outputList.push_back("----------------------------------------------");
+    this->outputList.push_back("| PROCESS-SMI V01.00 Driver Version: 0.1.00 |");
+    this->outputList.push_back("----------------------------------------------");
+    this->outputList.push_back(GlobalScheduler::getInstance()->getCPUUtilization());
+    this->outputList.push_back("Memory Usage: " + 
+                                std::to_string(MemoryManager::getInstance()->getMemoryUsage()) +
+                                "/" +
+                                std::to_string(MemoryManager::getInstance()->getMemorySize()) + 
+                                "MiB");
+    this->outputList.push_back("Memory Utilization: " + 
+                                    std::to_string(MemoryManager::getInstance()->getMemoryUsage()/
+                                    MemoryManager::getInstance()->getMemorySize() * 100) + "%"
+                                );
+    this->outputList.push_back("");
+    this->outputList.push_back("==============================================");
+    this->outputList.push_back("Running processes and memory usage:");
+    this->outputList.push_back("----------------------------------------------");
+    this->outputList.push_back("process05 134MiB");
+    this->outputList.push_back("----------------------------------------------");
+    
+
+
+    
+
+
+
+
+
+
+
+
+
+}
