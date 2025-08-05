@@ -9,6 +9,7 @@ public:
 
     int read(int offset) const;
     int write(int offset, int value);
+    int getMemorySize() const;
 
 private:
     uint8_t* baseAddress;
