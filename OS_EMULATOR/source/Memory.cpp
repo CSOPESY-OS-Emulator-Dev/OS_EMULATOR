@@ -25,3 +25,7 @@ int Memory::write(int offset, int value) {
     baseAddress[offset] = static_cast<uint8_t>(value);
     return 0; // Success
 }
+
+size_t Memory::getMemorySize() {
+    return size;
+}
