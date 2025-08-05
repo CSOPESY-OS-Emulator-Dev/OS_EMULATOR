@@ -4,6 +4,8 @@
 #include <mutex>
 #include "IETThread.h"
 #include "Process.h"
+#include "Compiler.h"
+#include "MemoryManager.h"
 
 class AScheduler : public IETThread {
     // AScheduler is an abstract class that defines the interface for all schedulers.
@@ -29,7 +31,7 @@ protected:
     // Mutex to ensure thread safety when accessing the process queue
     mutable std::mutex queueMutex; 
     int quantumCycles = 0; // Quantum cycles for time-slicing in round robin preemptive scheduling
-    
+    Compiler compiler;
 private:
     bool isRunning = true; // Flag to control the scheduler's execution loop
 };

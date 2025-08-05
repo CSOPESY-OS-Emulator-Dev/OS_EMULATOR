@@ -5,7 +5,8 @@
 #include <mutex>
 #include "IETThread.h"
 #include "Process.h"
-#include "GlobalScheduler.h"
+#include "Compiler.h"
+#include "MemoryManager.h"
 
 class CoreThread : public IETThread {
     // CoreThread represents a single CPU core in the system.
@@ -28,6 +29,12 @@ public:
     int getCoreID() const { return coreID; }
     
 private:
+    MemoryManager *mm;
+    void executeByteCode(uint16_t PC);
+    void releaseProcess();
+    std::string getFormattedCurrentTime();
+
+
     std::shared_ptr<Process> currentProcess; // The process currently assigned to this core
     bool occupied = false; // Indicates if the core is currently occupied by a process
     bool isRunning = true; // Indicates if the core thread is running

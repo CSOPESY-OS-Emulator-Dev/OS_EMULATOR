@@ -26,7 +26,9 @@ public:
     void setScheduler(std::string schedulerAlgorithm, int quantumCycles);
 
     // Create a new process
-    void createProcess(std::string processName);
+    bool createProcess(std::string processName, int memorySize);
+    // Create a new process with user defined instructions
+    bool createProcess(std::string processName, int memorySize, const std::vector<std::string> &lines);
     // Add finished process to the list
     void finishProcess(std::shared_ptr<Process> process);
     // Add a process to the scheduler's readyqueue
@@ -53,6 +55,8 @@ public:
 
     // Check if a process with the given name exists
     bool processExists(const std::string &processName) const;
+    // Check if a process accessed an invalid memory
+    bool processViolation(const std::string &processName) const;
     // Get a process by its name
     std::shared_ptr<Process> getProcessByName(const std::string &processName) const;
     // Get a process by its ID
@@ -83,7 +87,6 @@ private:
 
     // Mutex to ensure thread safety when accessing shared resources
     mutable std::mutex coreMutex;              // Mutex to ensure thread safety when accessing core threads
-    mutable std::mutex schedulerMutex;         // Mutex to ensure thread safety when accessing scheduler resources
     mutable std::mutex processMapMutex;        // Mutex to ensure thread safety when accessing processMap
     mutable std::mutex finishedProcessesMutex; // Mutex to ensure thread safety when accessing finishedProcesses
     mutable std::mutex queueMutex;             // Mutex to ensure thread safety when accessing the ready queue

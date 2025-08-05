@@ -44,7 +44,7 @@ void ConsoleManager::process() const
 	this->currentConsole->process(input);
 }
 
-bool ConsoleManager::registerConsole(std::string consoleName)
+bool ConsoleManager::registerConsole(std::string consoleName, std::string memorySize)
 {
 	auto scheduler = GlobalScheduler::getInstance();
 

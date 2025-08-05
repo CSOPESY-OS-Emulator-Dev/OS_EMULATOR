@@ -75,7 +75,7 @@ void ProcessConsole::initialize()
     if (this->currentProcess.get()->currentState == FINISHED) {
         this->outputList.push_back("\nFinished!\n");
     } else {
-        this->outputList.push_back("\nCurrent Instruction Line: " + std::to_string(this->currentProcess->progressCount));
+        this->outputList.push_back("\nCurrent Instruction Line: " + std::to_string(this->currentProcess->progressCounter));
         this->outputList.push_back("Lines of code: " + std::to_string(this->currentProcess->instructionCount) + '\n');
     }
     this->outputList.push_back("<-help> to view all available commands");
