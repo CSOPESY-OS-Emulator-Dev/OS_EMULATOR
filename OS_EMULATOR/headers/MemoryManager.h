@@ -47,6 +47,7 @@ public:
     // ---- Utilities ----
     int getPageSize() const;
     size_t getMemorySize() const;
+    size_t getMemoryUsage() const;
 
     // ---- Page Handling ----
     int getFrame(std::shared_ptr<Process> proc, int virtualPage);
