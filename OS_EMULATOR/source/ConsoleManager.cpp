@@ -61,6 +61,23 @@ std::string ConsoleManager::registerConsole(std::string consoleName, std::string
 	return "";
 }
 
+std::string ConsoleManager::registerConsole(std::string consoleName, std::string memorySize, std::vector<std::string> instructions)
+{
+	std::stringstream errorMessage;
+	auto scheduler = GlobalScheduler::getInstance();
+    if (!scheduler->processExists(consoleName)) { // Check if a process with a similar name exist
+        scheduler->createProcess(consoleName, std::stoi(memorySize), instructions); 
+		consoleTable[consoleName] = std::make_shared<ProcessConsole>(consoleName, getFormattedCurrentTime());
+		switchConsole(consoleName);
+    } else { // Return an error message if it exist
+		errorMessage << "A process with the name "
+			<< consoleName
+			<< " already exist";
+		return errorMessage.str();
+	} 
+	return "";
+}
+
 std::string ConsoleManager::switchConsole(std::string consoleName)
 {
 	std::stringstream errorMessage;

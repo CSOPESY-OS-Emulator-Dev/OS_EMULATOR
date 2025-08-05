@@ -17,6 +17,7 @@ public:
     void draw() const;
     void process() const;
     std::string registerConsole(std::string consoleName, std::string memorySize);
+    std::string registerConsole(std::string consoleName, std::string memorySize, std::vector<std::string> instructions);
     std::string switchConsole(std::string consoleName);
     void returnToPreviousConsole();
 

@@ -289,3 +289,20 @@ std::shared_ptr<Process> GlobalScheduler::getProcessByID(int processID) const
     }
     return nullptr; // Process not found
 }
+
+std::vector<std::string> GlobalScheduler::getProcessUsedMemory()
+{
+    // Get the list of running processes in string format
+    // Return running processes in occupied cores
+    std::lock_guard<std::mutex> lock(coreMutex); // Lock the mutex to ensure thread safety
+    std::vector<std::string> log;
+    for (auto &core : this->cores)
+    {
+        if (core->isOccupied())
+        {
+            log.push_back(core->getUsedProcessMemory());
+        }
+    }
+
+    return log;
+}

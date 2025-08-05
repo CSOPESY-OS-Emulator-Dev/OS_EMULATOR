@@ -32,12 +32,12 @@ public:
     int getTotalTicks() const { return cpuTicks; }
     int getActiveTicks() const { return activeTicks; }
     int getIdleTicks() const { return cpuTicks - activeTicks; }
+    std::string getUsedProcessMemory();
 private:
     MemoryManager *mm;
     void executeByteCode(uint16_t PC);
     void releaseProcess();
     std::string getFormattedCurrentTime();
-
 
     std::shared_ptr<Process> currentProcess; // The process currently assigned to this core
     bool occupied = false; // Indicates if the core is currently occupied by a process

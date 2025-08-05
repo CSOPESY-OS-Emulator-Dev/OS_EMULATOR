@@ -69,6 +69,8 @@ public:
     // Get a process by its ID
     std::shared_ptr<Process> getProcessByID(int processID) const;
 
+    std::vector<std::string> getProcessUsedMemory();
+
     friend class FCFSScheduler; // Allow FCFS Scheduler to access private members
     friend class RRScheduler; // Allow RR Scheduler to access private members
     

@@ -75,6 +75,11 @@ void MainConsole::process(std::string input)
             redrawScreen(parsed.args[1]);
             isvalid = true;
         }
+        if(parsed.command == "screen" && parsed.args.size() == 4 && parsed.args[0] == "-c" ) {
+            std::vector<std::string> instructions = parseInstructions(parsed.args[3]);
+            setScreenIns(parsed.args[1], parsed.args[2], instructions);
+            isvalid = true;
+        }
         if(parsed.command == "screen" && parsed.args.size() == 1 && parsed.args[0] == "-ls" ) {
             showProcesses();
             isvalid = true;
@@ -96,6 +101,10 @@ void MainConsole::process(std::string input)
         }
         if (parsed.command == "vmstat") {
             showVMStat();
+            isvalid = true;
+        }
+        if (parsed.command == "process-smi") {
+            showProcessSMI("Process: Mumei");
             isvalid = true;
         }
     } else if(parsed.command == "initialize"){
@@ -371,6 +380,27 @@ void MainConsole::setScreen(std::string processName, std::string memorySize)
     }
 }
 
+void MainConsole::setScreenIns(std::string processName, std::string memorySize, std::vector<std::string> instructions)
+{
+    // 1. Convert memorySize to an integer for validation
+    int memSize = std::stoi(memorySize);
+    // 2. Validate memory size against the min/max limits
+    if (memSize < minMem || memSize > maxMem) { 
+        this->outputList.push_back("Invalid Memory Allocation! Must be between " + std::to_string(minMem) + " and " + std::to_string(maxMem) + ".");
+        return;
+    } 
+    int instrSize = instructions.size();
+    if (instrSize < minIns || instrSize > maxIns) { 
+        this->outputList.push_back("Invalid Instruction Size! Must be between " + std::to_string(minIns) + " and " + std::to_string(maxIns) + ".");
+        return;
+    }
+    auto err = ConsoleManager::getInstance()->registerConsole(processName, memorySize, instructions);
+    // 4. Report any errors to the console output
+    if(err != "") {
+        this->outputList.push_back(err);
+    }
+}
+
 void MainConsole::redrawScreen(std::string processName)
 {
     auto err = ConsoleManager::getInstance()->switchConsole(processName);
@@ -488,4 +518,94 @@ void MainConsole::startScheduler() {
 void MainConsole::stopScheduler() {
     GlobalScheduler::getInstance()->stopProcessGeneration();
     this->outputList.push_back("Stop Generating Processes");
+}
+
+// For screen -c
+std::vector<std::string> MainConsole::parseInstructions(const std::string& input) {
+    std::vector<std::string> instructions;
+    if (input.empty()) {
+        return instructions;
+    }
+
+    std::string currentInstruction;
+    bool inString = false;
+    int bracketLevel = 0; // To track nesting within FOR loop brackets [...]
+
+    for (char c : input) {
+        // Toggle the inString state if we encounter a double quote.
+        if (c == '"') {
+            inString = !inString;
+        }
+
+        // Only adjust the bracket level if we are NOT inside a string.
+        if (!inString) {
+            if (c == '[') {
+                bracketLevel++;
+            } else if (c == ']') {
+                // Ensure we don't go below zero if there's a syntax error.
+                if (bracketLevel > 0) {
+                    bracketLevel--;
+                }
+            }
+        }
+
+        // Check for the semicolon delimiter, but only if we are at the "top level"
+        if (c == ';' && !inString && bracketLevel == 0) {
+            // Trim leading/trailing whitespace from the completed instruction.
+            size_t first = currentInstruction.find_first_not_of(" \t\r\n");
+            size_t last = currentInstruction.find_last_not_of(" \t\r\n");
+            if (std::string::npos != first && std::string::npos != last) {
+                instructions.push_back(currentInstruction.substr(first, (last - first + 1)));
+            }
+            
+            // Reset for the next instruction.
+            currentInstruction.clear();
+        } else {
+            // This character is part of the current instruction, so append it.
+            currentInstruction += c;
+        }
+    }
+
+    // Add the last instruction in the string, which might not have a trailing semicolon.
+    size_t first = currentInstruction.find_first_not_of(" \t\r\n");
+    size_t last = currentInstruction.find_last_not_of(" \t\r\n");
+    if (std::string::npos != first && std::string::npos != last) {
+        instructions.push_back(currentInstruction.substr(first, (last - first + 1)));
+    }
+
+    return instructions;
+}
+
+void MainConsole::showProcessSMI(std::string processName) {
+    this->outputList.push_back("----------------------------------------------");
+    this->outputList.push_back("| PROCESS-SMI V01.00 Driver Version: 0.1.00 |");
+    this->outputList.push_back("----------------------------------------------");
+    this->outputList.push_back(GlobalScheduler::getInstance()->getCPUUtilization());
+    this->outputList.push_back("Memory Usage: " + 
+                                std::to_string(MemoryManager::getInstance()->getUsedMemory()) +
+                                "/" +
+                                std::to_string(MemoryManager::getInstance()->getTotalMemory()) + 
+                                "Bytes");
+    this->outputList.push_back("Memory Utilization: " + 
+                                    std::to_string(((float)MemoryManager::getInstance()->getUsedMemory()/(float)MemoryManager::getInstance()->getTotalMemory()) * 100) + "%"
+                                );
+    this->outputList.push_back("");
+    this->outputList.push_back("==============================================");
+    this->outputList.push_back("Running processes and memory usage:");
+    this->outputList.push_back("----------------------------------------------");
+    
+    //Frame table
+    // this->outputList.push_back("Frame Table:");
+    // std::vector<std::string> frameTable = MemoryManager::getInstance()->getFrameTable()
+    // std::vector<std::string> frameTableMemory = GlobalScheduler::getInstance()->getProcessUsedMemory();
+
+    // for (int i = 0; i < frameTableMemory.size(); i++) {
+    //     this->outputList.push_back(frameTableMemory[i]);
+    // }
+
+    this->outputList.push_back("----------------------------------------------");
+    
+
+
+
 }

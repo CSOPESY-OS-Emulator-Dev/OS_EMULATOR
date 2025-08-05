@@ -22,10 +22,13 @@ private:
     // Function prototype of available commands
     void showVMStat();
     void setScreen(std::string, std::string);
+    void setScreenIns(std::string, std::string, std::vector<std::string>);
     void redrawScreen(std::string);
     void reportUtil();
     void startScheduler();
     void stopScheduler();
+    std::vector<std::string> parseInstructions(const std::string &input);
+    void showProcessSMI(std::string processName);
     void showProcesses();
     void initializeOS();
 };
