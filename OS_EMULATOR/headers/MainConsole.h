@@ -19,6 +19,7 @@ private:
 
     // Function prototype of available commands
     void setScreen(std::string, std::string);
+    void setScreenWithInstructions(std::string processName, std::string memorySize, const std::vector<std::string>& instructions);
     void redrawScreen(std::string);
     void reportUtil();
     void startScheduler();
