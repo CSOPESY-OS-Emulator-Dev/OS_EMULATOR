@@ -54,7 +54,7 @@ int Process::getTotalIntstruction()
 
 int Process::getProgressCount()
 {
-    return this->programCounter;
+    return this->progressCounter;
 }
 
 int Process::getProcessID()

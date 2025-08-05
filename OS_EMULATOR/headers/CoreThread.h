@@ -7,6 +7,7 @@
 #include "Process.h"
 #include "Compiler.h"
 #include "MemoryManager.h"
+#include "GlobalScheduler.h"
 
 class CoreThread : public IETThread {
     // CoreThread represents a single CPU core in the system.

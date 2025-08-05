@@ -1,4 +1,5 @@
 #include "RRScheduler.h"
+#include "DiskManager.h"
 
 RRScheduler::RRScheduler() {
     // Constructor implementation
@@ -54,7 +55,7 @@ void RRScheduler::execute() {
                 // 5. --- ASSIGN TO CPU ---
                 // The process is compiled and its program is on disk. Now assign it to the core.
                 // The FCFS policy gives it enough ticks to run to completion.
-                core->assignProcess(process, process->getByteSize());// Assign the process to the core with quantumCycles ticks
+                core->assignProcess(process, quantumCycles);// Assign the process to the core with quantumCycles ticks
                 // If the process is not finished, add it back to the end of the queue later
                 // (This is handled inside CoreThread automatically by checking ticks and re-queuing)
             }

@@ -1,8 +1,10 @@
 #include "MemoryManager.h"
+#include "DiskManager.h"
 
 MemoryManager *MemoryManager::sharedInstance = nullptr;
 
 MemoryManager::MemoryManager() {
+    this->disk = DiskManager::getInstance(); // Initialize here
     policy = "FIFO";
 }
 

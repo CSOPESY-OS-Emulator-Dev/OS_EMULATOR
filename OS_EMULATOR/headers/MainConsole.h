@@ -17,7 +17,7 @@ private:
     std::vector<std::string> outputList;
 
     // Function prototype of available commands
-    void setScreen(std::string);
+    void setScreen(std::string, std::string);
     void redrawScreen(std::string);
     void reportUtil();
     void startScheduler();
