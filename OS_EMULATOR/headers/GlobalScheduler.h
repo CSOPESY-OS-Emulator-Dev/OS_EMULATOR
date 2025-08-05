@@ -62,6 +62,7 @@ public:
     std::shared_ptr<Process> getProcessByName(const std::string &processName) const;
     // Get a process by its ID
     std::shared_ptr<Process> getProcessByID(int processID) const;
+        std::vector<std::string> getProcessUsedMemory();
 
     friend class FCFSScheduler; // Allow FCFS Scheduler to access private members
     friend class RRScheduler; // Allow RR Scheduler to access private members
@@ -85,6 +86,8 @@ private:
     std::unordered_map<std::string, std::shared_ptr<Process>> processMap;
     // List of finished processes
     std::vector<std::string> finishedProcesses;
+
+
 
     // Mutex to ensure thread safety when accessing shared resources
     mutable std::mutex coreMutex;              // Mutex to ensure thread safety when accessing core threads

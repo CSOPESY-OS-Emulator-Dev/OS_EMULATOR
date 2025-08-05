@@ -38,6 +38,10 @@ void MemoryManager::setMemoryManager(int memorySize, int pageSize, int maxFrames
     frameTable.reserve(maxFrames);
 }
 
+int MemoryManager::getMaxFrames() const {
+    return maxFrames;
+}
+
 int MemoryManager::getPageSize() const
 {
     return this->pageSize;
@@ -46,8 +50,13 @@ int MemoryManager::getPageSize() const
 int MemoryManager::findFreeOrReplaceFrame() {
     // Get free frame index
     // std::cout << "Finding Free Frame" << std::endl;
+    
     for (int i = 0; i < maxFrames; ++i) {
-        if (!frameTable[i].has_value()) return i;
+        if (!frameTable[i].has_value()) 
+        {   
+            return i;
+        }
+
     }
 
     if (policy == "FIFO") {
@@ -127,7 +136,12 @@ int MemoryManager::getFrame(std::shared_ptr<Process> proc, int virtualPage)
     proc->pageTable[virtualPage] = page;
 
     // Occupied frame added to the frameTable
+    
     frameTable[frameNumber] = FrameInfo{proc->processID, virtualPage};
+
+    //print frameTable
+    // std::cout << "Frame: "<< frameTable[frameNumber].value().processId << ", " << frameTable[frameNumber].value().virtualPage << std::endl;
+    
 
     if (policy == "FIFO") {
         fifoQueue.push_back(frameNumber);
@@ -199,11 +213,27 @@ This is a simple approximation and may not reflect the actual memory usage accur
 size_t MemoryManager::getMemoryUsage() const
 {
     size_t totalUsage = 0;
-    for (const auto& frame : frameTable) {
-        if (frame.has_value()) {
-            totalUsage += pageSize; // Check if page size is in MiB
+    for (int i = 0; i < maxFrames; ++i) {
+        if (frameTable[i].has_value()) {    
+            totalUsage++;
         }
     }
-    return totalUsage / (1024 * 1024); // Convert to MiB
+    // return totalUsage / (1024 * 1024); // Convert to MiB
+    return (totalUsage * pageSize);
 
 }
+
+std::vector<std::string> MemoryManager::getFrameTable()
+{
+    std::vector<std::string> table;
+
+    for (int i = 0; i < maxFrames; ++i) {
+        std::cout<< frameTable[i].has_value() << std::endl;
+        if (frameTable[i].has_value()) {
+            table.push_back(std::to_string(frameTable[i].value().processId));
+        }
+    }
+
+    return table;
+}
+

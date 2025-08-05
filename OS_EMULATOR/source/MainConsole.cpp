@@ -1,10 +1,10 @@
 #include "MainConsole.h"
-#include "ConsoleManager.h"
-#include "GlobalScheduler.h"
-#include "MemoryManager.h"
 #include <chrono>
 #include <ctime>
 #include <iomanip>
+#include "ConsoleManager.h"
+#include "GlobalScheduler.h"
+#include "MemoryManager.h"
 
 void MainConsole::initialize()
 {
@@ -442,9 +442,9 @@ void MainConsole::showProcessSMI(std::string processName) {
                                 std::to_string(MemoryManager::getInstance()->getMemoryUsage()) +
                                 "/" +
                                 std::to_string(MemoryManager::getInstance()->getMemorySize()) + 
-                                "MiB");
+                                "Bytes");
     this->outputList.push_back("Memory Utilization: " + 
-                                    std::to_string(MemoryManager::getInstance()->getMemoryUsage()/MemoryManager::getInstance()->getMemorySize() * 100) + "%"
+                                    std::to_string((MemoryManager::getInstance()->getMemoryUsage()/MemoryManager::getInstance()->getMemorySize()) * 100) + "%"
                                 );
     this->outputList.push_back("");
     this->outputList.push_back("==============================================");
@@ -452,28 +452,18 @@ void MainConsole::showProcessSMI(std::string processName) {
     this->outputList.push_back("----------------------------------------------");
     
     //Frame table
-    auto frameTable = MemoryManager::getInstance()->getFrameTable();
-    for (int i = 0; i < frameTable.size(); ++i) {
-        if (frameTable[i].has_value()) {
-            auto frame = frameTable[i].value();
-            this->outputList.push_back("Frame " + std::to_string(i) + ": Process ID " + std::to_string(frame.processId) + ", Virtual Page " + std::to_string(frame.virtualPage));
-        } else {
-            this->outputList.push_back("Frame " + std::to_string(i) + ": Free");
-        }
-    }
+    // this->outputList.push_back("Frame Table:");
+    // std::vector<std::string> frameTable = MemoryManager::getInstance()->getFrameTable()
+    std::vector<std::string> frameTableMemory = GlobalScheduler::getInstance()->getProcessUsedMemory();
 
+                                
+
+    for (int i = 0; i < frameTableMemory.size(); i++) {
+        this->outputList.push_back(frameTableMemory[i]);
+    }
 
     this->outputList.push_back("----------------------------------------------");
     
-
-
-    
-
-
-
-
-
-
 
 
 

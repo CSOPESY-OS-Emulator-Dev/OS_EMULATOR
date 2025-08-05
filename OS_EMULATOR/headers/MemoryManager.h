@@ -15,11 +15,11 @@ private:
     Memory *memory = nullptr;
     int pageSize;
     int maxFrames;
-
     struct FrameInfo {
-        int processId;
-        int virtualPage;
-    };
+                int processId;
+                int virtualPage;
+            };
+    
 
     DiskManager* disk;  // Swap space/backing store
     std::vector<std::optional<FrameInfo>> frameTable; // indexed by frame number
@@ -40,6 +40,8 @@ private:
     static MemoryManager *sharedInstance;
 
 public:
+    
+
     static MemoryManager *getInstance();
     static void initialize();
     static void destroy();
@@ -49,6 +51,10 @@ public:
     int getPageSize() const;
     size_t getMemorySize() const;
     size_t getMemoryUsage() const;
+    std::vector<std::string> getFrameTable();
+    int getMaxFrames() const;
+
+
 
     // ---- Page Handling ----
     int getFrame(std::shared_ptr<Process> proc, int virtualPage);

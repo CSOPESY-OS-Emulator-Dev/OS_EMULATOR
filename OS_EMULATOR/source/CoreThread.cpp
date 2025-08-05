@@ -78,6 +78,20 @@ std::string CoreThread::getProcess() {
            std::to_string(currentProcess->getTotalIntstruction());
 }
 
+std::string CoreThread::getUsedProcessMemory(){
+    int count = 0;
+
+    auto pageTable = currentProcess->pageTable; 
+    // std::cout<<this->currentProcess.pageTable.size()<<std::endl;
+    for(int i=0; pageTable.size();i++){
+
+        if(pageTable[i].inMemory){
+            count++;
+        }
+    }
+    return (currentProcess->getProcessName() + " " + std::to_string(count*mm->getPageSize()));
+}
+
 void CoreThread::releaseProcess()
 {
     this->occupied = false; // Free the core

@@ -24,6 +24,8 @@ public:
     void assignProcess(std::shared_ptr<Process> process, int ticks);
     bool isOccupied() const;
 
+    std::string getUsedProcessMemory();
+
     std::string getProcess();
 
     // for debugging purposes, return the core ID
