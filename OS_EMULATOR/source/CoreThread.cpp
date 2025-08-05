@@ -261,12 +261,13 @@ std::string CoreThread::getUsedProcessMemory(){
     std::stringstream ss;
     int count = 0;
     auto pageTable = currentProcess->pageTable; 
-    // std::cout<<this->currentProcess.pageTable.size()<<std::endl;
-    for(int i=0; pageTable.size();i++){
+
+    // CORRECTED: The loop now correctly iterates from 0 to size-1.
+    for(int i=0; i < pageTable.size(); i++){
         if(pageTable[i].inMemory){
             count++;
         }
     }
-    ss << currentProcess->getProcessName() << " " << std::to_string(count*mm->getPageSize());
+    ss << currentProcess->getProcessName() << " " << std::to_string(count * mm->getPageSize());
     return ss.str();
 }

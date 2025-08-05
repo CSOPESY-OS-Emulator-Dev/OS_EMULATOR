@@ -76,7 +76,17 @@ void MainConsole::process(std::string input)
             isvalid = true;
         }
         if(parsed.command == "screen" && parsed.args.size() == 4 && parsed.args[0] == "-c" ) {
-            std::vector<std::string> instructions = parseInstructions(parsed.args[3]);
+            // --- Start of Fix ---
+            std::string rawInstructions = parsed.args[3];
+
+            // 1. Safely strip the outer quotes from the instruction argument.
+            if (rawInstructions.length() >= 2 && rawInstructions.front() == '"' && rawInstructions.back() == '"') {
+                rawInstructions = rawInstructions.substr(1, rawInstructions.length() - 2);
+            }
+
+            // 2. Parse the now-clean instruction string into a vector.
+            std::vector<std::string> instructions = parseInstructions(rawInstructions);
+            // --- End of Fix ---
             setScreenIns(parsed.args[1], parsed.args[2], instructions);
             isvalid = true;
         }
@@ -597,11 +607,11 @@ void MainConsole::showProcessSMI(std::string processName) {
     //Frame table
     // this->outputList.push_back("Frame Table:");
     // std::vector<std::string> frameTable = MemoryManager::getInstance()->getFrameTable()
-    // std::vector<std::string> frameTableMemory = GlobalScheduler::getInstance()->getProcessUsedMemory();
+    auto frameTableMemory = GlobalScheduler::getInstance()->getProcessUsedMemory();
 
-    // for (int i = 0; i < frameTableMemory.size(); i++) {
-    //     this->outputList.push_back(frameTableMemory[i]);
-    // }
+    for (int i = 0; i < frameTableMemory.size(); i++) {
+        this->outputList.push_back(frameTableMemory[i]);
+    }
 
     this->outputList.push_back("----------------------------------------------");
     
