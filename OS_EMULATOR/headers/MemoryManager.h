@@ -23,7 +23,7 @@ private:
 
     DiskManager* disk;  // Swap space/backing store
     std::vector<std::optional<FrameInfo>> frameTable; // indexed by frame number
-    
+
     // Replacement policy data
     std::deque<int> fifoQueue;             // for FIFO
     std::list<int> lruList;                // for LRU
@@ -39,10 +39,18 @@ private:
     MemoryManager &operator=(const MemoryManager &) = delete;
     static MemoryManager *sharedInstance;
 
+    int pagedIn, pageOut;
 public:
     static MemoryManager *getInstance();
     static void initialize();
     static void destroy();
+
+    // ---- Report -----
+    int getTotalMemory();
+    int getUsedMemory();
+    int getFreeMemory();
+    int getPagesPagedIn();
+    int getPagesPagedOut();
 
     void setMemoryManager(int memorySize, int pageSize, int maxFrames);
     // ---- Utilities ----

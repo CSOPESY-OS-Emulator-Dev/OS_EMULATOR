@@ -42,6 +42,7 @@ void CoreThread::run() {
                 currentProcess->progressCounter++;
                 this->currentTicks--; // Decrease the ticks for the current process
             } 
+            this->activeTicks++;
         }
         this->cpuTicks++;
         sleep(1); // Sleep for 10 millisecond to simulate time passing

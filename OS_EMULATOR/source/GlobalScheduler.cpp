@@ -101,6 +101,31 @@ void GlobalScheduler::setScheduler(std::string schedulerAlgorithm, int quantumCy
     }
 }
 
+// CPU Tick Aggregators
+size_t GlobalScheduler::getTotalCpuTicks() {
+    size_t total = 0;
+    std::lock_guard<std::mutex> lock(coreMutex); // Protect access to cores vector
+    for (const auto &core : cores) {
+        if (core) total += core->getTotalTicks();
+    }
+    return total;
+}
+
+size_t GlobalScheduler::getIdleCpuTicks() {
+    size_t idle = 0;
+    std::lock_guard<std::mutex> lock(coreMutex); // Protect access to cores vector
+    for (const auto &core : cores) {
+        if (core) idle += core->getIdleTicks();
+    }
+    return idle;
+}
+
+size_t GlobalScheduler::getActiveCpuTicks() {
+    // This can be calculated without locking again
+    return getTotalCpuTicks() - getIdleCpuTicks();
+}
+
+
 bool GlobalScheduler::createProcess(std::string processName, int memorySize)
 {
     auto process = processGenerator->createProcess(processName, memorySize);

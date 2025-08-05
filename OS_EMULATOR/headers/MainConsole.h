@@ -17,7 +17,10 @@ private:
     std::vector<std::string> outputList;
     int minIns, maxIns, minMem, maxMem;
 
+    
+
     // Function prototype of available commands
+    void showVMStat();
     void setScreen(std::string, std::string);
     void redrawScreen(std::string);
     void reportUtil();

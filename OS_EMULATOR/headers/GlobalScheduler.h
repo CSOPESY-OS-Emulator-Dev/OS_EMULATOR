@@ -26,6 +26,12 @@ public:
     void runScheduler();
     void setScheduler(std::string schedulerAlgorithm, int quantumCycles);
 
+    size_t getTotalCpuTicks();
+
+    size_t getIdleCpuTicks();
+
+    size_t getActiveCpuTicks();
+
     // Create a new process
     bool createProcess(std::string processName, int memorySize);
     // Create a new process with user defined instructions

@@ -28,7 +28,10 @@ public:
 
     // for debugging purposes, return the core ID
     int getCoreID() const { return coreID; }
-    
+    // For vmstat
+    int getTotalTicks() const { return cpuTicks; }
+    int getActiveTicks() const { return activeTicks; }
+    int getIdleTicks() const { return cpuTicks - activeTicks; }
 private:
     MemoryManager *mm;
     void executeByteCode(uint16_t PC);

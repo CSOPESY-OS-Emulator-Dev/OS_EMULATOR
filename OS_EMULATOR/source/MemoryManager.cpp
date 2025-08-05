@@ -31,6 +31,35 @@ void MemoryManager::destroy()
     }
 }
 
+int MemoryManager::getTotalMemory()
+{
+    return maxFrames * pageSize;
+}
+
+int MemoryManager::getUsedMemory()
+{
+    int count = 0;
+    for (int i = 0; i < maxFrames; ++i) {
+        if (frameTable[i].has_value()) count++;
+    }
+    return count * pageSize;
+}
+
+int MemoryManager::getFreeMemory()
+{
+    return getTotalMemory() - getUsedMemory();
+}
+
+int MemoryManager::getPagesPagedIn()
+{
+    return pagedIn;
+}
+
+int MemoryManager::getPagesPagedOut()
+{
+    return pageOut;
+}
+
 void MemoryManager::setMemoryManager(int memorySize, int pageSize, int maxFrames) {
     this->memory = new Memory(memorySize);
     this->pageSize = pageSize;
@@ -101,11 +130,13 @@ int MemoryManager::getFrame(std::shared_ptr<Process> proc, int virtualPage)
             bytecode.push_back(memory->read(frameNumber * pageSize + i));
         }
         // Store page data into disk
+        pagedIn++;
         disk->storePage(evicted.processId, evicted.virtualPage, bytecode);
     }
 
     // std::cout << "Loading Page from Disk" << std::endl;
     // Load page data from disk if it exists
+    pageOut++;
     std::vector<uint8_t> bytecode = disk->loadPage(proc->processID, pageSize, virtualPage);
     if (!bytecode.empty()) {
         for (int i = 0; i < pageSize; ++i) {
