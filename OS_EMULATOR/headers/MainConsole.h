@@ -12,6 +12,9 @@ public:
     MainConsole();
     ~MainConsole();
 
+    // For vmstat
+    void showVMStat();
+
 private:
     bool isinitialized = false;
     std::vector<std::string> outputList;

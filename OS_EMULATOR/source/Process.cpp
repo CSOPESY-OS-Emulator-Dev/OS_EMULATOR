@@ -98,6 +98,19 @@ Process::Process(std::string name, int id)
 
     this->currentState = READY;
     this->coreID = -1; // Default core ID, indicating no core assigned yet
+
+    // For vmstat
+    this->memorySize = 0; // Initialize memory size to 0
+}
+
+// For vmstat
+size_t Process::getMemorySize() const {
+    return this->memorySize;
+}
+
+// For vmstat
+void Process::setMemorySize(size_t size) {
+    this->memorySize = size;
 }
 
 std::string Process::getFormattedCurrentTime()

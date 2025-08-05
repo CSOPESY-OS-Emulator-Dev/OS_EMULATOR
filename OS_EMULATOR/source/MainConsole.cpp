@@ -4,6 +4,8 @@
 #include <chrono>
 #include <ctime>
 #include <iomanip>
+#include <string>
+#include <algorithm>
 
 void MainConsole::initialize()
 {
@@ -45,6 +47,61 @@ void MainConsole::draw()
     {
         std::cout << this->outputList[i] << std::endl;
     }
+}
+
+// For vmstat
+void MainConsole::showVMStat() {
+    auto scheduler = GlobalScheduler::getInstance();
+
+    // --- Data Gathering (Same as before) ---
+    int r = scheduler->getRunnableProcessCount();
+    int b = scheduler->getBlockedProcessCount();
+    size_t total_mem = scheduler->getTotalMemory();
+    size_t used_mem = scheduler->getUsedMemory();
+    size_t free_mem = scheduler->getFreeMemory();
+    size_t idle_ticks = scheduler->getIdleCpuTicks();
+    size_t active_ticks = scheduler->getActiveCpuTicks();
+    size_t total_ticks = scheduler->getTotalCpuTicks();
+    size_t pgin = scheduler->getPagesPagedIn();
+    size_t pgout = scheduler->getPagesPagedOut();
+
+    // --- Define Column Widths for a Clean Table ---
+    const int W_R      = 3;
+    const int W_B      = 5;
+    const int W_TOTAL_M = 5;
+    const int W_USED_M = 7;
+    const int W_FREE_M = 7;
+    const int W_IDLE_T = 6;
+    const int W_ACTIVE_T = 8;
+    const int W_TOTAL_T = 8;
+    const int W_PGIN   = 5;
+    const int W_PGOUT  = 7;
+
+    // --- Build Header and Data Rows ---
+    std::ostringstream header_row;
+    std::ostringstream data_row;
+
+    // Build the header row for column titles
+    header_row << "| "
+               << std::setw(W_R) << "r" << std::setw(W_B) << "b" << " | "
+               << std::setw(W_TOTAL_M) << "total" << std::setw(W_USED_M) << "used" << std::setw(W_FREE_M) << "free" << " | "
+               << std::setw(W_IDLE_T) << "idle" << std::setw(W_ACTIVE_T) << "active" << std::setw(W_TOTAL_T) << "total" << " | "
+               << std::setw(W_PGIN) << "pgin" << std::setw(W_PGOUT) << "pgout" << " |";
+
+    // Build the data row using the exact same widths
+    data_row << "| "
+             << std::setw(W_R) << r << std::setw(W_B) << b << " | "
+             << std::setw(W_TOTAL_M) << total_mem << std::setw(W_USED_M) << used_mem << std::setw(W_FREE_M) << free_mem << " | "
+             << std::setw(W_IDLE_T) << idle_ticks << std::setw(W_ACTIVE_T) << active_ticks << std::setw(W_TOTAL_T) << total_ticks << " | "
+             << std::setw(W_PGIN) << pgin << std::setw(W_PGOUT) << pgout << " |";
+
+
+    // --- 4. Add to Output List ---
+    this->outputList.push_back(""); // Spacer for readability
+    this->outputList.push_back("|---procs--|----memory(bytes)----|--------cpu-ticks-------|----paging----|");
+    this->outputList.push_back(header_row.str());
+    this->outputList.push_back(data_row.str());
+    this->outputList.push_back(""); // Spacer
 }
 
 void MainConsole::process(std::string input)
@@ -91,6 +148,11 @@ void MainConsole::process(std::string input)
         }
         if (parsed.command == "report-util"){
             reportUtil();
+            isvalid = true;
+        }
+        // For vmstat
+        if (parsed.command == "vmstat") {
+            showVMStat();
             isvalid = true;
         }
     } else if(parsed.command == "initialize"){

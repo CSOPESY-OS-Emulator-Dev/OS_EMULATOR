@@ -53,6 +53,11 @@ public:
     friend class SleepCommand;
     friend class ForCommand;
     friend class SchedulerTestThread;
+
+    // For vmstat
+    size_t getMemorySize() const;
+    void setMemorySize(size_t size);
+
 private:
     std::string getFormattedCurrentTime();
 
@@ -78,4 +83,7 @@ private:
     state currentState;
 
     void writeToTxtFile(); // call it, maybe? process1Logs
+
+    // For vmstat
+    size_t memorySize; // Memory size allocated for the process
 };
