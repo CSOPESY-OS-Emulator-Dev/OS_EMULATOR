@@ -22,28 +22,39 @@ ParsedCommand AConsole::parseInput(const std::string& input) {
     std::string currentToken;
     bool inQuotes = false;
 
-    for (char c : input) {
-        if (c == '"') {
-            // A quote simply toggles the state. The character itself will be
-            // appended to the current token in the 'else' block below.
-            inQuotes = !inQuotes;
-        }
+    for (size_t i = 0; i < input.length(); ++i) {
+        char c = input[i];
 
-        if (std::isspace(c) && !inQuotes) {
-            // A space outside of quotes acts as a delimiter.
-            // Push the completed token and reset.
+        if (c == '\\') {
+            // This is an escape character.
+            // Check if there is a character after it to escape.
+            if (i + 1 < input.length()) {
+                // Append the *next* character to the token literally,
+                // regardless of what it is (e.g., \", \\, \n).
+                currentToken += input[i + 1];
+                // Increment i to skip the next character in the loop,
+                // since we've already processed it.
+                i++;
+            }
+            // If a backslash is the very last character, it's ignored.
+        } else if (c == '"') {
+            // This is a non-escaped quote. Toggle the state.
+            inQuotes = !inQuotes;
+            // Append the quote to the token, as requested.
+            currentToken += c;
+        } else if (std::isspace(c) && !inQuotes) {
+            // A space outside of quotes is a delimiter.
             if (!currentToken.empty()) {
                 allTokens.push_back(currentToken);
                 currentToken.clear();
             }
         } else {
-            // If the character is not a delimiter (i.e., it's a regular char,
-            // a quote char, or a space inside quotes), append it.
+            // This is a standard character, append it.
             currentToken += c;
         }
     }
 
-    // Add the very last token in the string, if it exists.
+    // Add the very last token in the string if it exists.
     if (!currentToken.empty()) {
         allTokens.push_back(currentToken);
     }
