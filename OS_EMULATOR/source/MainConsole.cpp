@@ -67,9 +67,9 @@ void MainConsole::process(std::string input)
     }
 
     if(isinitialized){
-        if(parsed.command == "screen" && parsed.args.size() == 2 && parsed.args[0] == "-s" ) {
+        if(parsed.command == "screen" && parsed.args.size() == 3 && parsed.args[0] == "-s" ) {
             setScreen(parsed.args[1], parsed.args[2]);
-        isvalid = true;
+            isvalid = true;
         }
         if(parsed.command == "screen" && parsed.args.size() == 2 && parsed.args[0] == "-r" ) {
             redrawScreen(parsed.args[1]);
@@ -283,7 +283,10 @@ void MainConsole::initializeOS()
         GlobalScheduler::getInstance()->setScheduler(scheduler,quantum_cycles);
         GlobalScheduler::getInstance()->runScheduler();
         GlobalScheduler::getInstance()->initializeProcessGeneration(batch_process_freq,min_ins,max_ins,min_mem_per_proc,max_mem_per_proc,mem_per_frame);
-
+        minIns = min_ins; 
+        maxIns = max_ins; 
+        minMem = min_mem_per_proc; 
+        maxMem = max_mem_per_proc;
         this->outputList.push_back("OS Initialized");    
     }else{
         this->outputList.push_back("Invalid Config");
@@ -297,8 +300,18 @@ void MainConsole::initializeOS()
 
 void MainConsole::setScreen(std::string processName, std::string memorySize)
 {
-    if (!ConsoleManager::getInstance()->registerConsole(processName, memorySize)) {
-        this->outputList.push_back("Could not find " + processName + " console");
+    // Convert memorySize to an integer for comparison
+    int memSize = std::stoi(memorySize);
+
+    // CORRECTED: Compare memSize against the min/max MEMORY limits.
+    if (memSize < minMem || memSize > maxMem) { 
+        this->outputList.push_back("Invalid Memory Allocation! Must be between " + std::to_string(minMem) + " and " + std::to_string(maxMem) + ".");
+        return;
+    } 
+    
+    auto err = ConsoleManager::getInstance()->registerConsole(processName, memorySize);
+    if(err != "") {
+        this->outputList.push_back(err);
     }
 }
 

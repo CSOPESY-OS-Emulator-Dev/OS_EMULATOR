@@ -44,21 +44,21 @@ void ConsoleManager::process() const
 	this->currentConsole->process(input);
 }
 
-bool ConsoleManager::registerConsole(std::string consoleName, std::string memorySize)
+std::string ConsoleManager::registerConsole(std::string consoleName, std::string memorySize)
 {
+	std::stringstream errorMessage;
 	auto scheduler = GlobalScheduler::getInstance();
-
-    if (!scheduler->processExists(consoleName)) {
+    if (!scheduler->processExists(consoleName)) { // Check if a process with a similar name exist
         scheduler->createProcess(consoleName, std::stoi(memorySize)); 
-    }
-    if (consoleTable.find(consoleName) == consoleTable.end()) {
-        consoleTable[consoleName] = std::make_shared<ProcessConsole>(consoleName, getFormattedCurrentTime());
-    }
-	if (scheduler->getProcessByName(consoleName)->getState() != FINISHED) {
+		consoleTable[consoleName] = std::make_shared<ProcessConsole>(consoleName, getFormattedCurrentTime());
 		switchConsole(consoleName);
-		return true;
-	}
-	return false;
+    } else { // Return an error message if it exist
+		errorMessage << "A process with the name "
+			<< consoleName
+			<< " already exist";
+		return errorMessage.str();
+	} 
+	return "";
 }
 
 std::string ConsoleManager::switchConsole(std::string consoleName)

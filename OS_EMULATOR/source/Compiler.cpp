@@ -75,6 +75,31 @@ std::vector<std::string> Compiler::tokenize(const std::string &line)
     return tokens;
 }
 
+/**
+ * @brief Parses a string that could be a decimal or hexadecimal number.
+ * @param s The string token to parse.
+ * @return An optional containing the uint16_t value if successful, otherwise std::nullopt.
+ */
+std::optional<int> Compiler::parseNumeric(const std::string& s) {
+    if (s.empty()) {
+        return std::nullopt;
+    }
+    try {
+        // std::stoul can handle "0x" prefixes if the base is 0.
+        size_t pos;
+        unsigned long value = std::stoul(s, &pos, 0);
+
+        // Check if the entire string was consumed and if the value fits in uint16_t.
+        if (pos == s.length() && value <= UINT16_MAX) {
+            return static_cast<int>(value);
+        }
+    } catch (...) {
+        // std::stoul throws if no conversion could be performed.
+        return std::nullopt;
+    }
+    return std::nullopt;
+}
+
 uint8_t Compiler::storeString(const std::string &literal)
 {
     auto it = std::find(stringLiterals.begin(), stringLiterals.end(), literal);
@@ -203,17 +228,26 @@ void Compiler::compileInstructions(const std::vector<std::string>& lines, std::v
                 append(bytecode, static_cast<uint8_t>(OpCode::NOP), {}); // Skip Instruction
             }
         } else if (instr == "WRITE") {
-            uint16_t address = std::stoi(tokens[1]);
-            uint16_t value = std::stoi(tokens[2]);
-            append(bytecode, static_cast<uint8_t>(OpCode::WRITE), {
-                static_cast<uint8_t>(address & 0xFF), // lowbyte
-                static_cast<uint8_t>(address >> 8), // highbyte
-                static_cast<uint8_t>(value & 0xFF), // lowbyte
-                static_cast<uint8_t>(value >> 8) // highbyte
-            }); // highbyte
+            auto addrOpt = parseNumeric(tokens[1]);
+            uint16_t address = *addrOpt;
+
+            auto valueOpt = parseNumeric(tokens[2]);
+            if (valueOpt) { // WRITE address, imm_val
+                uint16_t value = *valueOpt;
+                append(bytecode, static_cast<uint8_t>(OpCode::WRITE), {
+                    static_cast<uint8_t>(address & 0xFF), (uint8_t)(address >> 8),
+                    static_cast<uint8_t>(value & 0xFF), (uint8_t)(value >> 8)
+                });
+            } else { // WRITE address, variable
+                append(bytecode, static_cast<uint8_t>(OpCode::WRITE) | 0x10, {
+                    static_cast<uint8_t>(address & 0xFF), (uint8_t)(address >> 8),
+                    storeVar(tokens[2])
+                });
+            }
         } else if (instr == "READ") {
             uint8_t var = storeVar(tokens[1]);
-            uint16_t address = std::stoi(tokens[2]);
+            auto addrOpt = parseNumeric(tokens[2]);
+            uint16_t address = *addrOpt;
             append(bytecode, static_cast<uint8_t>(OpCode::READ), {
                 var,
                 static_cast<uint8_t>(address & 0xFF), // lowbyte

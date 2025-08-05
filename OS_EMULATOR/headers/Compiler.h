@@ -7,7 +7,8 @@
 #include <variant>
 #include <unordered_map>
 #include <regex>
-#include <cctype> // Required for isspace
+#include <optional>
+#include <cctype>
 
 enum class OpCode : uint8_t {
     PRINT = 0x01, // 0x01 = PRINT(msg.id)
@@ -44,8 +45,9 @@ private:
 
     void append(std::vector<uint8_t>& code, uint8_t op, std::initializer_list<uint8_t> operands);
     std::vector<std::string> tokenize(const std::string& line);
+    std::optional<int> parseNumeric(const std::string &s);
 
-    uint8_t storeString(const std::string& literal);
+    uint8_t storeString(const std::string &literal);
     uint8_t storeVar(const std::string& name);
 
     // Helper for recursive compilation

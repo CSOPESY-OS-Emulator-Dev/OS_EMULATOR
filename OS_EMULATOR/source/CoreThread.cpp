@@ -153,7 +153,7 @@ void CoreThread::executeByteCode(uint16_t PC) {
         case OpCode::WRITE: {
             // std::cout << "WRITE Process" << std::endl;
             uint16_t address = fetch16();
-            uint16_t value = fetch16();
+            uint16_t value = (variant != 0x10) ? fetch16() : mm->read16(currentProcess, fetch() * 2);
             // Validate Address
             if(address < currentProcess->getByteSize() || address > currentProcess->getMemorySize()) {
                 std::stringstream hex;
