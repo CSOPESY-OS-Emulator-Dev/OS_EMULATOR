@@ -1,6 +1,7 @@
 #include "MainConsole.h"
 #include "ConsoleManager.h"
 #include "GlobalScheduler.h"
+#include "MemoryManager.h"
 #include <chrono>
 #include <ctime>
 #include <iomanip>
@@ -67,7 +68,7 @@ void MainConsole::process(std::string input)
 
     if(isinitialized){
         if(parsed.command == "screen" && parsed.args.size() == 2 && parsed.args[0] == "-s" ) {
-            setScreen(parsed.args[1]);
+            setScreen(parsed.args[1], parsed.args[2]);
         isvalid = true;
         }
         if(parsed.command == "screen" && parsed.args.size() == 2 && parsed.args[0] == "-r" ) {
@@ -120,17 +121,19 @@ void MainConsole::initializeOS()
     std::ifstream file("Config.txt");
     bool isValid = true;
     int num_cpu, quantum_cycles, batch_process_freq, min_ins, max_ins, delays_per_exec;
+    // Memory parameters
+    int max_overall_mem, mem_per_frame, min_mem_per_proc, max_mem_per_proc;
     std::string scheduler, input;
     this->outputList.push_back("------------------------------------");
     
     file >> input;
-    if (input == "num_cpu")
+    if (input == "num-cpu")
     {
         file >> num_cpu;
         if(num_cpu >= 1 && num_cpu <= 128){
-            this->outputList.push_back("num_cpu : " + std::to_string(num_cpu));
+            this->outputList.push_back("num-cpu : " + std::to_string(num_cpu));
         }else{
-            this->outputList.push_back("num_cpu : Invalid config");
+            this->outputList.push_back("num-cpu : Invalid config");
             isinitialized = false;
             isValid=false;
         }
@@ -148,80 +151,138 @@ void MainConsole::initializeOS()
     }
 
     file >> input;
-    if (input == "quantum_cycles")
+    if (input == "quantum-cycles")
     {
         file >> quantum_cycles;
         if(quantum_cycles >= 1 && quantum_cycles <= 4294967296u){
-            this->outputList.push_back("quantum_cycles : " + std::to_string(quantum_cycles));
+            this->outputList.push_back("quantum-cycles : " + std::to_string(quantum_cycles));
         }else{
-            this->outputList.push_back("quantum_cycles : Invalid config");
+            this->outputList.push_back("quantum-cycles : Invalid config");
             isinitialized = false;
             isValid=false;
         }
     }
 
     file >> input;
-    if (input == "batch_process_freq")
+    if (input == "batch-process-freq")
     {
         file >> batch_process_freq;
         if(batch_process_freq >= 1 && batch_process_freq <= 4294967296u){
-            this->outputList.push_back("batch_process_freq : " + std::to_string(batch_process_freq));
+            this->outputList.push_back("batch-process-freq : " + std::to_string(batch_process_freq));
         }else{
-            this->outputList.push_back("batch_process_freq : Invalid config");
+            this->outputList.push_back("batch-process-freq : Invalid config");
             isinitialized = false;
             isValid=false;
         }
     }
 
     file >> input;
-    if (input == "min_ins")
+    if (input == "min-ins")
     {
         file >> min_ins;
         if(min_ins >= 1 && min_ins <= 4294967296u){
-            this->outputList.push_back("min_ins : " + std::to_string(min_ins));
+            this->outputList.push_back("min-ins : " + std::to_string(min_ins));
         }else{
-            this->outputList.push_back("min_ins : Invalid config");
+            this->outputList.push_back("min-ins : Invalid config");
             isinitialized = false;
             isValid=false;
         }
     }
 
     file >> input;
-    if (input == "max_ins")
+    if (input == "max-ins")
     {
         file >> max_ins;
         if(max_ins >= 1 && max_ins <= 4294967296u){
-            this->outputList.push_back("max_ins : " + std::to_string(max_ins));
+            this->outputList.push_back("max-ins : " + std::to_string(max_ins));
         }else{
-            this->outputList.push_back("max_ins : Invalid config");
+            this->outputList.push_back("max-ins : Invalid config");
             isinitialized = false;
             isValid=false;
         }
     }
 
     file >> input;
-    if (input == "delay_per_exec")
+    if (input == "delays-per-exec")
     {
         file >> delays_per_exec;
+        // std::cout << delays_per_exec << std::endl;
         if(delays_per_exec >= 0 && delays_per_exec <= 4294967296u){
-            this->outputList.push_back("delays_per_exec : " + std::to_string(delays_per_exec));
+            this->outputList.push_back("delays-per-exec : " + std::to_string(delays_per_exec));
         }else{
-            this->outputList.push_back("delays_per_exec : Invalid config");
+            this->outputList.push_back("delays-per-exec : Invalid config");
+            isinitialized = false;
+            isValid=false;
+        }
+    }
+
+    file >> input;
+    if (input == "max-overall-mem")
+    {
+        file >> max_overall_mem;
+        // std::cout << max_overall_mem << std::endl;
+        if(max_overall_mem >= 64u && max_overall_mem <= 65536u){
+            this->outputList.push_back("max-overall-mem : " + std::to_string(max_overall_mem));
+        }else{
+            this->outputList.push_back("max-overall-mem : Invalid config");
             isinitialized = false;
             isValid=false;
         }
     }
     
+    file >> input;
+    if (input == "mem-per-frame")
+    {
+        file >> mem_per_frame;
+        // std::cout << mem_per_frame << std::endl;
+        if(mem_per_frame >= 64u && mem_per_frame <= 65536u){
+            this->outputList.push_back("mem-per-frame : " + std::to_string(mem_per_frame));
+        }else{
+            this->outputList.push_back("mem-per-frame : Invalid config");
+            isinitialized = false;
+            isValid=false;
+        }
+    }
+    
+    file >> input;
+    if (input == "min-mem-per-proc")
+    {
+        file >> min_mem_per_proc;
+        // std::cout << min_mem_per_proc << std::endl;
+        if(min_mem_per_proc >= 64u && min_mem_per_proc <= 65536u){
+            this->outputList.push_back("min-mem-per-proc : " + std::to_string(min_mem_per_proc));
+        }else{
+            this->outputList.push_back("min-mem-per-proc : Invalid config");
+            isinitialized = false;
+            isValid=false;
+        }
+    }
+    
+    file >> input;
+    if (input == "max-mem-per-proc")
+    {
+        file >> max_mem_per_proc;
+        // std::cout << max_mem_per_proc << std::endl;
+        if(max_mem_per_proc >= 64u && max_mem_per_proc <= 65536u){
+            this->outputList.push_back("max-mem-per-proc : " + std::to_string(max_mem_per_proc));
+        }else{
+            this->outputList.push_back("max-mem-per-proc : Invalid config");
+            isinitialized = false;
+            isValid=false;
+        }
+    }
     this->outputList.push_back("------------------------------------");
     if(max_ins<min_ins){
         isValid = false;
     }
     if(isValid){
+        // Memory initialization
+        MemoryManager::getInstance()->setMemoryManager(max_overall_mem,mem_per_frame,max_overall_mem/mem_per_frame);
         GlobalScheduler::getInstance()->initializeCores(num_cpu,delays_per_exec);
         GlobalScheduler::getInstance()->runCores();
         GlobalScheduler::getInstance()->setScheduler(scheduler,quantum_cycles);
         GlobalScheduler::getInstance()->runScheduler();
-        GlobalScheduler::getInstance()->initializeProcessGeneration(batch_process_freq,min_ins,max_ins);
+        GlobalScheduler::getInstance()->initializeProcessGeneration(batch_process_freq,min_ins,max_ins,min_mem_per_proc,max_mem_per_proc,mem_per_frame);
 
         this->outputList.push_back("OS Initialized");    
     }else{
@@ -234,9 +295,9 @@ void MainConsole::initializeOS()
     Note: Only function definitions of commands are implemented below
 */
 
-void MainConsole::setScreen(std::string processName)
+void MainConsole::setScreen(std::string processName, std::string memorySize)
 {
-    if (!ConsoleManager::getInstance()->registerConsole(processName)) {
+    if (!ConsoleManager::getInstance()->registerConsole(processName, memorySize)) {
         this->outputList.push_back("Could not find " + processName + " console");
     }
 }

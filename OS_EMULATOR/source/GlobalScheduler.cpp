@@ -3,6 +3,7 @@
 #include "FCFSScheduler.h"
 #include "RRScheduler.h"
 #include "SchedulerTestThread.h"
+#include "AScheduler.h"
 
 GlobalScheduler *GlobalScheduler::sharedInstance = nullptr;
 
@@ -105,6 +106,7 @@ bool GlobalScheduler::createProcess(std::string processName, int memorySize)
     auto process = processGenerator->createProcess(processName, memorySize);
     if (process) processGenerator->assignToScheduler(process);
     else return false;
+    return true;
 }
 
 bool GlobalScheduler::createProcess(std::string processName, int memorySize, const std::vector<std::string> &lines)
@@ -112,6 +114,7 @@ bool GlobalScheduler::createProcess(std::string processName, int memorySize, con
     auto process = processGenerator->createProcess(processName, memorySize, lines);
     if (process) processGenerator->assignToScheduler(process);
     else return false;
+    return true;
 }
 
 void GlobalScheduler::finishProcess(std::shared_ptr<Process> process)
@@ -144,9 +147,9 @@ void GlobalScheduler::addProcess(std::shared_ptr<Process> process)
     processMap[process->getProcessName()] = process;
 }
 
-void GlobalScheduler::initializeProcessGeneration(int cpuCycle, int minInstructions, int maxInstructions)
+void GlobalScheduler::initializeProcessGeneration(int cpuCycle, int minInstructions, int maxInstructions, int minMemProcess, int maxMemProcess, int frameSize)
 {
-    processGenerator = std::make_shared<SchedulerTestThread>(cpuCycle, minInstructions, maxInstructions);
+    processGenerator = std::make_shared<SchedulerTestThread>(cpuCycle, minInstructions, maxInstructions, minMemProcess, maxMemProcess, frameSize);
 }
 
 void GlobalScheduler::startProcessGeneration()

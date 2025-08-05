@@ -49,7 +49,7 @@ bool ConsoleManager::registerConsole(std::string consoleName, std::string memory
 	auto scheduler = GlobalScheduler::getInstance();
 
     if (!scheduler->processExists(consoleName)) {
-        scheduler->createProcess(consoleName); 
+        scheduler->createProcess(consoleName, std::stoi(memorySize)); 
     }
     if (consoleTable.find(consoleName) == consoleTable.end()) {
         consoleTable[consoleName] = std::make_shared<ProcessConsole>(consoleName, getFormattedCurrentTime());

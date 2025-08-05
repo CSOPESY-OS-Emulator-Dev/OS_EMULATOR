@@ -1,4 +1,5 @@
 #include "FCFSScheduler.h"
+#include "DiskManager.h"
 
 FCFSScheduler::FCFSScheduler() {
     // Constructor implementation
@@ -52,7 +53,7 @@ void FCFSScheduler::execute() {
                 // 5. --- ASSIGN TO CPU ---
                 // The process is compiled and its program is on disk. Now assign it to the core.
                 // The FCFS policy gives it enough ticks to run to completion.
-                core->assignProcess(process, process->getByteSize());
+                core->assignProcess(process, process->getTotalIntstruction());
             }
         }
     }
