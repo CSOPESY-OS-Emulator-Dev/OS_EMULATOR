@@ -7,7 +7,7 @@ FFMemAllocator::FFMemAllocator(size_t maxMemorySize) : maxMemorySize(maxMemorySi
     blockMap[base] = memoryBlocks.back(); // Map the base address to the block
     // Optionally, initialize processID to -1 or some default value
     for (auto &block : memoryBlocks) {
-        block->processID = -1; // Initialize processID to -1 indicating no process owns the block
+        block->processID = -1; // Initialize processID to -1 indicating no process owns the block banana
     }
 }
 
